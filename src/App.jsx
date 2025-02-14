@@ -1,35 +1,36 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from 'react'
+import { getRandomCard, getRandomCommander } from '../api/cards'
+import Searchbar from './Searchbar';
 
 function App() {
-  const [count, setCount] = useState(0)
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    const [card, setCard] = useState(null);
+    
+
+    async function onRandomCommander() {
+        const random = await getRandomCommander();
+        if (random) {
+            setCard(random);
+        }
+    }
+
+
+    return (
+        <div>
+            <Searchbar onCardFound={setCard}/>
+            
+            <h2>or</h2>
+
+            <button onClick={onRandomCommander}>getRandomCommander</button>
+            
+            {card && (
+                <div>
+                    <h2>{card.name}</h2>
+                    <img width={300} src={card.image_uris?.normal} alt={`${card.name} (${card.set.toUpperCase()}#${card.collector_number})`}/>
+                </div>
+            )}
+        </div>
+    )
 }
 
 export default App
