@@ -1,17 +1,15 @@
+import { useNavigate } from "react-router-dom";
 
+export default function Home() {
 
-
-function HomeScreen() {
+    const navigate = useNavigate();
 
     return (
         <div>
             <h1>Meet your new deck-building buddy!</h1>
 
-            <button>Start building!</button>
+            <button onClick={() => navigate('/builder')}>Start building!</button>
         </div>
     )
 
 }
-
-
-export default HomeScreen;

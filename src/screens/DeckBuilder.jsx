@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react'
-import { getRandomCard, getRandomCommander } from '../api/cards'
-import Searchbar from './components/Searchbar';
+import { useState } from "react";
+import { getRandomCommander } from "../../api/cards";
+import Searchbar from "../components/Searchbar";
 
-function App() {
+export default function DeckBuilder() {
 
     const [card, setCard] = useState(null);
     
@@ -36,5 +36,3 @@ function App() {
         </div>
     )
 }
-
-export default App
