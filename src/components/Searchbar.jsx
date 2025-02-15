@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { searchCard } from '../api/cards';
+import { searchCard } from '../../api/cards';
 
 function Searchbar({ onCardFound }) {    
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { getRandomCard, getRandomCommander } from '../api/cards'
-import Searchbar from './Searchbar';
+import Searchbar from './components/Searchbar';
 
 function App() {
 
