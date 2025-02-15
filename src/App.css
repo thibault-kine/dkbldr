@@ -1,3 +1,7 @@
 :root {
     background-color: cadetblue;
 }
+
+.card {
+    border-radius: 15px;
+}

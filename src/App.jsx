@@ -26,7 +26,11 @@ function App() {
             {card && (
                 <div>
                     <h2>{card.name}</h2>
-                    <img width={300} src={card.image_uris?.normal} alt={`${card.name} (${card.set.toUpperCase()}#${card.collector_number})`}/>
+                    <img 
+                        className='card' width={300} 
+                        src={card.image_uris?.normal} 
+                        alt={`${card.name} (${card.set.toUpperCase()}#${card.collector_number})`}
+                    />
                 </div>
             )}
         </div>

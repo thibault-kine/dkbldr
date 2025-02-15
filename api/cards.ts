@@ -1,6 +1,31 @@
-import axios from "axios";
+import axios, { all } from "axios";
 
 const URL = "https://api.scryfall.com/cards";
+
+
+export async function getAllCards(query: string) {
+    let allCards: any[] = [];
+    let parsed = query.split(" ").join("+");
+    let url: (string | null) = `${URL}/search?q=${parsed}`;
+
+    try {
+        while (url) {
+            const res = await axios.get(url);
+            allCards = [...allCards, ...res.data.data];
+
+            if (res.data.has_more)
+                url = res.data.next_page;
+            else
+                url = null;
+        }
+
+        return allCards;
+    }
+    catch (err) {
+        console.log(err);
+        throw err;
+    }
+}
 
 
 export async function getRandomCard() {
@@ -17,10 +42,12 @@ export async function getRandomCard() {
 
 export async function getRandomCommander() {
     try {
-        //                                           legal:edh   is:commander
-        const res = await axios.get(`${URL}/search?q=legal%3Aedh+is%3Acommander`);
-        const randomIndex = Math.floor(Math.random() * res.data.data.length);
-        return res.data.data[randomIndex];
+        const allCommanders = await getAllCards("legal%3Aedh+is%3Acommander");
+        if (allCommanders.length === 0)
+            throw new Error("No commander found!");
+
+        const randomIndex = Math.floor(Math.random() * allCommanders.length);
+        return allCommanders[randomIndex];
     }
     catch (err) {
         console.log(err);
