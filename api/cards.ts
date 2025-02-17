@@ -1,25 +1,11 @@
 import axios, { all } from "axios";
-
-const URL = "https://api.scryfall.com/cards";
+import { Card, Cards } from "scryfall-api";
 
 
 export async function getAllCards(query: string) {
-    let allCards: any[] = [];
-    let parsed = query.split(" ").join("+");
-    let url: (string | null) = `${URL}/search?q=${parsed}`;
-
     try {
-        while (url) {
-            const res = await axios.get(url);
-            allCards = [...allCards, ...res.data.data];
-
-            if (res.data.has_more)
-                url = res.data.next_page;
-            else
-                url = null;
-        }
-
-        return allCards;
+        const res = await Cards.search(query).all();
+        return res;
     }
     catch (err) {
         console.log(err);
@@ -28,10 +14,10 @@ export async function getAllCards(query: string) {
 }
 
 
-export async function getRandomCard() {
+export async function getRandomCard(): Promise<Card> {
     try {
-        const res = await axios.get(`${URL}/random`);
-        return res.data;
+        const res = await Cards.random();
+        return res;
     }
     catch (err) {
         console.log(err);
@@ -40,9 +26,9 @@ export async function getRandomCard() {
 }
 
 
-export async function getRandomCommander() {
+export async function getRandomCommander(): Promise< Card > {
     try {
-        const allCommanders = await getAllCards("legal%3Aedh+is%3Acommander");
+        const allCommanders = await getAllCards("legal:edh is:commander");
         if (allCommanders.length === 0)
             throw new Error("No commander found!");
 
@@ -56,11 +42,10 @@ export async function getRandomCommander() {
 }
 
 
-export async function searchCard(query: String) {
+export async function searchCard(query: string) {
     try {
-        const parsed = query.split(" ").join("+");
-        const res = await axios.get(`${URL}/named?fuzzy=${parsed}`);
-        return res.data;
+        const res = await Cards.byName(query, true);
+        return res;
     }
     catch (err) {
         console.log(err);

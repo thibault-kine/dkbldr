@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { searchCard } from '../../api/cards';
 
 function Searchbar({ onCardFound }) {    

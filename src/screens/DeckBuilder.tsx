@@ -1,16 +1,18 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { getRandomCommander } from "../../api/cards";
 import Searchbar from "../components/Searchbar";
+import { Card } from "scryfall-api";
 
 export default function DeckBuilder() {
 
-    const [card, setCard] = useState(null);
+    const [commander, setCommander] = useState<Card>();
+    const [card, setCard] = useState<Card[]>([]);
     
 
     async function onRandomCommander() {
         const random = await getRandomCommander();
         if (random) {
-            setCard(random);
+            setCommander(random);
         }
     }
 
@@ -23,13 +25,13 @@ export default function DeckBuilder() {
 
             <button onClick={onRandomCommander}>getRandomCommander</button>
             
-            {card && (
+            {commander && (
                 <div>
-                    <h2>{card.name}</h2>
+                    <h2>{commander.name}</h2>
                     <img 
                         className='card' width={300} 
-                        src={card.image_uris?.normal} 
-                        alt={`${card.name} (${card.set.toUpperCase()}#${card.collector_number})`}
+                        src={commander.image_uris?.normal} 
+                        alt={`${commander.name} (${commander.set.toUpperCase()}#${commander.collector_number})`}
                     />
                 </div>
             )}
