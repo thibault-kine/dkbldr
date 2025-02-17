@@ -13,30 +13,23 @@ export default function Login() {
 
     async function handleLogin(e: React.FormEvent) {
         e.preventDefault();
-    
-        const { data, error } = await supabase.auth.signInWithPassword({
-            email,
-            password
-        });
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     
         if (error) {
             setError(error.message);
         } else {
-            const user = data.user;
-            if (user) {
-                const { data: userData } = await supabase
-                    .from("users")
-                    .select("username")
-                    .eq("id", user.id)
-                    .single();
+            const { user, session } = data;
+            const username = user?.user_metadata?.username || "Utilisateur";
     
-                const username = userData?.username;
-    
-                // alert("Connexion réussie !");
-                navigate(`/user/${username}/${user.id}`);
+            // Stocker le JWT dans sessionStorage
+            if (session?.access_token) {
+                sessionStorage.setItem("jwt", session.access_token);
             }
+    
+            // alert("Login successful");
+            navigate(`/user/${username}/${user.id}`);
         }
-    }    
+    }
 
 
     return (
