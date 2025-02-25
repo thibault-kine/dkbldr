@@ -71,3 +71,41 @@ export async function deleteUser(id: string) {
     if (error) throw error;
     return data;
 }
+
+
+export async function uploadProfilePicture(file: File, id: string) {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${id}.${fileExt}`;
+    const filePath = `${fileName}`;
+
+    // Upload du fichier
+    const { error } = await supabase.storage
+        .from("avatars")
+        .upload(filePath, file, { upsert: true });
+
+    if (error) {
+        console.error("Erreur d'upload: ", error.message);
+        return null;
+    }
+
+    // Récupération de l'URL publique
+    const { data } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+    // console.log("public url = ", data.publicUrl);
+
+    return data.publicUrl;
+}
+
+
+export async function updateProfilePicture(id: string, url: string) {
+    const { error } = await supabase
+        .from('users')
+        .update({ pfp: url })
+        .eq('id', id);
+
+    if (error) {
+        console.error("Erreur de mise à jour: ", error.message);
+    }
+}

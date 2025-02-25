@@ -52,3 +52,15 @@ export async function searchCard(query: string) {
         throw err;
     }
 }
+
+
+export async function getCardById(id: number) {
+    try {
+        const res = await Cards.byId(id.toString());
+        return res;
+    }
+    catch (err) {
+        console.log(err);
+        throw err;
+    }
+}

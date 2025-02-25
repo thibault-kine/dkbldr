@@ -1,7 +1,34 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap');
+
+* {
+    margin: 0;
+    font-family: "Montserrat", Arial, Helvetica, sans-serif;
+}
+
 :root {
-    background-color: cadetblue;
+    --lightgrey: #c3c3c3;
+    --bg-color: #2d2c39;
+    --bg-color-lighter: #3d3c4b;
+    --txt-color: #d1d1d1;
+    
+    background-color: var(--bg-color);
 }
 
 .card {
     border-radius: 15px;
+}
+
+
+.MuiTypography-root.msg-ok {
+    color: green;
+    font-weight: bold;
+    font-style: italic;
+}
+
+
+.MuiButton-root.standard-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 30px;
+    transition: background-color 0.2s;
 }

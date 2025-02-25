@@ -1,8 +1,11 @@
 import React, { useState } from "react";
-import { login, logout } from "../../db/auth";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "../../db/supabase";
-
+import { Button, Link, Input, Box, Typography } from "@mui/joy";
+import { FiLogIn } from "react-icons/fi";
+import { FaEnvelope } from "react-icons/fa";
+import { FaLock, FaRegEnvelope } from "react-icons/fa6";
+ 
 export default function Login() {
 
     const [email, setEmail] = useState("");
@@ -34,27 +37,56 @@ export default function Login() {
 
     return (
         <div>
-            <h2>Login</h2>
-            <Link to="/register">First time here?</Link>
-            {error && <p style={{ color: "red" }}>{error}</p>}
-            <form onSubmit={handleLogin}>
-                <input
+            <Box 
+                component='form' 
+                onSubmit={handleLogin}
+                sx={{ 
+                    p: 2, 
+                    border: '1px solid grey', 
+                    width: '25%', 
+                    m: 'auto',
+                    backgroundColor: 'white',
+                    borderRadius: '10px',
+                    display: 'flex', 
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'space-evenly'
+                }}
+            >
+                <Typography level="h2" textAlign="center">Login</Typography>
+                <Link href="/register" width="fit-content" m="auto">First time here?</Link>
+                {error && <p style={{ color: "red" }}>{error}</p>}
+                <Input
+                    startDecorator={<FaRegEnvelope/>}
                     type="email"
                     placeholder="Email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
+                    sx={{
+                        border: '1px solid var(--lightgrey)',
+                        m: '20px auto'
+                    }}
                 />
-                <input
+                <Input
+                    startDecorator={<FaLock/>}
                     type="password"
-                    placeholder="Mot de passe"
+                    placeholder="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
+                    sx={{
+                        border: '1px solid var(--lightgrey)',
+                        m: '0 auto 20px'
+                    }}
                 />
-                <button type="submit">Se connecter</button>
-            </form>
-            <button onClick={logout}>Se déconnecter</button>
+                <Button 
+                    type="submit"
+                    variant="solid"
+                    endDecorator={<FiLogIn size="20px"/>}
+                    sx={{width:"fit-content"}}
+                >Log In</Button>
+            </Box>
         </div>
     )
 

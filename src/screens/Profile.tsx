@@ -1,37 +1,68 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { supabase } from "../../db/supabase";
+import { useUser } from "../context/UserContext";
+import React, { useState, useEffect } from "react";
+import { Input, Button, Box, Typography, Avatar } from "@mui/joy";
+import { updateUser } from "../../db/users";
+import Loading from "../components/Loading";
+import "../style/Profile.css"
+import { Edit } from "@mui/icons-material";
+
 
 export default function Profile() {
-
-    const { username, id } = useParams();
-    const [user, setUser] = useState<any>(null);
+    const { user, setUser, refreshUser } = useUser();
     
-    const navigate = useNavigate();
+    const [newUsername, setNewUsername] = useState(user?.username || "");
+    const [isUsernameOk, setIsUsernameOk] = useState(false);
 
+    
     useEffect(() => {
-        async function fetchUser() {
-            const { data: { user }, error } = await supabase.auth.getUser();
-            if (error || !user) 
-                navigate("/login");
-            else
-                setUser(user);
+        if (user) {
+            setNewUsername(user.username);
         }
-        fetchUser();
-    }, [id, navigate]);
+    }, [user]);
+
+    
+    async function handleUsernameChange() {
+        if (!user || !newUsername.trim()) return;
+
+        try {
+            await updateUser(user.id, newUsername.trim());
+            await refreshUser();
+            setIsUsernameOk(true);
+
+            setTimeout(() => setIsUsernameOk(false), 2000);
+        } catch (error) {
+            console.error("Erreur lors de la mise à jour :", error);
+            setIsUsernameOk(false);
+        }
+    }
 
 
     return (
-        <div>
-            <h1>Profil</h1>
+        <Box sx={{ display: "flex" }}>
             {user ? (
-                <div>
-                    <p><strong>Username :</strong> {username}</p>
-                    <p><strong>Email :</strong> {user.email}</p>
-                </div>
+                <Box className="profile">
+                    <Box className="background-profile">
+                        <Button className="edit-background-profile standard-btn">
+                            <Edit/>
+                        </Button>
+                        {isUsernameOk && <Typography className="msg-ok">Username successfully changed!</Typography>}
+                        <Input
+                            className="username-input"
+                            type="text"
+                            value={newUsername}
+                            onChange={(e) => setNewUsername(e.target.value)}
+                            endDecorator={
+                                <Button className="validate-username-btn standard-btn" onClick={handleUsernameChange}>
+                                    <Edit/>
+                                </Button>
+                            }
+                        />
+                        <Avatar src={user.pfp || ""} className="profile-avatar" />
+                    </Box>
+                </Box>
             ) : (
-                <p>Chargement...</p>
+                <Loading/>
             )}
-        </div>
-    )
+        </Box>
+    );
 }

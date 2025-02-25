@@ -28,3 +28,6 @@ export async function logout() {
     await supabase.auth.signOut();
     sessionStorage.removeItem('jwt');
 }
+
+
+export const isLoggedIn = () => sessionStorage.getItem('jwt')
