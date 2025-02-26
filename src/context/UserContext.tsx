@@ -2,11 +2,12 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "../../db/supabase";
 import { getUserById } from "../../db/users";
 
-interface User {
+export interface User {
     id: string;
     username: string;
     email: string;
     pfp?: string;
+    headerBg?: string;
 }
 
 interface UserContextType {

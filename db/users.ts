@@ -38,19 +38,33 @@ export async function getUserById(id: string) {
 }
 
 
-export async function updateUser(id: string, username?: string, email?: string, password?: string) {
-    let updates: { 
-        username?: string,
-        email?: string, 
-        pass_hash?: string 
+export async function updateUser(
+    id: string, 
+    updates: Partial<{
+        username: string;
+        email: string;
+        password: string;
+        pfp: string;
+        header_bg: string;
+    }>
+) {
+    let _updates: { 
+        username?: string;
+        email?: string;
+        pass_hash?: string;
+        pfp?: string;
+        headerBg?: string;
     } = {};
 
-    if (username)   updates.username = username;
-    if (email)      updates.email = email;
-    if (password)   {
+    if (updates.username)   _updates.username = updates.username;
+    if (updates.email)      _updates.email = updates.email;
+    if (updates.password)   {
         const salt = bcrypt.genSaltSync(10);
-        updates.pass_hash = bcrypt.hashSync(password, salt);
+        _updates.pass_hash = bcrypt.hashSync(updates.password, salt);
     }
+    if (updates.pfp)       _updates.pfp;
+    if (updates.header_bg)  _updates.headerBg;
+
 
     const { data, error } = await supabase
         .from('users')
@@ -72,40 +86,3 @@ export async function deleteUser(id: string) {
     return data;
 }
 
-
-export async function uploadProfilePicture(file: File, id: string) {
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${id}.${fileExt}`;
-    const filePath = `${fileName}`;
-
-    // Upload du fichier
-    const { error } = await supabase.storage
-        .from("avatars")
-        .upload(filePath, file, { upsert: true });
-
-    if (error) {
-        console.error("Erreur d'upload: ", error.message);
-        return null;
-    }
-
-    // Récupération de l'URL publique
-    const { data } = supabase.storage
-        .from('avatars')
-        .getPublicUrl(filePath);
-
-    // console.log("public url = ", data.publicUrl);
-
-    return data.publicUrl;
-}
-
-
-export async function updateProfilePicture(id: string, url: string) {
-    const { error } = await supabase
-        .from('users')
-        .update({ pfp: url })
-        .eq('id', id);
-
-    if (error) {
-        console.error("Erreur de mise à jour: ", error.message);
-    }
-}

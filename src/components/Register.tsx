@@ -34,7 +34,7 @@ export default function Register() {
                 ]);
             }
     
-            alert("Inscription réussie !");
+            // alert("Inscription réussie !");
             navigate(`/login`);
         }
     }

@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "../../db/supabase";
 import { Button, Link, Input, Box, Typography } from "@mui/joy";
 import { FiLogIn } from "react-icons/fi";
-import { FaEnvelope } from "react-icons/fa";
 import { FaLock, FaRegEnvelope } from "react-icons/fa6";
  
 export default function Login() {
@@ -22,7 +21,6 @@ export default function Login() {
             setError(error.message);
         } else {
             const { user, session } = data;
-            const username = user?.user_metadata?.username || "Utilisateur";
     
             // Stocker le JWT dans sessionStorage
             if (session?.access_token) {
@@ -30,7 +28,8 @@ export default function Login() {
             }
     
             // alert("Login successful");
-            navigate(`/user/${username}/${user.id}`);
+            // navigate(`/user/${username}/${user.id}`);
+            navigate(`/`);
         }
     }
 

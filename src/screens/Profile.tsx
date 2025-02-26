@@ -1,52 +1,117 @@
-import { useUser } from "../context/UserContext";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, HTMLInputTypeAttribute } from "react";
+import { User, useUser } from "../context/UserContext";
 import { Input, Button, Box, Typography, Avatar } from "@mui/joy";
-import { updateUser } from "../../db/users";
+import { getUserById, updateUser } from "../../db/users";
 import Loading from "../components/Loading";
-import "../style/Profile.css"
 import { Edit } from "@mui/icons-material";
+import { uploadHeaderBgImage } from "../../db/storage";
+import { useParams } from "react-router-dom";
+import Page404 from "./404";
+
+import "../style/Profile.css"
 
 
 export default function Profile() {
-    const { user, setUser, refreshUser } = useUser();
     
-    const [newUsername, setNewUsername] = useState(user?.username || "");
-    const [isUsernameOk, setIsUsernameOk] = useState(false);
+    const { id } = useParams();
+    const { user, refreshUser } = useUser();
 
-    
+    const [profile, setProfile] = useState<User | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    // Uniquement si l'utilisateur est le propriétaire du profil
+    const [newUsername, setNewUsername] = useState("");
+    const [editing, setEditing] = useState(false);
+
+    const isOwner = user && profile && user.id === profile.id;
+
+
     useEffect(() => {
-        if (user) {
-            setNewUsername(user.username);
+        async function fetchProfile() {
+            if (!id) return;
+            try {
+                const userData = await getUserById(id);
+                
+                setProfile({
+                    id: userData.id,
+                    username: userData.username,
+                    email: userData.email,
+                    pfp: userData.pfp,
+                    headerBg: userData.header_bg
+                });
+
+                setNewUsername(userData.username);
+            } catch (error) {
+                console.error("Erreur lors de la récupération de l'utilisateur: ", error);
+            } finally {
+                setLoading(false);
+            }
         }
-    }, [user]);
+        fetchProfile();
+    }, [id]);
 
     
     async function handleUsernameChange() {
-        if (!user || !newUsername.trim()) return;
+        if (!user || !isOwner) return;
 
         try {
-            await updateUser(user.id, newUsername.trim());
+            await updateUser(user.id, { username: newUsername.trim() });
             await refreshUser();
-            setIsUsernameOk(true);
-
-            setTimeout(() => setIsUsernameOk(false), 2000);
+            setEditing(false);
         } catch (error) {
             console.error("Erreur lors de la mise à jour :", error);
-            setIsUsernameOk(false);
         }
     }
 
 
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    function handleUploadClick() {
+        fileInputRef.current?.click();
+    }
+
+    async function handleHeaderBgChange(event) {
+        const file = event.target.files[0];
+        if (!file || !user) return;
+
+        try {
+            const imageUrl = await uploadHeaderBgImage(user.id, file);
+            await updateUser(user.id, { header_bg: imageUrl })
+            await refreshUser().then(() => window.location.reload());
+        } catch (err) {
+            console.error("Erreur d'upload : ", err);
+        }
+    }
+
+
+    if (loading) return <Loading/>;
+    if (!profile) return <Page404/>;
+    
+
     return (
         <Box sx={{ display: "flex" }}>
-            {user ? (
+            {profile ? (
                 <Box className="profile">
-                    <Box className="background-profile">
-                        <Button className="edit-background-profile standard-btn">
-                            <Edit/>
-                        </Button>
-                        {isUsernameOk && <Typography className="msg-ok">Username successfully changed!</Typography>}
-                        <Input
+                    <Box 
+                        className="background-profile"
+                        sx={{ 
+                            backgroundImage: `url(${profile.headerBg || ""})`,
+                            backgroundSize: "cover",
+                            
+                        }}
+                    >
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            style={{ display: "none" }}
+                            accept="image/*"
+                            onChange={handleHeaderBgChange}
+                        />
+                        {isOwner ? (<>
+                            <Button className="edit-background-profile standard-btn" onClick={handleUploadClick}>
+                                <Edit/>
+                            </Button>
+                            <Input
                             className="username-input"
                             type="text"
                             value={newUsername}
@@ -56,8 +121,11 @@ export default function Profile() {
                                     <Edit/>
                                 </Button>
                             }
-                        />
-                        <Avatar src={user.pfp || ""} className="profile-avatar" />
+                            />
+                        </>) : (<>
+                            <Typography className="username-input">{profile.username}</Typography>
+                        </>)}
+                        <Avatar src={profile.pfp || ""} className="profile-avatar" />
                     </Box>
                 </Box>
             ) : (
