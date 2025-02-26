@@ -3,12 +3,13 @@ import { User, useUser } from "../context/UserContext";
 import { Input, Button, Box, Typography, Avatar } from "@mui/joy";
 import { getUserById, updateUser } from "../../db/users";
 import Loading from "../components/Loading";
-import { Edit } from "@mui/icons-material";
-import { uploadHeaderBgImage } from "../../db/storage";
-import { useParams } from "react-router-dom";
+import { Add, Check, Edit } from "@mui/icons-material";
+import { updateProfilePicture, uploadHeaderBgImage, uploadProfilePicture } from "../../db/storage";
+import { useNavigate, useParams } from "react-router-dom";
 import Page404 from "./404";
 
 import "../style/Profile.css"
+import ProfileAvatar from "../components/ProfileAvatar";
 
 
 export default function Profile() {
@@ -24,6 +25,8 @@ export default function Profile() {
     const [editing, setEditing] = useState(false);
 
     const isOwner = user && profile && user.id === profile.id;
+
+    const navigate = useNavigate();
 
 
     useEffect(() => {
@@ -70,6 +73,21 @@ export default function Profile() {
         fileInputRef.current?.click();
     }
 
+    async function handleAvatarChange(event) {
+        const file = event.target.files[0];
+        if (!file || !user) return;
+
+        try {
+            const imageUrl = await uploadProfilePicture(file, user.id);
+            if (imageUrl) {
+                await updateProfilePicture(user.id, imageUrl);
+                await refreshUser().then(() => window.location.reload());
+            }
+        } catch (err) {
+            console.error("Erreur lors du changement d'avatar : ", err);
+        }
+    }
+
     async function handleHeaderBgChange(event) {
         const file = event.target.files[0];
         if (!file || !user) return;
@@ -90,17 +108,16 @@ export default function Profile() {
 
     return (
         <Box sx={{ display: "flex" }}>
-            {profile ? (
+            {profile ? (<>
                 <Box className="profile">
                     <Box 
                         className="background-profile"
                         sx={{ 
                             backgroundImage: `url(${profile.headerBg || ""})`,
                             backgroundSize: "cover",
-                            
                         }}
                     >
-                        <input
+                        <input 
                             type="file"
                             ref={fileInputRef}
                             style={{ display: "none" }}
@@ -112,23 +129,37 @@ export default function Profile() {
                                 <Edit/>
                             </Button>
                             <Input
-                            className="username-input"
-                            type="text"
-                            value={newUsername}
-                            onChange={(e) => setNewUsername(e.target.value)}
-                            endDecorator={
-                                <Button className="validate-username-btn standard-btn" onClick={handleUsernameChange}>
-                                    <Edit/>
-                                </Button>
-                            }
+                                className="username-input"
+                                type="text"
+                                value={newUsername}
+                                onChange={(e) => {
+                                    setNewUsername(e.target.value);
+                                    setEditing(true);
+                                }}
+                                endDecorator={
+                                    <Button className="validate-username-btn standard-btn" onClick={handleUsernameChange}>
+                                        {editing ? <Check/> : <Edit/>}
+                                    </Button>
+                                }
                             />
-                        </>) : (<>
+                        </>) : (
                             <Typography className="username-input">{profile.username}</Typography>
-                        </>)}
-                        <Avatar src={profile.pfp || ""} className="profile-avatar" />
+                        )}
+                        <ProfileAvatar
+                            user={profile}
+                            isOwner={profile.id === user?.id}
+                            onAvatarChange={handleAvatarChange}
+                        /> 
+                    </Box>
+
+                    <Box paddingTop="200px">
+                        <Button 
+                            startDecorator={<Add sx={{ paddingRight: "10px" }}/>}
+                            onClick={() => navigate("/builder")}
+                        >Create new deck</Button>
                     </Box>
                 </Box>
-            ) : (
+            </>) : (
                 <Loading/>
             )}
         </Box>

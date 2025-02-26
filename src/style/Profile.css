@@ -18,15 +18,8 @@
 .MuiAvatar-root.profile-avatar {
     width: 200px;
     height: 200px;
-
-    transition: filter 0.2s;
+    outline: 5px solid white;
 }
-
-.MuiAvatar-root.profile-avatar:hover {
-    cursor: pointer;
-    filter: drop-shadow(0 0 10px #6d6d6d);
-}
-
 
 
 .MuiBox-root.background-profile {
@@ -119,4 +112,22 @@
 
 .MuiButton-root.edit-background-profile:hover {
     background-color: #00000099;
+}
+
+
+div .avatar-profile {
+    background-size: cover;
+    position: relative;
+    width: 200px;
+    height: 200px;
+}
+
+.MuiButton-root.edit-icon {
+    position: absolute;
+    top: calc(50% - (60px / 2));
+    right: calc(50% - (60px / 2));
+    background-color: #00000099;
+    color: white;
+
+    transition: opacity 0.2s;
 }
