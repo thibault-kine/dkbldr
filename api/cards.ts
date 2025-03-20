@@ -26,7 +26,7 @@ export async function getRandomCard(): Promise<Card> {
 }
 
 
-export async function getRandomCommander(): Promise< Card > {
+export async function getRandomCommander(): Promise<Card> {
     try {
         const allCommanders = await getAllCards("legal:edh is:commander");
         if (allCommanders.length === 0)

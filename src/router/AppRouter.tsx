@@ -12,9 +12,13 @@ import Profile from "../screens/Profile";
 import DeckBuilder from "../screens/DeckBuilder";
 import DeckDetails from "../screens/DeckDetails";
 import Page404 from "../screens/404";
+import { useUser } from "../context/UserContext";
 
 
 export default function AppRouter() {
+
+    const { user } = useUser();
+
     return (
         <>
             <Header />
@@ -28,7 +32,7 @@ export default function AppRouter() {
                 {/* Routes protégées */}
                 <Route element={<ProtectedRoute />}>
                     <Route path="/user/:username/:id" element={<Profile />} />
-                    <Route path="/builder" element={<DeckBuilder />} />
+                    <Route path="/builder" element={<DeckBuilder user={user} />} />
                     <Route path="/deck/:id/details" element={<DeckDetails />} />
                     {/* <Route path="/user/:username/:id/decks" element={<DeckList />} /> */}
                 </Route>
