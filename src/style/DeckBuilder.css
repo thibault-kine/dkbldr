@@ -6,3 +6,13 @@
 .MuiTextarea-root.text-area *::placeholder {
     font-style: italic;
 }
+
+.MuiBox-root.card-display {
+    margin: 10px;
+}
+
+.MuiMenuItem-root.card-menu {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}

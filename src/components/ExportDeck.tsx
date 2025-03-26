@@ -1,3 +1,4 @@
+import { ContentPaste } from "@mui/icons-material";
 import { Button } from "@mui/joy";
 import React from "react";
 
@@ -32,6 +33,6 @@ export default function ExportDeck({ decklist }: { decklist: string }) {
 
 
     return (
-        <Button onClick={copyToClipboard}>Copy to clipboard</Button>
+        <Button startDecorator={<ContentPaste/>} onClick={copyToClipboard}>Copy to clipboard</Button>
     )
 }

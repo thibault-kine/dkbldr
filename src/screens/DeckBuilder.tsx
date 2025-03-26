@@ -1,50 +1,60 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Box, Button, Input, List, ListItem, Tab, TabList, TabPanel, Tabs, Textarea, Typography } from "@mui/joy";
+import { Box, Button, Dropdown, IconButton, Input, List, ListItem, Menu, MenuButton, MenuItem, Tab, TabList, TabPanel, Tabs, Textarea, Typography } from "@mui/joy";
 import { useUser } from "../context/UserContext";
 import { useNavigate } from "react-router-dom";
 import { saveDeckToUser } from "../../db/decks";
 import "../style/DeckBuilder.css"
 import BasicModal from "../components/BasicModal";
-import { MoreVert } from "@mui/icons-material";
+import { AutoAwesome, MoreVert, OpenInNew, SwapHoriz } from "@mui/icons-material";
 import ExportDeck from "../components/ExportDeck";
-import { searchCard } from "../../api/cards";
+import { getAllCards, searchCard } from "../../api/cards";
+import { Card, Cards } from "scryfall-api";
+import DeckCardDisplay from "../components/DeckCardDisplay";
 
-
-export interface CardEntry {
-    quantity: number;
-    name: string;
-    setCode?: string | null;
-    collecNum?: string | null;
-}
 
 
 export default function DeckBuilder({ user }) {
 
     const [deckList, setDeckList] = useState("");
-    const [parsedDeck, setParsedDeck] = useState<CardEntry[]>([]);
+    const [parsedDeck, setParsedDeck] = useState<{ card: Card; qty: number; }[]>([]);
+
+    const inputRef = useRef<HTMLInputElement>(null);
 
     const navigate = useNavigate();
 
 
-    function parseDecklist(text: string) {
-        const lines = text.split("\n");
-        const deck: CardEntry[] = [];
+    async function fetchCardObjects(deck: { name: string; qty: number; }[]): Promise<{ card: Card; qty: number }[]> {
+        if (deck.length === 0) return [];
+        
+        try {
+            const cardPromises = deck.map(entry => Cards.byName(entry.name).then(card => card ? { card, qty: entry.qty } : undefined));
+            const fetchedCards = await Promise.all(cardPromises);
+    
+            return fetchedCards.filter((entry): entry is { card: Card; qty: number } => entry !== undefined);
+        }
+        catch (err) {
+            console.error("Erreur lors de la récupération des cartes: ", err);
+            return [];
+        }
+    }
 
-        lines.forEach((line) => {
-            const match = line.match(/^(\d+)\s+(.+?)(?:\s+\((\w+)\)\s+(\d+))?$/);
-            if (match) {
-                const [, qty, name, setCode, collecNum] = match;
-                deck.push({
-                    quantity: parseInt(qty, 10),
-                    name: name.trim(),
-                    setCode: setCode || null,
-                    collecNum: collecNum || null,
-                });
-            }
-        });
 
-        setParsedDeck(deck);
-        console.table(deck);
+    async function parseDecklist(text: string) {
+        const lines = text.split("\n").map(line => line.trim()).filter(line => line);
+        const cardNames: string[] = [];
+
+        const deckEntries = lines.map((line) => {
+            const match = line.match(/^(\d+)\s+(.+)$/);
+            // const match = line.match(/^(\d+)\s+(.+?)(?:\s+\((\w+)\)\s+(\d+))?$/);
+            if (!match) return null;
+
+            const [, qty, name] = match;
+            return { name: name.trim(), qty: parseInt(qty, 10) };
+        }).filter(entry => entry !== null) as { name: string; qty: number }[];
+
+        const fetchedCards = await fetchCardObjects(deckEntries);
+        setParsedDeck(fetchedCards);
+        console.log(fetchedCards);
     }
     
 
@@ -106,13 +116,49 @@ export default function DeckBuilder({ user }) {
             {parsedDeck.length > 0 && (
                 <Box>
                     <Typography>Deck Preview:</Typography>
-                    <List>
-                        {parsedDeck.map((card, index) => (
-                            <ListItem key={index}>
-                                {card.quantity}x {card.name} {card.setCode ? `(${card.setCode}) ${card.collecNum || ""}` : ""}
-                            </ListItem>
+                    <Box
+                        sx={{
+                            display: "flex",
+                            flexWrap: "wrap",
+                        }}
+                    >
+                        {parsedDeck.map((entry, index) => (
+                            <Dropdown>
+                                <MenuButton sx={{ display: 'contents' }} key={index}>
+                                    <DeckCardDisplay card={entry.card} quantity={entry.qty} />
+                                </MenuButton>
+
+                                <Menu>
+                                    <MenuItem
+                                        className="card-menu"
+                                        onClick={() => window.open(entry.card.scryfall_uri, '_blank', 'noreferrer')}
+                                    >
+                                        See card on Scryfall <img src="/icons/other/scryfall.svg" width={25}/>
+                                    </MenuItem>
+                                    <MenuItem className="card-menu">Switch printing <AutoAwesome/></MenuItem>
+                                    <MenuItem 
+                                        className="card-menu"
+                                        onClick={(e) => e.preventDefault()}
+                                    >
+                                        Change quantity
+                                        <Input
+                                            defaultValue={1}
+                                            type="number"
+                                            slotProps={{
+                                                input: {
+                                                    ref: inputRef,
+                                                    min: 1,
+                                                    max: 99,
+                                                    step: 1
+                                                }
+                                            }}
+                                        />
+                                    </MenuItem>
+                                    <MenuItem className="card-menu">Move to sideboard <SwapHoriz/></MenuItem>
+                                </Menu>
+                            </Dropdown>
                         ))}
-                    </List>
+                    </Box>
                 </Box>
             )}
         </Box>
