@@ -4,9 +4,18 @@ import React, { useRef, useState } from "react";
 import { Card } from "scryfall-api";
 
 
-export default function DeckCardDisplay({ card, quantity }: { card: Card; quantity: number }) {
+export default function DeckCardDisplay({ 
+    card, 
+    quantity,
+    onQuantityChange
+}: {
+    card: Card; 
+    quantity: number;
+    onQuantityChange?: (newQty: number) => void; 
+}) {
 
     const [open, setOpen] = useState(false);
+    const [currentQuantity, setCurrentQuantity] = useState(quantity);
     const buttonRef = useRef(null);
 
 
@@ -14,7 +23,7 @@ export default function DeckCardDisplay({ card, quantity }: { card: Card; quanti
         <Dropdown open={open} onOpenChange={(e, isOpen) => setOpen(isOpen)}>
             <MenuButton sx={{ display: 'contents' }} ref={buttonRef}>
                 <Box className="card-display">
-                    <Badge badgeContent={quantity}>
+                    <Badge badgeContent={currentQuantity}>
                         <img
                             src={card.image_uris?.png || card.card_faces?.[0].image_uris?.png}
                             alt={`${card.name} (${card.set})`}
@@ -24,7 +33,7 @@ export default function DeckCardDisplay({ card, quantity }: { card: Card; quanti
                 </Box>
             </MenuButton>
 
-            <Menu placement="top-end" anchorEl={this}>
+            <Menu onClick={() => setOpen(!open)}>
                 <MenuItem
                     className="card-menu"
                     onClick={() => window.open(card.scryfall_uri, '_blank', 'noreferrer')}
@@ -32,37 +41,31 @@ export default function DeckCardDisplay({ card, quantity }: { card: Card; quanti
                     See card on Scryfall <img src="/icons/other/scryfall.svg" width={25}/>
                 </MenuItem>
                 <MenuItem className="card-menu">Switch printing <AutoAwesome/></MenuItem>
-                <Box 
-                    sx={{ 
-                        display:"flex", 
-                        flexDirection: "row", 
-                        justifyContent: "space-between",
-                        padding: "5px",
-                        verticalAlign: "text-bottom",
-                        height: "fit-content",
-                        outline: "1px solid red",
-                        lineHeight: "30px"
-                    }}
+                <MenuItem
                     className="card-menu"
-                    onClick={(e) => e.preventDefault()}
+                    onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setOpen(true)
+                    }}
                 >
                     Change quantity
                     <Input
-                        sx={{
-                            width: 'fit-content'
-                        }}
                         onClick={(e) => e.stopPropagation()}
-                        defaultValue={1}
+                        defaultValue={quantity}
                         type="number"
-                        slotProps={{
-                            input: {
-                                min: 1,
-                                max: 99,
-                                step: 1
-                            }
+                        slotProps={{ input: {
+                            min: 1,
+                            max: 999,
+                            step: 1
+                        }}}
+                        onChange={(e) => {
+                            const newQty = Number(e.target.value);
+                            setCurrentQuantity(newQty);
+                            if (onQuantityChange) onQuantityChange(newQty);
                         }}
                     />
-                </Box>
+                </MenuItem>
                 <MenuItem className="card-menu">Move to sideboard <SwapHoriz/></MenuItem>
             </Menu>
         </Dropdown>

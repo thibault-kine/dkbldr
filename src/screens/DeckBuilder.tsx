@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { Box, Button, Tab, TabList, TabPanel, Tabs, Textarea, Typography } from "@mui/joy";
 import { useNavigate } from "react-router-dom";
 import { saveDeckToUser } from "../../db/decks";
 import "../style/DeckBuilder.css"
 import BasicModal from "../components/BasicModal";
-import { MoreVert } from "@mui/icons-material";
+import { ContentPaste, MoreVert, Save } from "@mui/icons-material";
 import ExportDeck from "../components/ExportDeck";
 import { Card, Cards } from "scryfall-api";
 import DeckCardDisplay from "../components/DeckCardDisplay";
@@ -13,6 +13,7 @@ import DeckCardDisplay from "../components/DeckCardDisplay";
 
 export default function DeckBuilder({ user }) {
 
+    const [deckId, setDeckId] = useState<string | null>(null);
     const [deckList, setDeckList] = useState("");
     const [parsedDeck, setParsedDeck] = useState<{ card: Card; qty: number; }[]>([]);
 
@@ -57,16 +58,33 @@ export default function DeckBuilder({ user }) {
     async function handleSaveDeck() {
         if (!user) {
             navigate("/login");
+            return;
         }
 
         try {
-            await saveDeckToUser(user?.id, parsedDeck);
-            navigate(`/user/${user?.username}/${user?.id}`);
+            const updatedDeckId = await saveDeckToUser(user?.id, deckId, deckList);
+            setDeckId(updatedDeckId);
+            // navigate(`/user/${user?.username}/${user?.id}`);
         }
         catch (err) {
             console.error("Erreur de sauvegarde : ", err);
         }
     }
+
+    function updateCardQuantity(cardName: string, newQty: number) {
+        const newDeck = parsedDeck
+            .map(entry => entry.card.name === cardName ? { ...entry, qty: newQty } : entry)
+            .filter(entry => entry.qty > 0);
+        setParsedDeck(newDeck);
+    }
+
+
+    useEffect(() => {
+        const updatedDeckList = parsedDeck.map(entry => `${entry.qty} ${entry.card.name}`).join('\n');
+        setDeckList(updatedDeckList);
+        console.log("Updated decklist : " + updatedDeckList);
+    }, [parsedDeck]);
+
     
 
     return (
@@ -82,24 +100,30 @@ export default function DeckBuilder({ user }) {
 
                     <TabPanel value={0}>
                         <Textarea 
-                            className="text-area" 
-                            value={deckList} 
+                            className="text-area"
+                            value={deckList}
                             onChange={(e) => setDeckList(e.target.value)} 
                             placeholder={"Paste your deck here!"}
                             minRows={4}
                             maxRows={4}
                         />
                         <Button 
-                            disabled={deckList === undefined}
+                            startDecorator={<ContentPaste/>}
+                            disabled={deckList === ""}
                             onClick={() => parseDecklist(deckList)}
-                        >Import</Button>
+                        >
+                            Import
+                        </Button>
                         <Button 
-                            disabled={deckList === undefined}
+                            startDecorator={<Save/>}
+                            disabled={deckList === ""}
                             onClick={() => {
                                 parseDecklist(deckList);
                                 handleSaveDeck();
                             }}
-                        >Import & save</Button>
+                        >
+                            Import & save
+                        </Button>
                     </TabPanel>
                     
                     <TabPanel value={1}>
@@ -108,6 +132,7 @@ export default function DeckBuilder({ user }) {
                 </Tabs>
 
             </BasicModal>
+            <Button onClick={handleSaveDeck}>Save deck</Button>
 
             {parsedDeck.length > 0 && (
                 <Box
@@ -117,7 +142,12 @@ export default function DeckBuilder({ user }) {
                     }}
                 >
                     {parsedDeck.map((entry, index) => (
-                        <DeckCardDisplay key={index} card={entry.card} quantity={entry.qty} />
+                        <DeckCardDisplay 
+                            key={index} 
+                            card={entry.card} 
+                            quantity={entry.qty} 
+                            onQuantityChange={(newQty) => updateCardQuantity(entry.card.name, newQty)}
+                        />
                     ))}
                 </Box>
             )}
