@@ -1,0 +1,16 @@
+{
+    "name": "Dkbldr",
+    "short_name": "Dkbldr",
+    "description": "Deckbuilder",
+    "theme_color": "#ffffff",
+    "display": "standalone",
+    "start-url": "/",
+    "scope": "/",
+    "icons": [
+        {
+            "src": "/icons/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}
