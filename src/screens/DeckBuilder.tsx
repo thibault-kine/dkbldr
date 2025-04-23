@@ -53,6 +53,39 @@ export default function DeckBuilder({ user }) {
         setParsedDeck(fetchedCards);
         console.log(fetchedCards);
     }
+
+
+    function groupCardsByType(deck: { qty: number; card: Card }[]) {
+        const groups: Record<string, { qty: number; card: Card }[]> = {
+            Creature: [],
+            Artifact: [],
+            Enchantment: [],
+            Instant: [],
+            Sorcery: [],
+            Planeswalker: [],
+            Battle: [],
+            Land: [],
+        }
+
+        for (const entry of deck) {
+            const typeline = entry.card.type_line;
+            const isCreature = typeline.includes("Creature");
+
+            if (!isCreature) {
+                groups.Creature.push(entry);
+            } else {
+                if (typeline.includes("Land"))   groups.Land.push(entry);
+                if (typeline.includes("Artifact"))   groups.Artifact.push(entry);
+                if (typeline.includes("Enchantment"))   groups.Enchantment.push(entry);
+                if (typeline.includes("Instant"))   groups.Instant.push(entry);
+                if (typeline.includes("Sorcery"))   groups.Sorcery.push(entry);
+                if (typeline.includes("Planeswalker"))   groups.Planeswalker.push(entry);
+                if (typeline.includes("Battle"))   groups.Battle.push(entry);
+            }
+        }
+
+        return groups;
+    }
     
 
     const [savedDeckToast, setSavedDeckToast] = useState(false);
@@ -137,7 +170,40 @@ export default function DeckBuilder({ user }) {
             </BasicModal>
             <Button onClick={handleSaveDeck}>Save deck</Button>
 
-            {parsedDeck.length > 0 && (
+            {parsedDeck.length > 0 && (() => {
+                const grouped = groupCardsByType(parsedDeck);
+                const types = Object.keys(grouped) as (keyof typeof grouped)[];
+
+                return (
+                    <Tabs defaultValue={0} className="deck-builder">
+                        <TabList sx={{ overflowX: "auto", flexWrap: "nowrap", whiteSpace: "nowrap" }}>
+                            {types.map((type, index) => (
+                                <Tab key={index}>
+                                    <img src={`/icons/other/${type}_symbol.svg`} height={15}/> 
+                                    {type.length}
+                                </Tab>
+                            ))}
+                        </TabList>
+
+                        {types.map((type, index) => (
+                            <TabPanel key={index} value={index}>
+                                <Box sx={{ display: "flex", flexWrap: "wrap" }}>
+                                    {grouped[type].map((entry, i) => (
+                                        <DeckCardDisplay
+                                            key={i}
+                                            card={entry.card}
+                                            quantity={entry.qty}
+                                            onQuantityChange={(newQty) => updateCardQuantity(entry.card.name, newQty)}
+                                        />
+                                    ))}
+                                </Box>
+                            </TabPanel>
+                        ))}
+                    </Tabs>
+                )
+            })()}
+
+            {/* {parsedDeck.length > 0 && (
                 <Box
                     sx={{
                         display: "flex",
@@ -153,7 +219,7 @@ export default function DeckBuilder({ user }) {
                         />
                     ))}
                 </Box>
-            )}
+            )} */}
 
             <Toast
                 open={savedDeckToast}

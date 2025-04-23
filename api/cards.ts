@@ -2,6 +2,9 @@ import axios, { all } from "axios";
 import { Card, Cards } from "scryfall-api";
 
 
+export type CardEntry = { qty: number; card: Card };
+
+
 export async function getAllCards(query: string) {
     try {
         const res = await Cards.search(query).all();
