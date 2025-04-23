@@ -9,13 +9,21 @@
     --lightgrey: #c3c3c3;
     --bg-color: #2d2c39;
     --bg-color-lighter: #3d3c4b;
+    --bg-color-lighter2: #4b4a5c;
     --txt-color: #d1d1d1;
+
+    --purple: #d349bc;
     
     background-color: var(--bg-color);
 }
 
 .card {
     border-radius: 15px;
+}
+
+
+.MuiTypography-root {
+    color: var(--txt-color);
 }
 
 

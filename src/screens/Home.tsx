@@ -1,16 +1,14 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { Button, Typography } from "@mui/material"
 
 export default function Home() {
 
     const navigate = useNavigate();
 
     return (
-        <div>
-            <h1>Meet your new deck-building buddy!</h1>
-
-            <button onClick={() => navigate('/builder')}>Start building!</button>
-        </div>
+        <>
+        </>
     )
 
 }

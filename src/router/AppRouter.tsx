@@ -13,6 +13,7 @@ import DeckBuilder from "../screens/DeckBuilder";
 import DeckDetails from "../screens/DeckDetails";
 import Page404 from "../screens/404";
 import { useUser } from "../context/UserContext";
+import Navbar from "../components/Navbar";
 
 
 export default function AppRouter() {
@@ -21,7 +22,8 @@ export default function AppRouter() {
 
     return (
         <>
-            <Header />
+            {/* <Header /> */}
+            <Navbar/>
             <Routes>
                 {/* Routes publiques */}
                 <Route path="/" element={<Home />} />

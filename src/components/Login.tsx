@@ -4,6 +4,7 @@ import { supabase } from "../../db/supabase";
 import { Button, Link, Input, Box, Typography } from "@mui/joy";
 import { FiLogIn } from "react-icons/fi";
 import { FaLock, FaRegEnvelope } from "react-icons/fa6";
+import "../style/Forms.css";
  
 export default function Login() {
 
@@ -37,53 +38,37 @@ export default function Login() {
     return (
         <div>
             <Box 
+                className="account-form"
                 component='form' 
                 onSubmit={handleLogin}
-                sx={{ 
-                    p: 2, 
-                    border: '1px solid grey', 
-                    width: '25%', 
-                    m: 'auto',
-                    backgroundColor: 'white',
-                    borderRadius: '10px',
-                    display: 'flex', 
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'space-evenly'
-                }}
             >
                 <Typography level="h2" textAlign="center">Login</Typography>
                 <Link href="/register" width="fit-content" m="auto">First time here?</Link>
                 {error && <p style={{ color: "red" }}>{error}</p>}
+                
                 <Input
+                    className="form-input"
                     startDecorator={<FaRegEnvelope/>}
                     type="email"
                     placeholder="Email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    sx={{
-                        border: '1px solid var(--lightgrey)',
-                        m: '20px auto'
-                    }}
                 />
                 <Input
+                    className="form-input"
                     startDecorator={<FaLock/>}
                     type="password"
                     placeholder="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    sx={{
-                        border: '1px solid var(--lightgrey)',
-                        m: '0 auto 20px'
-                    }}
                 />
                 <Button 
+                    className="form-btn"
                     type="submit"
                     variant="solid"
                     endDecorator={<FiLogIn size="20px"/>}
-                    sx={{width:"fit-content"}}
                 >Log In</Button>
             </Box>
         </div>
