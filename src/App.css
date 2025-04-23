@@ -40,3 +40,25 @@
     border-radius: 30px;
     transition: background-color 0.2s;
 }
+
+
+.MuiButton-root.standard-btn-sm {
+    width: 40px;
+    height: 40px;
+    border-radius: 100%;
+    transition: background-color 0.2s;
+}
+
+
+.MuiBox-root.sep {
+    width: 80%;
+    border-top: 1px solid #d7d7d7;
+    margin: 30px auto;
+}
+
+
+.MuiSnackbar-root.snack {
+    background-color: #3d3c4b;
+    border: 3px solid #4b4a5c;
+    border-radius: 2px;
+}

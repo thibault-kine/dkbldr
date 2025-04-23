@@ -39,7 +39,10 @@ export default function BasicModal({ title, children, icon }: BasicModalProps) {
                     <Typography 
                         component='h2'
                         level='h4'
-                    >{title}</Typography>
+                        m="10px"
+                    >
+                        {title}
+                    </Typography>
                     {children}
                 </Sheet>
             </Modal>

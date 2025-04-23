@@ -4,10 +4,11 @@ import { useNavigate } from "react-router-dom";
 import { saveDeckToUser } from "../../db/decks";
 import "../style/DeckBuilder.css"
 import BasicModal from "../components/BasicModal";
-import { ContentPaste, MoreVert, Save } from "@mui/icons-material";
+import { CheckCircle, ContentPaste, MoreVert, Save } from "@mui/icons-material";
 import ExportDeck from "../components/ExportDeck";
 import { Card, Cards } from "scryfall-api";
 import DeckCardDisplay from "../components/DeckCardDisplay";
+import Toast from "../components/Snackbar";
 
 
 
@@ -15,12 +16,12 @@ export default function DeckBuilder({ user }) {
 
     const [deckId, setDeckId] = useState<string | null>(null);
     const [deckList, setDeckList] = useState("");
-    const [parsedDeck, setParsedDeck] = useState<{ card: Card; qty: number; }[]>([]);
+    const [parsedDeck, setParsedDeck] = useState<{ qty: number; card: Card; }[]>([]);
 
     const navigate = useNavigate();
 
 
-    async function fetchCardObjects(deck: { name: string; qty: number; }[]): Promise<{ card: Card; qty: number }[]> {
+    async function fetchCardObjects(deck: { qty: number; name: string; }[]): Promise<{ qty: number; card: Card; }[]> {
         if (deck.length === 0) return [];
         
         try {
@@ -38,7 +39,6 @@ export default function DeckBuilder({ user }) {
 
     async function parseDecklist(text: string) {
         const lines = text.split("\n").map(line => line.trim()).filter(line => line);
-        const cardNames: string[] = [];
 
         const deckEntries = lines.map((line) => {
             const match = line.match(/^(\d+)\s+(.+)$/);
@@ -55,6 +55,8 @@ export default function DeckBuilder({ user }) {
     }
     
 
+    const [savedDeckToast, setSavedDeckToast] = useState(false);
+
     async function handleSaveDeck() {
         if (!user) {
             navigate("/login");
@@ -62,14 +64,16 @@ export default function DeckBuilder({ user }) {
         }
 
         try {
-            const updatedDeckId = await saveDeckToUser(user?.id, deckId, deckList);
+            const updatedDeckId = await saveDeckToUser(user?.id, parsedDeck);
             setDeckId(updatedDeckId);
             // navigate(`/user/${user?.username}/${user?.id}`);
+            setSavedDeckToast(true);
         }
         catch (err) {
             console.error("Erreur de sauvegarde : ", err);
         }
     }
+
 
     function updateCardQuantity(cardName: string, newQty: number) {
         const newDeck = parsedDeck
@@ -82,7 +86,6 @@ export default function DeckBuilder({ user }) {
     useEffect(() => {
         const updatedDeckList = parsedDeck.map(entry => `${entry.qty} ${entry.card.name}`).join('\n');
         setDeckList(updatedDeckList);
-        console.log("Updated decklist : " + updatedDeckList);
     }, [parsedDeck]);
 
     
@@ -151,6 +154,16 @@ export default function DeckBuilder({ user }) {
                     ))}
                 </Box>
             )}
+
+            <Toast
+                open={savedDeckToast}
+                onClose={() => setSavedDeckToast(false)}
+                position="bottom left"
+            >
+                <Typography startDecorator={<CheckCircle sx={{ color: "green" }}/>}>
+                    Deck successfully saved! 👍
+                </Typography>
+            </Toast>
         </Box>
     )
 }

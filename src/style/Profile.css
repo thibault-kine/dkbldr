@@ -1,10 +1,9 @@
 .MuiBox-root.profile {
-    width: 50%;
+    width: 100%;
+    height: 100%;
     margin: auto;
     background-color: white;
-    height: calc(100vh - 75px);
     color: black;
-    position: relative;
 }
 
 .MuiBox-root.profile * {
@@ -14,56 +13,45 @@
 } 
 
 
-
 .MuiAvatar-root.profile-avatar {
-    width: 200px;
-    height: 200px;
+    width: 125px;
+    height: 125px;
     outline: 5px solid white;
 }
 
 
 .MuiBox-root.background-profile {
-    padding-top: 200px;
-    height: 400px;
+    padding-top: 10px;
+    height: 200px;
     width: 100%;
-    position: relative;
 }
+
 
 .MuiBox-root.background-profile > * {
     margin: 20px auto;
 }
 
 
-
 .MuiInput-root.username-input {
-    width: 50%;
+    width: 75%;
     padding: 0;
     padding-left: 20px;
-    border-radius: 30px;
-    background-color: rgba(1, 1, 1, 0.2);
     border: none;
     box-shadow: none;
-    color: white;
-    font-size: 36px;
+    font-size: 20px;
     font-weight: bold;
-
-    --Input-decoratorChildHeight: 60px;
     
     transition: background-color 0.2s;
 }
 
+
 .MuiTypography-root.username-input {
-    width: 50%;
     padding: 0;
-    border-radius: 30px;
-    background-color: rgba(1, 1, 1, 0.2);
     border: none;
     box-shadow: none;
     color: white;
-    font-size: 36px;
+    font-size: 20px;
     font-weight: bold;
-
-    --Input-decoratorChildHeight: 60px;
     
     transition: background-color 0.2s;
 }
@@ -73,20 +61,20 @@
 }
 
 .MuiInput-root.username-input:hover {
-    background-color: rgba(0, 0, 0, 0.15);
+    background-color: rgba(0, 0, 0, 0.05);
 }
 
 .MuiInput-root.username-input:first-child {
     margin: auto;
     text-align: center;
-    font-size: 40px;
+    font-size: 20px;
     font-weight: bolder;
 }
 
 .MuiTypography-root.username-input:first-child {
     margin: auto;
     text-align: center;
-    font-size: 40px;
+    font-size: 20px;
     font-weight: bolder;
 }
 
@@ -101,14 +89,14 @@
 }
 
 
-
 .MuiButton-root.edit-background-profile {
     position: absolute;
-    top: 0;
-    right: 20px;
+    top: 10px;
+    right: 10px;
 
     background-color: #00000040;
 }
+
 
 .MuiButton-root.edit-background-profile:hover {
     background-color: #00000099;
@@ -119,8 +107,8 @@ div .avatar-profile {
     background-size: cover;
     position: relative;
     width: 200px;
-    height: 200px;
 }
+
 
 .MuiButton-root.edit-icon {
     position: absolute;
@@ -130,4 +118,15 @@ div .avatar-profile {
     color: white;
 
     transition: opacity 0.2s;
+}
+
+
+.MuiBox-root.avatar-and-username {
+    margin-top: 100px;
+}
+
+
+.MuiBox-root.main-content {
+    padding-top: 80px;
+    width: 100%;
 }

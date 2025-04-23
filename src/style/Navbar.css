@@ -3,6 +3,7 @@ div.navbar {
     bottom: 0;
     left: 50%;
     right: auto;
+    z-index: 99;
 }
 
 .MuiIconButton-root.open-icon {

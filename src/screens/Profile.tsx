@@ -117,47 +117,57 @@ export default function Profile() {
                             backgroundSize: "cover",
                         }}
                     >
-                        <input 
-                            type="file"
-                            ref={fileInputRef}
-                            style={{ display: "none" }}
-                            accept="image/*"
-                            onChange={handleHeaderBgChange}
-                        />
-                        {isOwner ? (<>
-                            <Button className="edit-background-profile standard-btn" onClick={handleUploadClick}>
-                                <Edit/>
-                            </Button>
-                            <Input
-                                className="username-input"
-                                type="text"
-                                value={newUsername}
-                                onChange={(e) => {
-                                    setNewUsername(e.target.value);
-                                    setEditing(true);
-                                }}
-                                endDecorator={
-                                    <Button className="validate-username-btn standard-btn" onClick={handleUsernameChange}>
-                                        {editing ? <Check/> : <Edit/>}
-                                    </Button>
-                                }
+                        <Box className="avatar-and-username">
+                            <input 
+                                type="file"
+                                ref={fileInputRef}
+                                style={{ display: "none" }}
+                                accept="image/*"
+                                onChange={handleHeaderBgChange}
                             />
-                        </>) : (
-                            <Typography className="username-input">{profile.username}</Typography>
-                        )}
-                        <ProfileAvatar
-                            user={profile}
-                            isOwner={profile.id === user?.id}
-                            onAvatarChange={handleAvatarChange}
-                        /> 
-                    </Box>
+                            <ProfileAvatar
+                                user={profile}
+                                isOwner={profile.id === user?.id}
+                                onAvatarChange={handleAvatarChange}
+                            /> 
+                            {isOwner ? (<>
+                                <Button className="edit-background-profile standard-btn" onClick={handleUploadClick}>
+                                    <Edit/>
+                                </Button>
+                                <Input
+                                    className="username-input"
+                                    type="text"
+                                    value={newUsername}
+                                    onChange={(e) => {
+                                        setNewUsername(e.target.value);
+                                        setEditing(true);
+                                    }}
+                                    endDecorator={
+                                        <Button className="validate-username-btn standard-btn-sm" onClick={handleUsernameChange}>
+                                            {editing ? <Check/> : <Edit/>}
+                                        </Button>
+                                    }
+                                />
+                            </>) : (
+                                <Typography className="username-input">{profile.username}</Typography>
+                            )}
+                        </Box>
 
-                    <Box paddingTop="200px">
+                    </Box>
+                    
+                    <Box className="main-content">
+
+                        <Box className="sep"></Box>
+
                         <Button 
                             startDecorator={<Add sx={{ paddingRight: "10px" }}/>}
                             onClick={() => navigate("/builder")}
-                        >Create new deck</Button>
+                        >
+                            Create new deck
+                        </Button>
+
                     </Box>
+
                 </Box>
             </>) : (
                 <Loading/>

@@ -1,7 +1,7 @@
 .MuiSheet-root.modal-sheet {
-    width: 40%;
+    width: 90%;
     margin: auto;
     position: relative;
     top: 20px;
-    padding: 30px;
+    /* padding: 30px; */
 }
