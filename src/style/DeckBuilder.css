@@ -16,3 +16,23 @@
     flex-direction: row;
     justify-content: space-between;
 }
+
+.MuiTabList-root.deckbuilder {
+    position: sticky;
+    top: 0;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    background-color: white;
+}
+
+.MuiTab-root.deckbuilder-tab {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    padding: 0 15px;
+    align-items: center;
+}
+
+.MuiTab-root.deckbuilder-tab:focus {
+    background-color: rgba(0, 0, 0, 0.2);
+}

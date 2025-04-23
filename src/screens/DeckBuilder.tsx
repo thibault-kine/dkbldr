@@ -11,12 +11,15 @@ import DeckCardDisplay from "../components/DeckCardDisplay";
 import Toast from "../components/Snackbar";
 
 
+type Deck = { qty: number; card: Card }[];
+
 
 export default function DeckBuilder({ user }) {
 
     const [deckId, setDeckId] = useState<string | null>(null);
     const [deckList, setDeckList] = useState("");
     const [parsedDeck, setParsedDeck] = useState<{ qty: number; card: Card; }[]>([]);
+    const [currTabValue, setCurrTabValue] = useState(0);
 
     const navigate = useNavigate();
 
@@ -42,47 +45,77 @@ export default function DeckBuilder({ user }) {
 
         const deckEntries = lines.map((line) => {
             const match = line.match(/^(\d+)\s+(.+)$/);
-            // const match = line.match(/^(\d+)\s+(.+?)(?:\s+\((\w+)\)\s+(\d+))?$/);
             if (!match) return null;
 
             const [, qty, name] = match;
-            return { name: name.trim(), qty: parseInt(qty, 10) };
-        }).filter(entry => entry !== null) as { name: string; qty: number }[];
+            return { qty: parseInt(qty, 10), name: name.trim() };
+        }).filter(entry => entry !== null) as { qty: number; name: string }[];
 
         const fetchedCards = await fetchCardObjects(deckEntries);
         setParsedDeck(fetchedCards);
-        console.log(fetchedCards);
     }
 
 
-    function groupCardsByType(deck: { qty: number; card: Card }[]) {
-        const groups: Record<string, { qty: number; card: Card }[]> = {
-            Creature: [],
-            Artifact: [],
-            Enchantment: [],
-            Instant: [],
-            Sorcery: [],
-            Planeswalker: [],
-            Battle: [],
-            Land: [],
+    const CARD_TYPES = [
+        "Commander", "Creature", "Artifact", 
+        "Enchantment", "Instant", "Sorcery", 
+        "Planeswalker", "Battle", "Land" 
+    ];
+
+    function groupCardsByType(deck: Deck) {
+        const groups: Record<string, Deck> = {};
+        for (const type of CARD_TYPES) {
+            groups[type] = [];
         }
 
-        for (const entry of deck) {
+        deck.forEach((entry, index) => {
+            const { card } = entry;
             const typeline = entry.card.type_line;
             const isCreature = typeline.includes("Creature");
 
-            if (!isCreature) {
-                groups.Creature.push(entry);
-            } else {
-                if (typeline.includes("Land"))   groups.Land.push(entry);
-                if (typeline.includes("Artifact"))   groups.Artifact.push(entry);
-                if (typeline.includes("Enchantment"))   groups.Enchantment.push(entry);
-                if (typeline.includes("Instant"))   groups.Instant.push(entry);
-                if (typeline.includes("Sorcery"))   groups.Sorcery.push(entry);
-                if (typeline.includes("Planeswalker"))   groups.Planeswalker.push(entry);
-                if (typeline.includes("Battle"))   groups.Battle.push(entry);
+            let commanders: typeof deck = [];
+            {
+                const potentialCommanders = deck.slice(-2); // les 3 dernières cartes
+    
+                const isCommanderType = (card: Card) => {
+                    const t = card.type_line;
+                    return (
+                        t.includes("Legendary") ||
+                        t.includes("Background") ||
+                        card.oracle_text?.includes("can be your commander")
+                    );
+                };
+    
+                const validCandidates = potentialCommanders.filter(entry => isCommanderType(entry.card));
+    
+                if (validCandidates.length === 1) {
+                    commanders = [validCandidates[0]];
+                } else if (validCandidates.length >= 2) {
+                    const background = validCandidates.find(e => e.card.type_line.includes("Background"));
+                    const creature = validCandidates.find(e => e.card.type_line.includes("Legendary Creature"));
+    
+                    if (background && creature) {
+                        commanders = [creature, background];
+                    } else {
+                        // Par défaut, on prend la dernière carte légendaire/commandable
+                        const last = [...validCandidates].reverse().find(e => isCommanderType(e.card));
+                        if (last) commanders = [last];
+                    }
+                }
+    
+                groups.Commander = commanders;
             }
-        }
+
+            if (isCreature && !commanders.includes(entry))
+                groups.Creature.push(entry);
+            else if (typeline.includes("Artifact"))      groups.Artifact.push(entry);
+            else if (typeline.includes("Enchantment"))   groups.Enchantment.push(entry);
+            else if (typeline.includes("Instant"))       groups.Instant.push(entry);
+            else if (typeline.includes("Sorcery"))       groups.Sorcery.push(entry);
+            else if (typeline.includes("Planeswalker"))  groups.Planeswalker.push(entry);
+            else if (typeline.includes("Battle"))        groups.Battle.push(entry);
+            else if (typeline.includes("Land"))          groups.Land.push(entry);
+        })
 
         return groups;
     }
@@ -172,21 +205,26 @@ export default function DeckBuilder({ user }) {
 
             {parsedDeck.length > 0 && (() => {
                 const grouped = groupCardsByType(parsedDeck);
-                const types = Object.keys(grouped) as (keyof typeof grouped)[];
+                const types = Object.keys(grouped).filter(type => grouped[type].length > 0);
 
                 return (
-                    <Tabs defaultValue={0} className="deck-builder">
-                        <TabList sx={{ overflowX: "auto", flexWrap: "nowrap", whiteSpace: "nowrap" }}>
-                            {types.map((type, index) => (
-                                <Tab key={index}>
+                    <Tabs defaultValue={0} value={currTabValue} onChange={(_, newVal) => setCurrTabValue(newVal)}>
+                        <TabList className="deckbuilder">
+                            {types.map((type, index) => {
+                            
+                            let sum = 0;
+                            grouped[type].forEach(c => sum += c.qty);
+
+                            return sum > 0 && (
+                                <Tab key={index} className="deckbuilder-tab">
                                     <img src={`/icons/other/${type}_symbol.svg`} height={15}/> 
-                                    {type.length}
+                                    {sum}
                                 </Tab>
-                            ))}
+                            )})}
                         </TabList>
 
                         {types.map((type, index) => (
-                            <TabPanel key={index} value={index}>
+                            <TabPanel key={index} value={index} sx={{ display: currTabValue == index ? "block" : "none" }}>
                                 <Box sx={{ display: "flex", flexWrap: "wrap" }}>
                                     {grouped[type].map((entry, i) => (
                                         <DeckCardDisplay
@@ -202,24 +240,6 @@ export default function DeckBuilder({ user }) {
                     </Tabs>
                 )
             })()}
-
-            {/* {parsedDeck.length > 0 && (
-                <Box
-                    sx={{
-                        display: "flex",
-                        flexWrap: "wrap",
-                    }}
-                >
-                    {parsedDeck.map((entry, index) => (
-                        <DeckCardDisplay 
-                            key={index} 
-                            card={entry.card} 
-                            quantity={entry.qty} 
-                            onQuantityChange={(newQty) => updateCardQuantity(entry.card.name, newQty)}
-                        />
-                    ))}
-                </Box>
-            )} */}
 
             <Toast
                 open={savedDeckToast}
