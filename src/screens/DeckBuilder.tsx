@@ -11,6 +11,8 @@ import DeckCardDisplay from "../components/DeckCardDisplay";
 import Toast from "../components/Snackbar";
 
 
+// TODO: Donner des noms aux decks et les sauvegarder sous un uuid 
+
 type Deck = { qty: number; card: Card }[];
 
 
@@ -208,7 +210,10 @@ export default function DeckBuilder({ user }) {
                 const types = Object.keys(grouped).filter(type => grouped[type].length > 0);
 
                 return (
-                    <Tabs defaultValue={0} value={currTabValue} onChange={(_, newVal) => setCurrTabValue(newVal)}>
+                    <Tabs defaultValue={0} value={currTabValue} onChange={(_, newVal) => {
+                        if (typeof newVal === "number")
+                            setCurrTabValue(newVal);
+                    }} className="main-editor">
                         <TabList className="deckbuilder">
                             {types.map((type, index) => {
                             
@@ -217,8 +222,8 @@ export default function DeckBuilder({ user }) {
 
                             return sum > 0 && (
                                 <Tab key={index} className="deckbuilder-tab">
-                                    <img src={`/icons/other/${type}_symbol.svg`} height={15}/> 
-                                    {sum}
+                                    <img src={`/icons/other/${type}_symbol.svg`} height={15} style={{ filter: "invert(100%)" }}/> 
+                                    <Typography>{sum}</Typography>
                                 </Tab>
                             )})}
                         </TabList>

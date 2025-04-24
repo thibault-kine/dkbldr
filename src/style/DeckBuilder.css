@@ -22,17 +22,22 @@
     top: 0;
     overflow-x: auto;
     flex-wrap: nowrap;
-    background-color: white;
 }
 
+/* TODO: Améliorer le look des onglets */
 .MuiTab-root.deckbuilder-tab {
     display: flex;
     flex-direction: row;
-    justify-content: space-evenly;
-    padding: 0 15px;
+    justify-content: space-between;
+    /* padding: 0 15px; */
+    width: fit-content;
     align-items: center;
 }
 
 .MuiTab-root.deckbuilder-tab:focus {
     background-color: rgba(0, 0, 0, 0.2);
+}
+
+.MuiTabs-root.main-editor {
+    background-color: var(--bg-color-lighter);
 }
