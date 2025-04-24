@@ -1,4 +1,3 @@
-import axios, { all } from "axios";
 import { Card, Cards } from "scryfall-api";
 
 

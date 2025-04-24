@@ -1,4 +1,3 @@
-// App.tsx
 import React, { useEffect, useState } from "react";
 import { ThemeProvider, CssBaseline } from "@mui/material";
 import { theme } from "./style/theme";

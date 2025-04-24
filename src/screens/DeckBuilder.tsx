@@ -1,7 +1,7 @@
 import React, { use, useEffect, useState } from "react";
-import { Box, Button, Tab, TabList, TabPanel, Tabs, Textarea, Typography } from "@mui/joy";
+import { Box, Button, Input, Tab, TabList, TabPanel, Tabs, Textarea, Typography } from "@mui/joy";
 import { useNavigate } from "react-router-dom";
-import { saveDeckToUser } from "../../db/decks";
+import { getAllDecksFromUser, saveDeckToUser } from "../../db/decks";
 import "../style/DeckBuilder.css"
 import BasicModal from "../components/BasicModal";
 import { CheckCircle, ContentPaste, MoreVert, Save, Settings } from "@mui/icons-material";
@@ -9,21 +9,32 @@ import ExportDeck from "../components/ExportDeck";
 import { Card, Cards } from "scryfall-api";
 import DeckCardDisplay from "../components/DeckCardDisplay";
 import Toast from "../components/Snackbar";
+import { Deck } from "../../db/decks";
 
 
 // TODO: Donner des noms aux decks et les sauvegarder sous un uuid 
-
-type Deck = { qty: number; card: Card }[];
 
 
 export default function DeckBuilder({ user }) {
 
     const [deckId, setDeckId] = useState<string | null>(null);
+    const [deckName, setDeckName] = useState("");
+
     const [deckList, setDeckList] = useState("");
-    const [parsedDeck, setParsedDeck] = useState<{ qty: number; card: Card; }[]>([]);
+    const [parsedDeck, setParsedDeck] = useState<Deck>([]);
+    
     const [currentTab, setCurrentTab] = useState(0);
 
     const navigate = useNavigate();
+
+
+    async function getDeckName() {
+        if (deckName.trim() !== "") return deckName.trim();
+
+        const unnamedDecks = await getAllDecksFromUser(user.id);
+        const unnamedCount = unnamedDecks.filter(d => d.name?.startsWith("Unnamed Deck")).length;
+        return `Unnamed Deck ${unnamedCount + 1}`;
+    }
 
 
     async function fetchCardObjects(deck: { qty: number; name: string; }[]): Promise<{ qty: number; card: Card; }[]> {
@@ -125,6 +136,7 @@ export default function DeckBuilder({ user }) {
     }
     
 
+    const [importedDeckToast, setImportedDeckToast] = useState(false);
     const [savedDeckToast, setSavedDeckToast] = useState(false);
 
     async function handleSaveDeck() {
@@ -134,7 +146,8 @@ export default function DeckBuilder({ user }) {
         }
 
         try {
-            const updatedDeckId = await saveDeckToUser(user?.id, parsedDeck);
+            const nameToSave = await getDeckName();
+            const updatedDeckId = await saveDeckToUser(user?.id, parsedDeck, nameToSave);
             setDeckId(updatedDeckId);
             // navigate(`/user/${user?.username}/${user?.id}`);
             setSavedDeckToast(true);
@@ -161,8 +174,15 @@ export default function DeckBuilder({ user }) {
 
     return (
         <Box>
-            <Typography level="h2">DeckBuilder</Typography>
-            <Box sx={{ display: "flex", flexDirection: "row" }}>
+            <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-evenly" }}>
+            
+            <Input
+                value={deckName}
+                onChange={(e) => setDeckName(e.target.value)}
+                sx={{ width: "100%" }}
+                placeholder="New Deck"
+            />
+
             <BasicModal icon={<Settings/>} title="">
 
                 <Tabs>
@@ -183,7 +203,10 @@ export default function DeckBuilder({ user }) {
                         <Button 
                             startDecorator={<ContentPaste/>}
                             disabled={deckList === ""}
-                            onClick={() => parseDecklist(deckList)}
+                            onClick={() => {
+                                parseDecklist(deckList);
+                                setImportedDeckToast(true);
+                            }}
                         >
                             Import
                         </Button>
@@ -206,7 +229,6 @@ export default function DeckBuilder({ user }) {
 
             </BasicModal>
             <Button className="square-btn" onClick={handleSaveDeck}><Save/></Button>
-            <Typography>currentTab = {currentTab}</Typography>
             </Box>
 
             {parsedDeck.length > 0 && (() => {      
@@ -258,6 +280,16 @@ export default function DeckBuilder({ user }) {
             >
                 <Typography startDecorator={<CheckCircle sx={{ color: "green" }}/>}>
                     Deck successfully saved! 👍
+                </Typography>
+            </Toast>
+
+            <Toast
+                open={importedDeckToast}
+                onClose={() => setImportedDeckToast(false)}
+                position="bottom left"
+            >
+                <Typography startDecorator={<CheckCircle sx={{ color: "green" }}/>}>
+                    Deck successfully imported! 👍
                 </Typography>
             </Toast>
         </Box>
