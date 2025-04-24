@@ -19,25 +19,45 @@
 
 .MuiTabList-root.deckbuilder {
     position: sticky;
-    top: 0;
+    top: 60px;
     overflow-x: auto;
     flex-wrap: nowrap;
+    background-color: var(--bg-color-lighter);
 }
 
 /* TODO: Améliorer le look des onglets */
 .MuiTab-root.deckbuilder-tab {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    /* padding: 0 15px; */
     width: fit-content;
-    align-items: center;
+    padding: 0 30px;
 }
 
-.MuiTab-root.deckbuilder-tab:focus {
+.MuiTab-root.deckbuilder-tab:focus, 
+.MuiTab-root.deckbuilder-tab:hover, 
+.MuiTab-root.deckbuilder-tab::selection {
     background-color: rgba(0, 0, 0, 0.2);
 }
 
 .MuiTabs-root.main-editor {
     background-color: var(--bg-color-lighter);
+}
+
+.MuiIconButton-root.flip-btn {
+    background-color: var(--purple);
+    border: 3px solid white;
+    border-radius: 100%;
+    margin: auto;
+    width: auto;
+    display: flex;
+    bottom: 40px;
+}
+
+.MuiBox-root.card-menu-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 10px;
+}
+
+.MuiInput-root.qty-input {
+    width: 50px;
 }

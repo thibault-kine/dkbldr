@@ -21,7 +21,6 @@ export default function DeckBuilder({ user }) {
     const [deckId, setDeckId] = useState<string | null>(null);
     const [deckList, setDeckList] = useState("");
     const [parsedDeck, setParsedDeck] = useState<{ qty: number; card: Card; }[]>([]);
-    const [currTabValue, setCurrTabValue] = useState(0);
 
     const navigate = useNavigate();
 
@@ -72,8 +71,9 @@ export default function DeckBuilder({ user }) {
 
         deck.forEach((entry, index) => {
             const { card } = entry;
-            const typeline = entry.card.type_line;
+            const typeline = entry.card.card_faces?.[0].type_line ?? entry.card.type_line;
             const isCreature = typeline.includes("Creature");
+            const isLand = typeline.includes("Land");
 
             let commanders: typeof deck = [];
             {
@@ -110,13 +110,14 @@ export default function DeckBuilder({ user }) {
 
             if (isCreature && !commanders.includes(entry))
                 groups.Creature.push(entry);
+            else if (isLand)
+                groups.Land.push(entry);
             else if (typeline.includes("Artifact"))      groups.Artifact.push(entry);
             else if (typeline.includes("Enchantment"))   groups.Enchantment.push(entry);
             else if (typeline.includes("Instant"))       groups.Instant.push(entry);
             else if (typeline.includes("Sorcery"))       groups.Sorcery.push(entry);
             else if (typeline.includes("Planeswalker"))  groups.Planeswalker.push(entry);
             else if (typeline.includes("Battle"))        groups.Battle.push(entry);
-            else if (typeline.includes("Land"))          groups.Land.push(entry);
         })
 
         return groups;
@@ -145,8 +146,7 @@ export default function DeckBuilder({ user }) {
 
     function updateCardQuantity(cardName: string, newQty: number) {
         const newDeck = parsedDeck
-            .map(entry => entry.card.name === cardName ? { ...entry, qty: newQty } : entry)
-            .filter(entry => entry.qty > 0);
+            .map(entry => entry.card.name === cardName ? { ...entry, qty: newQty } : entry);
         setParsedDeck(newDeck);
     }
 
@@ -210,10 +210,7 @@ export default function DeckBuilder({ user }) {
                 const types = Object.keys(grouped).filter(type => grouped[type].length > 0);
 
                 return (
-                    <Tabs defaultValue={0} value={currTabValue} onChange={(_, newVal) => {
-                        if (typeof newVal === "number")
-                            setCurrTabValue(newVal);
-                    }} className="main-editor">
+                    <Tabs defaultValue={0} className="main-editor">
                         <TabList className="deckbuilder">
                             {types.map((type, index) => {
                             
@@ -229,8 +226,8 @@ export default function DeckBuilder({ user }) {
                         </TabList>
 
                         {types.map((type, index) => (
-                            <TabPanel key={index} value={index} sx={{ display: currTabValue == index ? "block" : "none" }}>
-                                <Box sx={{ display: "flex", flexWrap: "wrap" }}>
+                            <TabPanel key={index} value={index}>
+                                <Box>
                                     {grouped[type].map((entry, i) => (
                                         <DeckCardDisplay
                                             key={i}
