@@ -1,6 +1,6 @@
 .MuiBox-root.header {
     width: 100%;
-    height: 75px;
+    height: auto;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -11,7 +11,6 @@
     top: 0;
     z-index: 10;
 }
-
 
 
 .MuiToolbar-root.header-links {
@@ -37,8 +36,6 @@
     background-color: #00000040;
 } 
 
-
-
 .MuiMenuButton-root.header-profile-btn {
     border-radius: 0;
     padding: 0 30px;
@@ -51,4 +48,17 @@
 
 .MuiMenuButton-root.header-profile-btn:hover {
     background-color: #00000040;
+}
+
+
+
+img.logo, .MuiIconButton-root.logo {
+    width: 50px;
+    height: 50px;
+    margin: 5px;
+    border-radius: 100%;
+}
+
+.MuiIconButton-root.logo:hover {
+    background-color: rgba(255, 255, 255, 0.1);
 }

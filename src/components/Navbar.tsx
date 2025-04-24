@@ -24,7 +24,7 @@ export default function Navbar() {
 
 
     return (
-        <div className="navbar">
+        <Box className="navbar">
             <IconButton 
                 className="open-icon" 
                 onClick={() => setOpen(true)}
@@ -35,43 +35,64 @@ export default function Navbar() {
             <Drawer open={open} onClose={() => setOpen(false)} anchor="bottom">
                 <Box className="menu-box">
 
+                    <Box sx={{ width: "100%", height: "100%" }}>
+                        <Button
+                            onClick={() => {
+                                navigate("/")
+                                setOpen(false)
+                            }}
+                            className="nav-btn"
+                        >
+                            Home
+                        </Button>
+
+                        {user ? (<>
+                            <Button
+                                onClick={() => {
+                                    navigate(`/user/${user?.username}/${user?.id}`)
+                                    setOpen(false)
+                                }}
+                                className="nav-btn"
+                            >
+                                {user.username}
+                            </Button>
+                            <Button
+                                onClick={handleLogout}
+                                className="nav-btn"
+                                sx={{ color: "red" }}
+                            >
+                                Logout
+                            </Button>
+                        </>) : (
+                            <Button
+                                onClick={() => {
+                                    navigate("/login")
+                                    setOpen(false)
+                                }}
+                                className="nav-btn"
+                            >
+                                Login
+                            </Button>
+                        )}
+
                     <Button
-                        onClick={() => navigate("/")}
+                        onClick={() => {
+                            navigate("/about")
+                            setOpen(false)
+                        }}
                         className="nav-btn"
-                    >
-                        Home
-                    </Button>
-                    <Button
-                        onClick={() => navigate("/about")}
-                        className="nav-btn"
-                    >
+                        >
                         About
                     </Button>
 
+                    </Box>
 
-                    {user ?
-                        (<Button
-                            onClick={() => navigate(`/user/${user?.username}/${user?.id}`)}
-                            className="nav-btn"
-                        >
-                            {user.username}
-                        </Button>)
-                        :
-                        (<Button
-                            onClick={() => navigate("/login")}
-                            className="nav-btn"
-                        >
-                            Login
-                        </Button>)
-                    }
-
-
-                    <IconButton onClick={() => setOpen(false)}>
-                        <Close sx={{ color: "white"}}/>
+                    <IconButton onClick={() => setOpen(false)} sx={{ marginBottom: "10px", backgroundColor: "var(--purple)", borderRadius: "30px" }}>
+                        <Close/>
                     </IconButton>
 
                 </Box>
             </Drawer>
-        </div>
+        </Box>
     )
 }

@@ -22,7 +22,7 @@ export default function AppRouter() {
 
     return (
         <>
-            {/* <Header /> */}
+            <Header />
             <Navbar/>
             <Routes>
                 {/* Routes publiques */}
