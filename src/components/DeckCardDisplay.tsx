@@ -26,7 +26,11 @@ export default function DeckCardDisplay({
     return (
         <Dropdown open={open} onOpenChange={(e, isOpen) => setOpen(isOpen)}>
             <Box>
-                <MenuButton sx={{ display: 'contents' }} ref={buttonRef}>
+                <MenuButton 
+                    variant="soft" 
+                    ref={buttonRef}
+                    sx={{ display: 'contents' }} 
+                >
                     <Box className="card-display">
                         <Badge badgeContent={currentQuantity} sx={{ zIndex: 0 }}>
                             <img
@@ -39,7 +43,17 @@ export default function DeckCardDisplay({
                 </MenuButton>
                 {card.card_faces && (
                     <Box sx={{ width: "100%", height: "0px", margin: "0px" }}>
-                        <IconButton className="flip-btn" onClick={() => setIsFlipped(!isFlipped)} sx={{ zIndex: 0 }}>
+                        <IconButton 
+                            variant="soft" 
+                            className="flip-btn" 
+                            onClick={() => setIsFlipped(!isFlipped)} 
+                            sx={{ 
+                                zIndex: 0,
+                                ':hover': {
+                                    bgcolor: "var(--purple)"
+                                }
+                            }}
+                        >
                             <Loop sx={{ color: "white" }}/>
                         </IconButton>
                     </Box>

@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { saveDeckToUser } from "../../db/decks";
 import "../style/DeckBuilder.css"
 import BasicModal from "../components/BasicModal";
-import { CheckCircle, ContentPaste, MoreVert, Save } from "@mui/icons-material";
+import { CheckCircle, ContentPaste, MoreVert, Save, Settings } from "@mui/icons-material";
 import ExportDeck from "../components/ExportDeck";
 import { Card, Cards } from "scryfall-api";
 import DeckCardDisplay from "../components/DeckCardDisplay";
@@ -21,6 +21,7 @@ export default function DeckBuilder({ user }) {
     const [deckId, setDeckId] = useState<string | null>(null);
     const [deckList, setDeckList] = useState("");
     const [parsedDeck, setParsedDeck] = useState<{ qty: number; card: Card; }[]>([]);
+    const [currentTab, setCurrentTab] = useState(0);
 
     const navigate = useNavigate();
 
@@ -161,7 +162,8 @@ export default function DeckBuilder({ user }) {
     return (
         <Box>
             <Typography level="h2">DeckBuilder</Typography>
-            <BasicModal icon={<MoreVert/>} title="Deck Options">
+            <Box sx={{ display: "flex", flexDirection: "row" }}>
+            <BasicModal icon={<Settings/>} title="">
 
                 <Tabs>
                     <TabList>
@@ -203,14 +205,16 @@ export default function DeckBuilder({ user }) {
                 </Tabs>
 
             </BasicModal>
-            <Button onClick={handleSaveDeck}>Save deck</Button>
+            <Button className="square-btn" onClick={handleSaveDeck}><Save/></Button>
+            <Typography>currentTab = {currentTab}</Typography>
+            </Box>
 
-            {parsedDeck.length > 0 && (() => {
+            {parsedDeck.length > 0 && (() => {      
                 const grouped = groupCardsByType(parsedDeck);
                 const types = Object.keys(grouped).filter(type => grouped[type].length > 0);
 
                 return (
-                    <Tabs defaultValue={0} className="main-editor">
+                    <Tabs defaultValue={currentTab} onChange={(_, val) => setCurrentTab(val as number)} className="main-editor">
                         <TabList className="deckbuilder">
                             {types.map((type, index) => {
                             
@@ -218,7 +222,11 @@ export default function DeckBuilder({ user }) {
                             grouped[type].forEach(c => sum += c.qty);
 
                             return sum > 0 && (
-                                <Tab key={index} className="deckbuilder-tab">
+                                <Tab 
+                                    key={index} 
+                                    className="deckbuilder-tab" 
+                                    // sx={{ backgroundColor: index === currentTab ? "blue" : "red" }}
+                                >
                                     <img src={`/icons/other/${type}_symbol.svg`} height={15} style={{ filter: "invert(100%)" }}/> 
                                     <Typography>{sum}</Typography>
                                 </Tab>
@@ -227,7 +235,7 @@ export default function DeckBuilder({ user }) {
 
                         {types.map((type, index) => (
                             <TabPanel key={index} value={index}>
-                                <Box>
+                                <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                                     {grouped[type].map((entry, i) => (
                                         <DeckCardDisplay
                                             key={i}

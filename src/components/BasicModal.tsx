@@ -15,11 +15,11 @@ export default function BasicModal({ title, children, icon }: BasicModalProps) {
     return (
         <>
             {title ? 
-                <Button variant="solid" color="neutral" onClick={() => setOpen(true)} startDecorator={icon}>
+                <Button className='square-btn' onClick={() => setOpen(true)} startDecorator={icon}>
                     {title}
                 </Button>
             :
-                <Button variant="solid" color="neutral" onClick={() => setOpen(true)}>
+                <Button className='square-btn' onClick={() => setOpen(true)}>
                     {icon}
                 </Button>
             }
