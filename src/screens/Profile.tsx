@@ -183,7 +183,7 @@ export default function Profile() {
                         </Button>
 
                         {decks.length > 0 ? (
-                            <Table>
+                            <Table className="profile-decks">
                                 <thead>
                                     <tr>
                                         <th>Name</th>
@@ -192,7 +192,7 @@ export default function Profile() {
                                 </thead>
                                 <tbody>
                                 {decks.map((d, i) => (
-                                    <tr key={i}>
+                                    <tr key={i} onClick={() => navigate(`/deck/${d.id}/details`)}>
                                         <td>{d.name}</td>
                                     </tr>
                                 ))}

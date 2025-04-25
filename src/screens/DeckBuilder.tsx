@@ -1,7 +1,7 @@
 import React, { use, useEffect, useState } from "react";
 import { Box, Button, Input, Tab, TabList, TabPanel, Tabs, Textarea, Typography } from "@mui/joy";
 import { useNavigate } from "react-router-dom";
-import { getAllDecksFromUser, saveDeckToUser } from "../../db/decks";
+import { DeckList, getAllDecksFromUser, saveDeckToUser } from "../../db/decks";
 import "../style/DeckBuilder.css"
 import BasicModal from "../components/BasicModal";
 import { CheckCircle, ContentPaste, MoreVert, Save, Settings } from "@mui/icons-material";
@@ -12,16 +12,13 @@ import Toast from "../components/Snackbar";
 import { Deck } from "../../db/decks";
 
 
-// TODO: Donner des noms aux decks et les sauvegarder sous un uuid 
-
-
 export default function DeckBuilder({ user }) {
 
     const [deckId, setDeckId] = useState<string | null>(null);
     const [deckName, setDeckName] = useState("");
 
     const [deckList, setDeckList] = useState("");
-    const [parsedDeck, setParsedDeck] = useState<Deck>([]);
+    const [parsedDeck, setParsedDeck] = useState<DeckList>([]);
     
     const [currentTab, setCurrentTab] = useState(0);
 
@@ -76,60 +73,62 @@ export default function DeckBuilder({ user }) {
     ];
 
     function groupCardsByType(deck: Deck) {
-        const groups: Record<string, Deck> = {};
+        const groups: Record<string, Card[]> = {};
         for (const type of CARD_TYPES) {
             groups[type] = [];
         }
 
-        deck.forEach((entry, index) => {
+        console.log(groups);
+
+        deck.deckList.forEach((entry, index) => {
             const { card } = entry;
-            const typeline = entry.card.card_faces?.[0].type_line ?? entry.card.type_line;
+            const typeline = card.card_faces?.[0].type_line ?? card.type_line;
             const isCreature = typeline.includes("Creature");
             const isLand = typeline.includes("Land");
 
-            let commanders: typeof deck = [];
+            let commanders: typeof deck.commanders = [];
             {
-                const potentialCommanders = deck.slice(-2); // les 3 dernières cartes
+                const potentialCommanders = deck.deckList.slice(-2); // les 2 dernières cartes
     
                 const isCommanderType = (card: Card) => {
                     const t = card.type_line;
                     return (
+                        card.legalities.commander === "legal" && (
                         t.includes("Legendary") ||
                         t.includes("Background") ||
                         card.oracle_text?.includes("can be your commander")
-                    );
+                    ));
                 };
     
                 const validCandidates = potentialCommanders.filter(entry => isCommanderType(entry.card));
     
                 if (validCandidates.length === 1) {
-                    commanders = [validCandidates[0]];
+                    commanders = [validCandidates[0].card];
                 } else if (validCandidates.length >= 2) {
                     const background = validCandidates.find(e => e.card.type_line.includes("Background"));
                     const creature = validCandidates.find(e => e.card.type_line.includes("Legendary Creature"));
     
                     if (background && creature) {
-                        commanders = [creature, background];
+                        commanders = [creature.card, background.card];
                     } else {
-                        // Par défaut, on prend la dernière carte légendaire/commandable
                         const last = [...validCandidates].reverse().find(e => isCommanderType(e.card));
-                        if (last) commanders = [last];
+                        if (last) commanders = [last.card];
                     }
                 }
     
                 groups.Commander = commanders;
             }
 
-            if (isCreature && !commanders.includes(entry))
-                groups.Creature.push(entry);
+            if (isCreature && !commanders.includes(entry.card))
+                groups.Creature.push(entry.card);
             else if (isLand)
-                groups.Land.push(entry);
-            else if (typeline.includes("Artifact"))      groups.Artifact.push(entry);
-            else if (typeline.includes("Enchantment"))   groups.Enchantment.push(entry);
-            else if (typeline.includes("Instant"))       groups.Instant.push(entry);
-            else if (typeline.includes("Sorcery"))       groups.Sorcery.push(entry);
-            else if (typeline.includes("Planeswalker"))  groups.Planeswalker.push(entry);
-            else if (typeline.includes("Battle"))        groups.Battle.push(entry);
+                groups.Land.push(entry.card);
+            else if (typeline.includes("Artifact"))      groups.Artifact.push(entry.card);
+            else if (typeline.includes("Enchantment"))   groups.Enchantment.push(entry.card);
+            else if (typeline.includes("Instant"))       groups.Instant.push(entry.card);
+            else if (typeline.includes("Sorcery"))       groups.Sorcery.push(entry.card);
+            else if (typeline.includes("Planeswalker"))  groups.Planeswalker.push(entry.card);
+            else if (typeline.includes("Battle"))        groups.Battle.push(entry.card);
         })
 
         return groups;
@@ -231,7 +230,7 @@ export default function DeckBuilder({ user }) {
             <Button className="square-btn" onClick={handleSaveDeck}><Save/></Button>
             </Box>
 
-            {parsedDeck.length > 0 && (() => {      
+            {parsedDeck.length > 0 && (() => {
                 const grouped = groupCardsByType(parsedDeck);
                 const types = Object.keys(grouped).filter(type => grouped[type].length > 0);
 
