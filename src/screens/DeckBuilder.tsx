@@ -10,130 +10,39 @@ import { Card, Cards } from "scryfall-api";
 import DeckCardDisplay from "../components/DeckCardDisplay";
 import Toast from "../components/Snackbar";
 import { Deck } from "../../db/decks";
+import { useDeckBuilder } from "../hooks/useDeckBuilder";
+import { groupCardsByType } from "../../utils/deck";
 
 
 export default function DeckBuilder({ user }) {
 
-    const [deckId, setDeckId] = useState<string | null>(null);
-    const [deckName, setDeckName] = useState("");
-
-    const [deckList, setDeckList] = useState("");
-    const [parsedDeck, setParsedDeck] = useState<DeckList>([]);
-    
-    const [currentTab, setCurrentTab] = useState(0);
-
     const navigate = useNavigate();
 
+    const {
+        deckId,
 
-    async function getDeckName() {
-        if (deckName.trim() !== "") return deckName.trim();
-
-        const unnamedDecks = await getAllDecksFromUser(user.id);
-        const unnamedCount = unnamedDecks.filter(d => d.name?.startsWith("Unnamed Deck")).length;
-        return `Unnamed Deck ${unnamedCount + 1}`;
-    }
-
-
-    async function fetchCardObjects(deck: { qty: number; name: string; }[]): Promise<{ qty: number; card: Card; }[]> {
-        if (deck.length === 0) return [];
-        
-        try {
-            const cardPromises = deck.map(entry => Cards.byName(entry.name).then(card => card ? { card, qty: entry.qty } : undefined));
-            const fetchedCards = await Promise.all(cardPromises);
+        deckName,
+        setDeckName,
     
-            return fetchedCards.filter((entry): entry is { card: Card; qty: number } => entry !== undefined);
-        }
-        catch (err) {
-            console.error("Erreur lors de la récupération des cartes: ", err);
-            return [];
-        }
-    }
+        deckListText,
+        setDeckListText,
 
+        mainboard,
+        setMainboard,
 
-    async function parseDecklist(text: string) {
-        const lines = text.split("\n").map(line => line.trim()).filter(line => line);
+        sideboard,
+        setSideboard,
 
-        const deckEntries = lines.map((line) => {
-            const match = line.match(/^(\d+)\s+(.+)$/);
-            if (!match) return null;
+        currentMBTab,
+        setCurrentMBTab,
 
-            const [, qty, name] = match;
-            return { qty: parseInt(qty, 10), name: name.trim() };
-        }).filter(entry => entry !== null) as { qty: number; name: string }[];
+        currentSBTab,
+        setCurrentSBTab,
 
-        const fetchedCards = await fetchCardObjects(deckEntries);
-        setParsedDeck(fetchedCards);
-    }
-
-
-    const CARD_TYPES = [
-        "Commander", "Creature", "Artifact", 
-        "Enchantment", "Instant", "Sorcery", 
-        "Planeswalker", "Battle", "Land" 
-    ];
-
-    function groupCardsByType(deck: Deck) {
-        const groups: Record<string, Card[]> = {};
-        for (const type of CARD_TYPES) {
-            groups[type] = [];
-        }
-
-        console.log(groups);
-
-        deck.deckList.forEach((entry, index) => {
-            const { card } = entry;
-            const typeline = card.card_faces?.[0].type_line ?? card.type_line;
-            const isCreature = typeline.includes("Creature");
-            const isLand = typeline.includes("Land");
-
-            let commanders: typeof deck.commanders = [];
-            {
-                const potentialCommanders = deck.deckList.slice(-2); // les 2 dernières cartes
-    
-                const isCommanderType = (card: Card) => {
-                    const t = card.type_line;
-                    return (
-                        card.legalities.commander === "legal" && (
-                        t.includes("Legendary") ||
-                        t.includes("Background") ||
-                        card.oracle_text?.includes("can be your commander")
-                    ));
-                };
-    
-                const validCandidates = potentialCommanders.filter(entry => isCommanderType(entry.card));
-    
-                if (validCandidates.length === 1) {
-                    commanders = [validCandidates[0].card];
-                } else if (validCandidates.length >= 2) {
-                    const background = validCandidates.find(e => e.card.type_line.includes("Background"));
-                    const creature = validCandidates.find(e => e.card.type_line.includes("Legendary Creature"));
-    
-                    if (background && creature) {
-                        commanders = [creature.card, background.card];
-                    } else {
-                        const last = [...validCandidates].reverse().find(e => isCommanderType(e.card));
-                        if (last) commanders = [last.card];
-                    }
-                }
-    
-                groups.Commander = commanders;
-            }
-
-            if (isCreature && !commanders.includes(entry.card))
-                groups.Creature.push(entry.card);
-            else if (isLand)
-                groups.Land.push(entry.card);
-            else if (typeline.includes("Artifact"))      groups.Artifact.push(entry.card);
-            else if (typeline.includes("Enchantment"))   groups.Enchantment.push(entry.card);
-            else if (typeline.includes("Instant"))       groups.Instant.push(entry.card);
-            else if (typeline.includes("Sorcery"))       groups.Sorcery.push(entry.card);
-            else if (typeline.includes("Planeswalker"))  groups.Planeswalker.push(entry.card);
-            else if (typeline.includes("Battle"))        groups.Battle.push(entry.card);
-        })
-
-        return groups;
-    }
-    
+        parseDeckList,
+        updateCardQuantity,
+        save
+    } = useDeckBuilder(user);    
 
     const [importedDeckToast, setImportedDeckToast] = useState(false);
     const [savedDeckToast, setSavedDeckToast] = useState(false);
@@ -145,10 +54,7 @@ export default function DeckBuilder({ user }) {
         }
 
         try {
-            const nameToSave = await getDeckName();
-            const updatedDeckId = await saveDeckToUser(user?.id, parsedDeck, nameToSave);
-            setDeckId(updatedDeckId);
-            // navigate(`/user/${user?.username}/${user?.id}`);
+            save();
             setSavedDeckToast(true);
         }
         catch (err) {
@@ -156,20 +62,6 @@ export default function DeckBuilder({ user }) {
         }
     }
 
-
-    function updateCardQuantity(cardName: string, newQty: number) {
-        const newDeck = parsedDeck
-            .map(entry => entry.card.name === cardName ? { ...entry, qty: newQty } : entry);
-        setParsedDeck(newDeck);
-    }
-
-
-    useEffect(() => {
-        const updatedDeckList = parsedDeck.map(entry => `${entry.qty} ${entry.card.name}`).join('\n');
-        setDeckList(updatedDeckList);
-    }, [parsedDeck]);
-
-    
 
     return (
         <Box>
@@ -193,17 +85,17 @@ export default function DeckBuilder({ user }) {
                     <TabPanel value={0}>
                         <Textarea 
                             className="text-area"
-                            value={deckList}
-                            onChange={(e) => setDeckList(e.target.value)} 
+                            value={deckListText}
+                            onChange={(e) => setDeckListText(e.target.value)} 
                             placeholder={"Paste your deck here!"}
                             minRows={4}
                             maxRows={4}
                         />
                         <Button 
                             startDecorator={<ContentPaste/>}
-                            disabled={deckList === ""}
+                            disabled={deckListText === ""}
                             onClick={() => {
-                                parseDecklist(deckList);
+                                parseDeckList(deckListText);
                                 setImportedDeckToast(true);
                             }}
                         >
@@ -211,9 +103,9 @@ export default function DeckBuilder({ user }) {
                         </Button>
                         <Button 
                             startDecorator={<Save/>}
-                            disabled={deckList === ""}
+                            disabled={deckListText === ""}
                             onClick={() => {
-                                parseDecklist(deckList);
+                                parseDeckList(deckListText);
                                 handleSaveDeck();
                             }}
                         >
@@ -222,7 +114,7 @@ export default function DeckBuilder({ user }) {
                     </TabPanel>
                     
                     <TabPanel value={1}>
-                        <ExportDeck decklist={deckList}/>
+                        <ExportDeck decklist={deckListText}/>
                     </TabPanel>
                 </Tabs>
 
@@ -230,12 +122,12 @@ export default function DeckBuilder({ user }) {
             <Button className="square-btn" onClick={handleSaveDeck}><Save/></Button>
             </Box>
 
-            {parsedDeck.length > 0 && (() => {
-                const grouped = groupCardsByType(parsedDeck);
+            {mainboard.length > 0 && (() => {
+                const grouped = groupCardsByType(mainboard);
                 const types = Object.keys(grouped).filter(type => grouped[type].length > 0);
 
                 return (
-                    <Tabs defaultValue={currentTab} onChange={(_, val) => setCurrentTab(val as number)} className="main-editor">
+                    <Tabs defaultValue={currentMBTab} onChange={(_, val) => setCurrentMBTab(val as number)} className="main-editor">
                         <TabList className="deckbuilder">
                             {types.map((type, index) => {
                             
@@ -243,11 +135,7 @@ export default function DeckBuilder({ user }) {
                             grouped[type].forEach(c => sum += c.qty);
 
                             return sum > 0 && (
-                                <Tab 
-                                    key={index} 
-                                    className="deckbuilder-tab" 
-                                    // sx={{ backgroundColor: index === currentTab ? "blue" : "red" }}
-                                >
+                                <Tab key={index} className="deckbuilder-tab">
                                     <img src={`/icons/other/${type}_symbol.svg`} height={15} style={{ filter: "invert(100%)" }}/> 
                                     <Typography>{sum}</Typography>
                                 </Tab>

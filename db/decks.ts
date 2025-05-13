@@ -13,17 +13,22 @@ export type Deck = {
     name: string;
     colorIdentity: string[];
     commanders: Card[];
-    deckList: DeckList;
+    
+    mainboard: DeckList;
+    sideboard: DeckList;
+
+    createdAt?: string;
 }
 
 
-export async function saveDeckToUser(userId: string, deckList: DeckList, name?: string) {
+export async function saveDeckToUser(userId: string, mainboard: DeckList, sideboard: DeckList, name?: string) {
     const { data, error } = await supabase
         .from("decks")
         .insert([{
             user_id: userId,
             name: name,
-            decklist: deckList,
+            mainboard: mainboard,
+            sideboard: sideboard,
         }]);
 
     if (error) throw error;
@@ -51,4 +56,18 @@ export async function getDeckById(id: string) {
     
     if (error) throw error;
     return data;
+}
+
+
+export async function updateDeckList(id: string, mainboard: DeckList, sideboard: DeckList) {
+    const { data, error } = await supabase
+        .from("decks")
+        .update({
+            mainboard: mainboard,
+            sideboard: sideboard
+        })
+        .eq("id", id);
+
+    if (error) throw error;
+    return data;    
 }
