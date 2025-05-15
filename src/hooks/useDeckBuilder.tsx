@@ -16,6 +16,9 @@ export function useDeckBuilder(user: User) {
     const [currentMBTab, setCurrentMBTab] = useState(0);
     const [currentSBTab, setCurrentSBTab] = useState(0);
 
+    const [isImporting, setIsImporting] = useState(false);
+    const [importProgress, setImportProgress] = useState(0);
+
 
     useEffect(() => {
         const updatedDeckList = mainboard.map(entry => `${entry.qty} ${entry.card.name}`).join("\n");
@@ -41,27 +44,22 @@ export function useDeckBuilder(user: User) {
 
 
     async function fetchCardObjects(deck: { qty: number; name: string }[]): Promise<DeckList> {
-
         const results: DeckList = [];
+        setIsImporting(true);
+        setImportProgress(0);
 
-        for (const entry of deck) {
-            try {
-                const card = await Cards.byName(entry.name);
-                if (card) {
-                    results.push({ card, qty: entry.qty });
-                    console.log(`Fetched ${entry.name}`);
-                }
-                else {
-                    console.warn(`Card not found: ${entry.name}`);
-                }
-            }
-            catch (err) {
-                console.error(`Error fetching ${entry.name}: ${err}`);
-            }
+        for (let i = 0; i < deck.length; i++) {
+            const entry = deck[i];
+            
+            const card = await Cards.byName(entry.name).catch(() => null);
+            if (card) results.push({ card, qty: entry.qty });
 
-            await delay(50);
+            const progress = Math.round(((i + 1) / deck.length) * 100);
+            setImportProgress(progress);
+            await new Promise(r => setTimeout(r, 70));
         }
 
+        setIsImporting(false);
         return results;
     }
     
@@ -80,6 +78,7 @@ export function useDeckBuilder(user: User) {
         
         const fetchedCards = await fetchCardObjects(entries);
         setMainboard(fetchedCards);
+        return fetchedCards;
     }
 
 
@@ -120,6 +119,7 @@ export function useDeckBuilder(user: User) {
         deckId,
 
         deckName,
+        getDeckName,
         setDeckName,
     
         deckListText,
@@ -136,6 +136,9 @@ export function useDeckBuilder(user: User) {
 
         currentSBTab,
         setCurrentSBTab,
+
+        isImporting,
+        importProgress,
 
         parseDeckList,
         updateCardQuantity,

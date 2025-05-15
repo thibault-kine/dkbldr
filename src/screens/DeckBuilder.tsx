@@ -1,5 +1,5 @@
 import React, { use, useEffect, useState } from "react";
-import { Box, Button, Input, Tab, TabList, TabPanel, Tabs, Textarea, Typography } from "@mui/joy";
+import { Box, Button, Input, LinearProgress, Tab, TabList, TabPanel, Tabs, Textarea, Typography } from "@mui/joy";
 import { useNavigate } from "react-router-dom";
 import { DeckList, getAllDecksFromUser, saveDeckToUser } from "../../db/decks";
 import "../style/DeckBuilder.css"
@@ -22,13 +22,13 @@ export default function DeckBuilder({ user }) {
         deckId,
 
         deckName,
+        getDeckName,
         setDeckName,
     
         deckListText,
         setDeckListText,
 
         mainboard,
-        setMainboard,
 
         sideboard,
         setSideboard,
@@ -39,28 +39,27 @@ export default function DeckBuilder({ user }) {
         currentSBTab,
         setCurrentSBTab,
 
+        isImporting,
+        importProgress,
+
         parseDeckList,
         updateCardQuantity,
         save
     } = useDeckBuilder(user);    
 
+    const [pendingSaveAfterImport, setPendingSaveAfterImport] = useState(false);
+
     const [importedDeckToast, setImportedDeckToast] = useState(false);
     const [savedDeckToast, setSavedDeckToast] = useState(false);
 
-    async function handleSaveDeck() {
-        if (!user) {
-            navigate("/login");
-            return;
-        }
 
-        try {
+    useEffect(() => {
+        if (pendingSaveAfterImport && mainboard.length > 0) {
             save();
+            setPendingSaveAfterImport(false);
             setSavedDeckToast(true);
         }
-        catch (err) {
-            console.error("Erreur de sauvegarde : ", err);
-        }
-    }
+    }, [mainboard])
 
 
     return (
@@ -88,8 +87,7 @@ export default function DeckBuilder({ user }) {
                             value={deckListText}
                             onChange={(e) => setDeckListText(e.target.value)} 
                             placeholder={"Paste your deck here!"}
-                            minRows={4}
-                            maxRows={4}
+                            minRows={4} maxRows={4}
                         />
                         <Button 
                             startDecorator={<ContentPaste/>}
@@ -105,12 +103,22 @@ export default function DeckBuilder({ user }) {
                             startDecorator={<Save/>}
                             disabled={deckListText === ""}
                             onClick={async () => {
+                                setPendingSaveAfterImport(true);
                                 await parseDeckList(deckListText);
-                                handleSaveDeck();
+                                setSavedDeckToast(true);
                             }}
                         >
                             Import & save
                         </Button>
+
+                        {isImporting && (
+                            <Box sx={{ width: "100%", mt: 2 }}>
+                                <LinearProgress determinate value={importProgress} />
+                                <Typography textAlign="center" mt={0.5}>
+                                    Importing deck... ({importProgress}%)
+                                </Typography>
+                            </Box>
+                        )}
                     </TabPanel>
                     
                     <TabPanel value={1}>
@@ -119,7 +127,17 @@ export default function DeckBuilder({ user }) {
                 </Tabs>
 
             </BasicModal>
-            <Button className="square-btn" onClick={handleSaveDeck}><Save/></Button>
+            
+            <Button 
+                disabled={mainboard.length <= 0} 
+                className="square-btn" 
+                onClick={async () => {
+                    await save();
+                    setSavedDeckToast(true);
+                }}
+            >
+                <Save/>
+            </Button>
             </Box>
 
             {mainboard.length > 0 && (() => {
