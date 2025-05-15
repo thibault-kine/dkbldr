@@ -94,8 +94,8 @@ export default function DeckBuilder({ user }) {
                         <Button 
                             startDecorator={<ContentPaste/>}
                             disabled={deckListText === ""}
-                            onClick={() => {
-                                parseDeckList(deckListText);
+                            onClick={async () => {
+                                await parseDeckList(deckListText)
                                 setImportedDeckToast(true);
                             }}
                         >
@@ -104,8 +104,8 @@ export default function DeckBuilder({ user }) {
                         <Button 
                             startDecorator={<Save/>}
                             disabled={deckListText === ""}
-                            onClick={() => {
-                                parseDeckList(deckListText);
+                            onClick={async () => {
+                                await parseDeckList(deckListText);
                                 handleSaveDeck();
                             }}
                         >

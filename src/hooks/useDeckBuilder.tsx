@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { DeckList, getAllDecksFromUser, saveDeckToUser } from "../../db/decks";
+import { Deck, DeckList, getAllDecksFromUser, saveDeckToUser } from "../../db/decks";
 import { User } from "@supabase/supabase-js";
 import { Card, Cards } from "scryfall-api";
+import { groupCardsByType } from "../../utils/deck";
 
 export function useDeckBuilder(user: User) {
 
@@ -34,28 +35,49 @@ export function useDeckBuilder(user: User) {
     }
 
 
-    async function fetchCardObjects(deck: { qty: number; name: string }[]): Promise<DeckList> {
-        const cardPromises = deck.map(entry =>
-            Cards.byName(entry.name).then(card => card ? { card, qty: entry.qty } : undefined)
-        );
-        const results = await Promise.all(cardPromises);
-
-        return results.filter((e): e is { card: Card; qty: number } => !!e);
+    function delay(ms: number) {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
 
+    async function fetchCardObjects(deck: { qty: number; name: string }[]): Promise<DeckList> {
+
+        const results: DeckList = [];
+
+        for (const entry of deck) {
+            try {
+                const card = await Cards.byName(entry.name);
+                if (card) {
+                    results.push({ card, qty: entry.qty });
+                    console.log(`Fetched ${entry.name}`);
+                }
+                else {
+                    console.warn(`Card not found: ${entry.name}`);
+                }
+            }
+            catch (err) {
+                console.error(`Error fetching ${entry.name}: ${err}`);
+            }
+
+            await delay(50);
+        }
+
+        return results;
+    }
+    
+    
     async function parseDeckList(text: string) {
         const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
         const entries = lines
             .map(line => {
                 const match = line.match(/^(\d+)\s+(.+)$/);
                 if (!match) return null;
-
+                
                 const [, qty, name] = match;
                 return { qty: parseInt(qty), name };
             })
             .filter((e): e is { qty: number; name: string } => !!e);
-
+        
         const fetchedCards = await fetchCardObjects(entries);
         setMainboard(fetchedCards);
     }
@@ -72,7 +94,23 @@ export function useDeckBuilder(user: User) {
 
     async function save() {
         const nameToSave = await getDeckName();
-        const updatedDeckId = await saveDeckToUser(user.id, mainboard, sideboard, nameToSave);
+        const commanders = groupCardsByType(mainboard).Commander.map(e => e.card);
+        const colorIdentity = commanders
+            .flatMap(c => c.color_identity)
+            .filter((val, i, self) => self.indexOf(val) === i);
+
+        const newDeck: Deck = {
+            id: "",
+            userId: user.id,
+            name: nameToSave,
+            colorIdentity: colorIdentity,
+            commanders: commanders,
+            
+            mainboard: mainboard,
+            sideboard: sideboard,
+        }
+
+        const updatedDeckId = await saveDeckToUser(newDeck);
         setDeckId(updatedDeckId);
         return updatedDeckId;
     }

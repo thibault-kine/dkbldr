@@ -5,23 +5,20 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Avatar, Box, Button, Drawer, Dropdown, IconButton, Link, ListItemDecorator, MenuButton, MenuItem, Typography } from "@mui/joy";
 import { ArrowDropDown, Close, Login, Logout, Menu, Person } from "@mui/icons-material";
 import { supabase } from "../../db/supabase";
+import { useAuth } from "../context/AuthContext";
+import LogoutButton from "./LogoutButton";
 
 
 export default function Navbar() {
 
-    const { user, setUser, refreshUser } = useUser();
+    const { user: profile, setUser, refreshUser } = useUser();
+    const { user, loading } = useAuth();
 
     const [open, setOpen] = useState(false);
-
+    
     const navigate = useNavigate();
     const location = useLocation();
-
-    async function handleLogout() {
-        await supabase.auth.signOut();
-        setUser(null);
-        navigate("/");
-    };
-
+    
 
     return (
         <Box className="navbar">
@@ -49,20 +46,15 @@ export default function Navbar() {
                         {user ? (<>
                             <Button
                                 onClick={() => {
-                                    navigate(`/user/${user?.username}/${user?.id}`)
+                                    navigate(`/user/${profile?.username}/${user?.id}`)
                                     setOpen(false)
                                 }}
                                 className="nav-btn"
                             >
-                                {user.username}
+                                {profile?.username}
                             </Button>
-                            <Button
-                                onClick={handleLogout}
-                                className="nav-btn"
-                                sx={{ color: "red" }}
-                            >
-                                Logout
-                            </Button>
+
+                            <LogoutButton/>
                         </>) : (
                             <Button
                                 onClick={() => {
@@ -81,7 +73,7 @@ export default function Navbar() {
                             setOpen(false)
                         }}
                         className="nav-btn"
-                        >
+                    >
                         About
                     </Button>
 

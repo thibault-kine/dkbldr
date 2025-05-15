@@ -5,18 +5,22 @@ import { BrowserRouter as Router } from "react-router-dom";
 import AppRouter from "./router/AppRouter";
 import { UserProvider } from "./context/UserContext";
 import "./App.css"
+import { supabase } from "../db/supabase";
+import { User } from "@supabase/supabase-js";
+import { AuthProvider } from "./context/AuthContext";
 
 function App() {
-
     return (
-        <ThemeProvider theme={theme}>
+        <AuthProvider>
             <UserProvider>
-                <CssBaseline />
-                <Router>
-                    <AppRouter />
-                </Router>
+                <ThemeProvider theme={theme}>
+                    <CssBaseline />
+                    <Router>
+                        <AppRouter />
+                    </Router>
+                </ThemeProvider>
             </UserProvider>
-        </ThemeProvider>
+        </AuthProvider>
     );
 }
 

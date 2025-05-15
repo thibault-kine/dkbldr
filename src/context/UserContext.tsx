@@ -41,7 +41,26 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     }
 
     useEffect(() => {
+
+        const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+            if (session?.user) {
+                getUserById(session.user.id)
+                    .then(userData => setUser(userData))
+                    .catch(err => {
+                        console.error("Erreur lors de la récupération du profil : ", err);
+                        setUser(null);
+                    });
+            }
+            else {
+                setUser(null);
+            }
+        })
+
         fetchUser();
+
+        return () => {
+            authListener.subscription.unsubscribe();
+        }
     }, []);
 
 
