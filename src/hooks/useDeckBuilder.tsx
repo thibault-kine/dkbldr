@@ -44,7 +44,6 @@ export function useDeckBuilder(user: User) {
     }
 
 
-    // TODO: fix commander parsing
     async function parseDeckList(text: string) {
         const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
         const entries = lines
@@ -59,7 +58,6 @@ export function useDeckBuilder(user: User) {
 
         const fetchedCards = await fetchCardObjects(entries);
         setMainboard(fetchedCards);
-        console.log(mainboard);
     }
 
 

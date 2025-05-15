@@ -3,19 +3,23 @@ import { DeckList } from "../db/decks";
 
 export function groupCardsByType(deckList: DeckList) {
 
-    const CARD_TYPES = [
+    const CARD_GROUPS = [
         "Commander", "Creature", "Artifact", 
         "Enchantment", "Instant", "Sorcery", 
         "Planeswalker", "Battle", "Land" 
     ];
 
     const groups: Record<string, { card: Card, qty: number }[]> = {};
-    CARD_TYPES.forEach(type => groups[type] = []);
+    CARD_GROUPS.forEach(type => groups[type] = []);
 
     const isCommander = (card: Card) => {
         const t = card.type_line;
+        
+        const releaseDate = Date.parse(card.released_at.toDateString());
+        const today = Date.now();
+        
         return (
-            card.legalities.commander === "legal" && 
+            (card.legalities.commander === "legal" || today <= releaseDate) && 
             (t.includes("Legendary") || t.includes("Background") || card.oracle_text?.includes("can be your commander"))
         );
     }
