@@ -22,4 +22,4 @@ Meet Dkbldr!
 Dkbldr (pronounced "Deckbuilder") is a friendly homonculus who is always eager to help you build your decks.
 It can understand what you want to achieve with your builds, and look through the archives of the [Library of Scry-Fall](https://scryfall.com/) to pull out the most optimized and best cards for you to fit in!
 
-## With Dkbldr by your side, brewing decks has never been so simple!
+### With Dkbldr by your side, brewing decks has never been so simple!
