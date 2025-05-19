@@ -66,3 +66,16 @@ export async function getCardById(id: number) {
         throw err;
     }
 }
+
+
+export async function getAllPrints(card: Card): Promise<Card[]> {
+    try {
+        const res = await fetch(card.prints_search_uri);
+        const data = await res.json();
+        return data.data;
+    }
+    catch(err) {
+        console.log(err);
+        throw err;
+    }
+}

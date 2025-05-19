@@ -2,25 +2,43 @@ import { AutoAwesome, Loop, SwapHoriz } from "@mui/icons-material";
 import { Badge, Box, Dropdown, IconButton, Input, Menu, MenuButton, MenuItem } from "@mui/joy";
 import React, { use, useRef, useState } from "react";
 import { Card } from "scryfall-api";
+import { getAllPrints } from "../../api/cards";
+import { DeckList } from "../../db/decks";
 
 
 export default function DeckCardDisplay({ 
     card, 
     quantity,
+    inSideboard,
     onQuantityChange
 }: {
     card: Card; 
     quantity: number;
+    inSideboard: boolean;
     onQuantityChange?: (newQty: number) => void; 
 }) {
 
     const [open, setOpen] = useState(false);
+
     const [currentQuantity, setCurrentQuantity] = useState(quantity);
+    const [isInCollection, setIsInCollection] = useState(false);
+    const [currentPrint, setCurrentPrint] = useState(card);
     const [isFlipped, setIsFlipped] = useState(false);
 
-    const displayedFace = card.card_faces ? (isFlipped ? card.card_faces?.[1] : card.card_faces?.[0]) : card;
+    const displayedFace = (card.card_faces && !card.image_uris) ? (isFlipped ? card.card_faces?.[1] : card.card_faces?.[0]) : card;
 
     const buttonRef = useRef(null);
+
+
+    const onPrintChange = async () => {
+        const allPrints = await getAllPrints(card);
+        
+    }
+
+
+    const onBoardSwitch = () => {
+        
+    }
 
 
     return (
@@ -35,13 +53,13 @@ export default function DeckCardDisplay({
                         <Badge badgeContent={currentQuantity} sx={{ zIndex: 0 }}>
                             <img
                                 src={displayedFace.image_uris?.png}
-                                alt={`${card.name} (${card.set}#${card.collector_number})`}
+                                alt={`${card.name} (${card.set.toUpperCase()}#${card.collector_number})`}
                                 width={200}
                             />
                         </Badge>
                     </Box>
                 </MenuButton>
-                {card.card_faces && (
+                {(card.card_faces && !card.image_uris) && (
                     <Box sx={{ width: "100%", height: "0px", margin: "0px" }}>
                         <IconButton 
                             variant="soft" 
@@ -67,7 +85,15 @@ export default function DeckCardDisplay({
                 >
                     See card on Scryfall <img src="/icons/other/scryfall.svg" width={25}/>
                 </MenuItem>
-                <MenuItem className="card-menu">Switch printing <AutoAwesome/></MenuItem>
+                <MenuItem 
+                    className="card-menu"
+                    onClick={() => onPrintChange()}
+                >Switch printing <AutoAwesome/></MenuItem>
+                <MenuItem
+                    className="card-menu"
+                >
+                    {isInCollection ? "Remove from collection" : "Add to collection"}
+                </MenuItem>
                 <Box
                     className="card-menu-box"
                     onClick={(e) => {
@@ -94,7 +120,11 @@ export default function DeckCardDisplay({
                         }}
                     />
                 </Box>
-                <MenuItem className="card-menu">Move to sideboard <SwapHoriz/></MenuItem>
+                <MenuItem 
+                    className="card-menu"
+                    onClick={() => onBoardSwitch()}
+                >Move to {inSideboard ? "mainboard" : "sideboard"} <SwapHoriz/>
+                </MenuItem>
             </Menu>
         </Dropdown>
     )

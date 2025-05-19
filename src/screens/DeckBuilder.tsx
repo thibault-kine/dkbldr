@@ -1,6 +1,6 @@
 import React, { use, useEffect, useState } from "react";
 import { Box, Button, Input, LinearProgress, Tab, TabList, TabPanel, Tabs, Textarea, Typography } from "@mui/joy";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { DeckList, getAllDecksFromUser, saveDeckToUser } from "../../db/decks";
 import "../style/DeckBuilder.css"
 import BasicModal from "../components/BasicModal";
@@ -16,17 +16,19 @@ import { groupCardsByType } from "../../utils/deck";
 
 export default function DeckBuilder({ user }) {
 
-    const navigate = useNavigate();
+    const { id: deckId } = useParams();
 
     const {
-        deckId,
+        // deckId,
+        setDeckId,
 
         deckName,
-        getDeckName,
         setDeckName,
     
         deckListText,
         setDeckListText,
+
+        getNextUnnamedDeckName,
 
         mainboard,
 
@@ -45,7 +47,7 @@ export default function DeckBuilder({ user }) {
         parseDeckList,
         updateCardQuantity,
         save
-    } = useDeckBuilder(user);    
+    } = useDeckBuilder(user, deckId);    
 
     const [pendingSaveAfterImport, setPendingSaveAfterImport] = useState(false);
 
@@ -54,12 +56,22 @@ export default function DeckBuilder({ user }) {
 
 
     useEffect(() => {
+
+        if (deckId) {
+            setDeckId(deckId);
+        }
+
+        if (!deckId && user && deckName === "") {
+            getNextUnnamedDeckName(user.id).then(name => setDeckName(name));
+        }
+
         if (pendingSaveAfterImport && mainboard.length > 0) {
             save();
             setPendingSaveAfterImport(false);
             setSavedDeckToast(true);
         }
-    }, [mainboard])
+
+    }, [deckId, user, deckName, mainboard])
 
 
     return (
@@ -140,43 +152,101 @@ export default function DeckBuilder({ user }) {
             </Button>
             </Box>
 
-            {mainboard.length > 0 && (() => {
-                const grouped = groupCardsByType(mainboard);
-                const types = Object.keys(grouped).filter(type => grouped[type].length > 0);
+            <Tabs defaultValue={0}>
+                <TabList tabFlex={1}>
+                    <Tab className="deckbuilder-tab">
+                        <Typography sx={{ fontWeight: "bold" }}>Mainboard</Typography>
+                    </Tab>
+                    <Tab className="deckbuilder-tab">
+                        <Typography sx={{ fontWeight: "bold" }}>Sideboard</Typography>
+                    </Tab>
+                </TabList>
 
-                return (
-                    <Tabs defaultValue={currentMBTab} onChange={(_, val) => setCurrentMBTab(val as number)} className="main-editor">
-                        <TabList className="deckbuilder">
-                            {types.map((type, index) => {
-                            
-                            let sum = 0;
-                            grouped[type].forEach(c => sum += c.qty);
+                <TabPanel value={0} sx={{ padding: "0" }}>
+                    <Box sx={{ padding: "0" }}>
+                        {mainboard.length > 0 && (() => {
+                            const grouped = groupCardsByType(mainboard);
+                            const types = Object.keys(grouped).filter(type => grouped[type].length > 0);
 
-                            return sum > 0 && (
-                                <Tab key={index} className="deckbuilder-tab">
-                                    <img src={`/icons/other/${type}_symbol.svg`} height={15} style={{ filter: "invert(100%)" }}/> 
-                                    <Typography>{sum}</Typography>
-                                </Tab>
-                            )})}
-                        </TabList>
+                            return (
+                                <Tabs defaultValue={currentMBTab} onChange={(_, val) => setCurrentMBTab(val as number)} className="main-editor">
+                                    <TabList className="deckbuilder">
+                                        {types.map((type, index) => {
+                                        
+                                        let sum = 0;
+                                        grouped[type].forEach(c => sum += c.qty);
 
-                        {types.map((type, index) => (
-                            <TabPanel key={index} value={index}>
-                                <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                                    {grouped[type].map((entry, i) => (
-                                        <DeckCardDisplay
-                                            key={i}
-                                            card={entry.card}
-                                            quantity={entry.qty}
-                                            onQuantityChange={(newQty) => updateCardQuantity(entry.card.name, newQty)}
-                                        />
+                                        return sum > 0 && (
+                                            <Tab key={index} className="deckbuilder-tab">
+                                                <img src={`/icons/other/${type}_symbol.svg`} height={15} style={{ filter: "invert(100%)" }}/> 
+                                                <Typography>{sum}</Typography>
+                                            </Tab>
+                                        )})}
+                                    </TabList>
+
+                                    {types.map((type, index) => (
+                                        <TabPanel key={index} value={index}>
+                                            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                                                {grouped[type].map((entry, i) => (
+                                                    <DeckCardDisplay
+                                                        key={i}
+                                                        card={entry.card}
+                                                        inSideboard={false}
+                                                        quantity={entry.qty}
+                                                        onQuantityChange={(newQty) => updateCardQuantity(entry.card.name, newQty)}
+                                                    />
+                                                ))}
+                                            </Box>
+                                        </TabPanel>
                                     ))}
-                                </Box>
-                            </TabPanel>
-                        ))}
-                    </Tabs>
-                )
-            })()}
+                                </Tabs>
+                            )
+                        })()}
+                    </Box>
+                </TabPanel>
+
+                <TabPanel value={1} sx={{ padding: "0" }}>
+                    {sideboard.length > 0 && (() => {
+                            const grouped = groupCardsByType(sideboard);
+                            const types = Object.keys(grouped).filter(type => grouped[type].length > 0);
+
+                            return (
+                                <Tabs defaultValue={currentSBTab} onChange={(_, val) => setCurrentMBTab(val as number)} className="main-editor">
+                                    <TabList className="deckbuilder">
+                                        {types.map((type, index) => {
+                                        
+                                        let sum = 0;
+                                        grouped[type].forEach(c => sum += c.qty);
+
+                                        return sum > 0 && (
+                                            <Tab key={index} className="deckbuilder-tab">
+                                                <img src={`/icons/other/${type}_symbol.svg`} height={15} style={{ filter: "invert(100%)" }}/> 
+                                                <Typography>{sum}</Typography>
+                                            </Tab>
+                                        )})}
+                                    </TabList>
+
+                                    {types.map((type, index) => (
+                                        <TabPanel key={index} value={index}>
+                                            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                                                {grouped[type].map((entry, i) => (
+                                                    <DeckCardDisplay
+                                                        key={i}
+                                                        card={entry.card}
+                                                        inSideboard={true}
+                                                        quantity={entry.qty}
+                                                        onQuantityChange={(newQty) => updateCardQuantity(entry.card.name, newQty)}
+                                                    />
+                                                ))}
+                                            </Box>
+                                        </TabPanel>
+                                    ))}
+                                </Tabs>
+                            )
+                        })()}
+                </TabPanel>
+            </Tabs>
+
 
             <Toast
                 open={savedDeckToast}

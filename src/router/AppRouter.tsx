@@ -34,7 +34,7 @@ export default function AppRouter() {
                 {/* Routes protégées */}
                 <Route element={<ProtectedRoute />}>
                     <Route path="/user/:username/:id" element={<Profile />} />
-                    <Route path="/builder" element={<DeckBuilder user={user} />} />
+                    <Route path="/deck/:id/builder" element={<DeckBuilder user={user} />} />
                     <Route path="/deck/:id/details" element={<DeckDetails />} />
                     {/* <Route path="/user/:username/:id/decks" element={<DeckList />} /> */}
                 </Route>

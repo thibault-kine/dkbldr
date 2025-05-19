@@ -8,6 +8,7 @@ import { updateProfilePicture, uploadHeaderBgImage, uploadProfilePicture } from 
 import { useNavigate, useParams } from "react-router-dom";
 import Page404 from "./404";
 import { DeckList, Deck, getAllDecksFromUser } from "../../db/decks"
+import { v4 as uuidv4 } from "uuid";
 
 import "../style/Profile.css"
 import ProfileAvatar from "../components/ProfileAvatar";
@@ -177,7 +178,7 @@ export default function Profile() {
                         <Typography level="h4">Your decks</Typography>
                         <Button 
                             startDecorator={<Add sx={{ paddingRight: "10px" }}/>}
-                            onClick={() => navigate("/builder")}
+                            onClick={() => navigate(`/deck/${uuidv4()}/builder`)}
                         >
                             Create new deck
                         </Button>

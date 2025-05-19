@@ -4,7 +4,7 @@ import { User } from "@supabase/supabase-js";
 import { Card, Cards } from "scryfall-api";
 import { groupCardsByType } from "../../utils/deck";
 
-export function useDeckBuilder(user: User) {
+export function useDeckBuilder(user: User, initialId?: string) {
 
     const [deckId, setDeckId] = useState<string | null>(null);
     const [deckName, setDeckName] = useState("");
@@ -12,6 +12,16 @@ export function useDeckBuilder(user: User) {
 
     const [mainboard, setMainboard] = useState<DeckList>([]);
     const [sideboard, setSideboard] = useState<DeckList>([]);
+
+    const [deck, setDeck] = useState<Deck>({
+        id: initialId ?? undefined,
+        name: "",
+        userId: user?.id,
+        colorIdentity: [],
+        commanders: [],
+        mainboard: [],
+        sideboard: []
+    });
 
     const [currentMBTab, setCurrentMBTab] = useState(0);
     const [currentSBTab, setCurrentSBTab] = useState(0);
@@ -24,6 +34,19 @@ export function useDeckBuilder(user: User) {
         const updatedDeckList = mainboard.map(entry => `${entry.qty} ${entry.card.name}`).join("\n");
         setDeckListText(updatedDeckList);
     }, [mainboard]);
+
+
+    async function getNextUnnamedDeckName(userId: string): Promise<string> {
+        const decks = await getAllDecksFromUser(userId);
+        const unnamedNumbers = decks
+            .map(deck => {
+                const match = deck.name.match(/^Unnamed Deck (\d+)$/);
+                return match ? parseInt(match[1]) : 0;
+            }).filter(n => n > 0);
+        
+        const max = unnamedNumbers.length > 0 ? Math.max(...unnamedNumbers) : 0;
+        return `Unnamed Deck ${max + 1}`;
+    }
 
 
     async function getDeckName(): Promise<string> {
@@ -92,14 +115,14 @@ export function useDeckBuilder(user: User) {
 
 
     async function save() {
-        const nameToSave = await getDeckName();
+        const nameToSave = deckName ?? await getNextUnnamedDeckName(user.id);
         const commanders = groupCardsByType(mainboard).Commander.map(e => e.card);
         const colorIdentity = commanders
             .flatMap(c => c.color_identity)
             .filter((val, i, self) => self.indexOf(val) === i);
 
         const newDeck: Deck = {
-            id: "",
+            id: deckId ?? "",
             userId: user.id,
             name: nameToSave,
             colorIdentity: colorIdentity,
@@ -116,9 +139,12 @@ export function useDeckBuilder(user: User) {
 
 
     return {
-        deckId,
+        deckId, setDeckId,
+
+        deck, setDeck,
 
         deckName,
+        getNextUnnamedDeckName,
         getDeckName,
         setDeckName,
     

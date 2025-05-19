@@ -27,6 +27,7 @@ export async function saveDeckToUser(deck: Deck) {
     const { data, error } = await supabase
         .from("decks")
         .insert([{
+            id: deck.id ?? "",
             name: name,
             commanders: commanders,
             color_identity: colorIdentity,
