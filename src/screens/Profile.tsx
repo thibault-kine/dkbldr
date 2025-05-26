@@ -1,17 +1,19 @@
-import React, { useState, useEffect, useRef, HTMLInputTypeAttribute } from "react";
+import React, { useState, useEffect, useRef, HTMLInputTypeAttribute, use } from "react";
 import { User, useUser } from "../context/UserContext";
-import { Input, Button, Box, Typography, Avatar, Table } from "@mui/joy";
+import { Input, Button, Box, Typography, Avatar, Table, Textarea } from "@mui/joy";
 import { getUserById, updateUser } from "../../db/users";
 import Loading from "../components/Loading";
 import { Add, Check, Edit } from "@mui/icons-material";
 import { updateProfilePicture, uploadHeaderBgImage, uploadProfilePicture } from "../../db/storage";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import Page404 from "./404";
 import { DeckList, Deck, getAllDecksFromUser } from "../../db/decks"
 import { v4 as uuidv4 } from "uuid";
 
 import "../style/Profile.css"
 import ProfileAvatar from "../components/ProfileAvatar";
+import { supabase } from "../../db/supabase";
+import { Card, Cards, Set, Sets } from "scryfall-api";
 
 
 export default function Profile() {
@@ -26,6 +28,9 @@ export default function Profile() {
     // Uniquement si l'utilisateur est le propriétaire du profil
     const [newUsername, setNewUsername] = useState("");
     const [editing, setEditing] = useState(false);
+    const [description, setDescription] = useState("");
+    const [favoriteCard, setFavoriteCard] = useState<Card | null>(null);
+    const [favoriteSet, setFavoriteSet] = useState<Set | null>(null);
 
     const isOwner = user && profile && user.id === profile.id;
 
@@ -38,15 +43,9 @@ export default function Profile() {
             try {
                 const userData = await getUserById(id);
                 
-                setProfile({
-                    id: userData.id,
-                    username: userData.username,
-                    email: userData.email,
-                    pfp: userData.pfp,
-                    headerBg: userData.header_bg
-                });
+                setProfile(userData);
 
-                setNewUsername(userData.username);
+                setNewUsername(userData?.username ?? "");
             } catch (error) {
                 console.error("Erreur lors de la récupération de l'utilisateur: ", error);
             } finally {
@@ -67,7 +66,11 @@ export default function Profile() {
             }
         }
         fetchDecks();
-    }, [id, decks]);
+
+        getFavoriteCard();
+        getFavoriteSet();
+
+    }, [id, decks, favoriteCard, favoriteSet]);
 
     
     async function handleUsernameChange() {
@@ -117,6 +120,42 @@ export default function Profile() {
         }
     }
 
+    async function handleDescriptionChange() {
+        if (!user || !isOwner) return;
+        
+        try {
+            await updateUser(user.id, { description: description });
+            await refreshUser();
+            setEditing(false);
+        } catch (error) {
+            console.error("Erreur lors de la mise à jour :", error);
+        }
+    }
+
+
+    async function getFavoriteCard() {
+        try {
+            if (!user?.favorite_card) return;
+            const res = await Cards.byName(user?.favorite_card);
+            setFavoriteCard(res!);
+        }
+        catch (error) {
+            console.error(error);
+        }
+    }
+
+
+    async function getFavoriteSet() {
+        try {
+            if (!user?.favorite_set) return;
+            const res = await Sets.byCode(user.favorite_set);
+            setFavoriteSet(res!);    
+        }
+        catch (error) {
+            console.error(error);
+        }
+    }
+
 
     if (loading) return <Loading/>;
     if (!profile) return <Page404/>;
@@ -129,7 +168,7 @@ export default function Profile() {
                     <Box 
                         className="background-profile"
                         sx={{ 
-                            backgroundImage: `url(${profile.headerBg || ""})`,
+                            backgroundImage: `url(${profile.header_bg || ""})`,
                             backgroundSize: "cover",
                         }}
                     >
@@ -167,6 +206,12 @@ export default function Profile() {
                             </>) : (
                                 <Typography className="username-input">{profile.username}</Typography>
                             )}
+
+                            <Typography className="followers">
+                                <Typography className="followers-count">{profile.followers && "0"}</Typography> followers
+                                •
+                                <Typography className="followers-count"> {profile.following && "0"}</Typography> following
+                            </Typography>
                         </Box>
 
                     </Box>
@@ -174,8 +219,61 @@ export default function Profile() {
                     <Box className="main-content">
 
                         <Box className="sep"></Box>
+                        <Typography className="subtitle">About {user?.username}</Typography>
+                        
+                        {isOwner ? (
+                            <Textarea
+                                placeholder="Write something interesting about you..."
+                                minRows={0}
+                                maxRows={5}
+                                value={user.description}
+                                onChange={(e) => {
+                                    setDescription(e.target.value);
+                                    setEditing(true);
+                                }}
+                                endDecorator={
+                                    <Box>
+                                        <Button className="validate-desc-btn standard-btn-sm" onClick={handleDescriptionChange}>
+                                            {editing ? <Check/> : <Edit/>}
+                                        </Button> 
+                                    </Box>
+                                }
+                            />
+                        ) : (
+                            <Box>
+                                <Typography>
+                                    {user?.description ?? "No description..."}
+                                </Typography>
+                            </Box>
+                        )}
 
-                        <Typography level="h4">Your decks</Typography>
+                        <Box>
+                            <Box>
+                                <Typography>Favorite Colors:</Typography>
+                                <Box>
+                                    {user?.favorite_colors?.map((color, i) => (
+                                        <img key={i} src={`/icons/mana/${color}.svg`} width={20} height={20}/>
+                                    ))}
+                                </Box>
+                            </Box>
+
+                            <Box>
+                                <Typography>Favorite Card:</Typography>
+                                <Link style={{ color: "var(--purple)" }} to={{ pathname: user?.favorite_card }}>{favoriteCard?.name}</Link>
+                            </Box>
+
+                            <Box>
+                                <Typography>Favorite Set:</Typography>
+                                <Link style={{ color: "var(--purple)" }} to={{ pathname: user?.favorite_set }}>
+                                    <img src={favoriteSet?.icon_svg_uri} color="var(--purple)" height={20}/>
+                                    <Typography sx={{ color: "var(--purple)" }}>{favoriteSet?.code.toUpperCase()}</Typography>
+                                </Link>
+                            </Box>
+                        </Box>
+
+                        <Box className="sep"></Box>
+
+                        <Typography className="subtitle">{user?.username}'s decks</Typography>
                         <Button 
                             startDecorator={<Add sx={{ paddingRight: "10px" }}/>}
                             onClick={() => navigate(`/deck/${uuidv4()}/builder`)}
@@ -184,21 +282,13 @@ export default function Profile() {
                         </Button>
 
                         {decks.length > 0 ? (
-                            <Table className="profile-decks">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Commander</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                {decks.map((d, i) => (
-                                    <tr key={i} onClick={() => navigate(`/deck/${d.id}/details`)}>
-                                        <td>{d.name}</td>
-                                    </tr>
+                            <Box sx={{ width: "100%", display: "flex", flexDirection: "column", paddingTop: "30px" }}>
+                                {decks.map((deck, i) => (
+                                    <Link key={i} to={`/deck/${deck.id}/${isOwner ? 'builder' : 'details'}`} style={{ color: "var(--purple)" }}>
+                                        {deck.name}
+                                    </Link>
                                 ))}
-                                </tbody>
-                            </Table>
+                            </Box>
                         ) : (
                             <Typography>No decks yet :/</Typography>
                         )}

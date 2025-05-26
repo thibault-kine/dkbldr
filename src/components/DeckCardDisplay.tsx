@@ -10,12 +10,14 @@ export default function DeckCardDisplay({
     card, 
     quantity,
     inSideboard,
-    onQuantityChange
+    onQuantityChange,
+    isAuthor = true
 }: {
     card: Card; 
     quantity: number;
     inSideboard: boolean;
     onQuantityChange?: (newQty: number) => void; 
+    isAuthor?: boolean;
 }) {
 
     const [open, setOpen] = useState(false);
@@ -30,15 +32,10 @@ export default function DeckCardDisplay({
     const buttonRef = useRef(null);
 
 
-    const onPrintChange = async () => {
-        const allPrints = await getAllPrints(card);
-        
-    }
+    const onPrintChange = async () => { }
 
 
-    const onBoardSwitch = () => {
-        
-    }
+    const onBoardSwitch = () => { }
 
 
     return (
@@ -54,7 +51,7 @@ export default function DeckCardDisplay({
                             <img
                                 src={displayedFace.image_uris?.png}
                                 alt={`${card.name} (${card.set.toUpperCase()}#${card.collector_number})`}
-                                width={200}
+                                style={{ margin: "auto", width: "80%" }}
                             />
                         </Badge>
                     </Box>
@@ -85,46 +82,56 @@ export default function DeckCardDisplay({
                 >
                     See card on Scryfall <img src="/icons/other/scryfall.svg" width={25}/>
                 </MenuItem>
-                <MenuItem 
-                    className="card-menu"
-                    onClick={() => onPrintChange()}
-                >Switch printing <AutoAwesome/></MenuItem>
-                <MenuItem
-                    className="card-menu"
-                >
-                    {isInCollection ? "Remove from collection" : "Add to collection"}
-                </MenuItem>
-                <Box
-                    className="card-menu-box"
-                    onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setOpen(true)
-                    }}
-                >
-                    Change quantity
-                    <Input
-                        className="qty-input"
-                        onClick={(e) => e.stopPropagation()}
-                        defaultValue={quantity}
-                        type="number"
-                        slotProps={{ input: {
-                            min: 1,
-                            max: 999,
-                            step: 1
-                        }}}
-                        onChange={(e) => {
-                            const newQty = Number(e.target.value);
-                            setCurrentQuantity(newQty);
-                            if (onQuantityChange) onQuantityChange(newQty);
+                {isAuthor ?? 
+                    <MenuItem 
+                        className="card-menu"
+                        onClick={() => onPrintChange()}
+                    >
+                        Switch printing <AutoAwesome/>
+                    </MenuItem>
+                }
+                
+                {isAuthor ?? 
+                    <MenuItem className="card-menu"> 
+                        {isInCollection ? "Remove from collection" : "Add to collection"}
+                    </MenuItem>
+                }
+                {isAuthor ?? 
+                    <Box
+                        className="card-menu-box"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setOpen(true)
                         }}
-                    />
-                </Box>
-                <MenuItem 
-                    className="card-menu"
-                    onClick={() => onBoardSwitch()}
-                >Move to {inSideboard ? "mainboard" : "sideboard"} <SwapHoriz/>
-                </MenuItem>
+                    >
+                        Change quantity
+                        <Input
+                            className="qty-input"
+                            onClick={(e) => e.stopPropagation()}
+                            defaultValue={quantity}
+                            type="number"
+                            slotProps={{ input: {
+                                min: 1,
+                                max: 999,
+                                step: 1
+                            }}}
+                            onChange={(e) => {
+                                const newQty = Number(e.target.value);
+                                setCurrentQuantity(newQty);
+                                if (onQuantityChange) onQuantityChange(newQty);
+                            }}
+                        />
+                    </Box>
+                }
+                {isAuthor ?? 
+                    <MenuItem 
+                        className="card-menu"
+                        onClick={() => onBoardSwitch()}
+                    >
+                        Move to {inSideboard ? "mainboard" : "sideboard"} <SwapHoriz/>
+                    </MenuItem>
+                }
             </Menu>
         </Dropdown>
     )

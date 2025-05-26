@@ -15,7 +15,8 @@ export function groupCardsByType(deckList: DeckList) {
     const isCommander = (card: Card) => {
         const t = card.type_line;
         
-        const releaseDate = Date.parse(card.released_at.toDateString());
+        // Check commander legality by release date
+        const releaseDate = Date.parse(new Date(card.released_at).toDateString());
         const today = Date.now();
         
         return (

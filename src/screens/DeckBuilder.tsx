@@ -1,7 +1,7 @@
 import React, { use, useEffect, useState } from "react";
 import { Box, Button, Input, LinearProgress, Tab, TabList, TabPanel, Tabs, Textarea, Typography } from "@mui/joy";
 import { useNavigate, useParams } from "react-router-dom";
-import { DeckList, getAllDecksFromUser, saveDeckToUser } from "../../db/decks";
+import { DeckList, getAllDecksFromUser, getDeckById, saveDeckToUser } from "../../db/decks";
 import "../style/DeckBuilder.css"
 import BasicModal from "../components/BasicModal";
 import { CheckCircle, ContentPaste, MoreVert, Save, Settings } from "@mui/icons-material";
@@ -31,6 +31,7 @@ export default function DeckBuilder({ user }) {
         getNextUnnamedDeckName,
 
         mainboard,
+        setMainboard,
 
         sideboard,
         setSideboard,
@@ -55,10 +56,21 @@ export default function DeckBuilder({ user }) {
     const [savedDeckToast, setSavedDeckToast] = useState(false);
 
 
+    async function loadDeckFromDb(id: string) {
+        const deck = await getDeckById(id);
+        if (deck) {
+            setDeckName(deck.name);
+            setMainboard(deck.mainboard);
+            setSideboard(deck.sideboard);
+        }
+    }
+
+
     useEffect(() => {
 
         if (deckId) {
             setDeckId(deckId);
+            loadDeckFromDb(deckId);
         }
 
         if (!deckId && user && deckName === "") {

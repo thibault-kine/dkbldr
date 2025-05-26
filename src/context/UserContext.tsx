@@ -2,13 +2,21 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "../../db/supabase";
 import { getUserById } from "../../db/users";
 
-export interface User {
+
+export type User = {
     id: string;
     username: string;
     email: string;
     pfp?: string;
-    headerBg?: string;
-}
+    header_bg?: string;
+    description?: string;
+    followers?: string[];
+    following?: string[];
+    liked_decks?: string[];
+    favorite_card?: string;
+    favorite_set?: string;
+    favorite_colors?: string[];
+};
 
 interface UserContextType {
     user: User | null;

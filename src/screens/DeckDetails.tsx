@@ -1,106 +1,145 @@
-import { Box, Typography } from "@mui/joy"
-import React, { useEffect, useState } from "react"
-import { useParams } from "react-router-dom"
-import { Deck, DeckList, getDeckById } from "../../db/decks";
-import Loading from "../components/Loading";
-import { Card } from "scryfall-api";
+import React, { use, useEffect, useState } from "react";
+import { Box, Button, Input, LinearProgress, Tab, TabList, TabPanel, Tabs, Textarea, Typography } from "@mui/joy";
+import { useNavigate, useParams } from "react-router-dom";
+import { DeckList, getAllDecksFromUser, getDeckById, saveDeckToUser } from "../../db/decks";
+import "../style/DeckBuilder.css"
+import BasicModal from "../components/BasicModal";
+import { CheckCircle, ContentPaste, MoreVert, Save, Settings } from "@mui/icons-material";
+import ExportDeck from "../components/ExportDeck";
+import { Card, Cards } from "scryfall-api";
+import DeckCardDisplay from "../components/DeckCardDisplay";
+import Toast from "../components/Snackbar";
+import { Deck } from "../../db/decks";
+import { useDeckBuilder } from "../hooks/useDeckBuilder";
+import { groupCardsByType } from "../../utils/deck";
+
 
 export default function DeckDetails() {
 
-    const { id } = useParams();
+    const { id: deckId } = useParams(); 
+
     const [deck, setDeck] = useState<Deck | null>(null);
-
-
-    const CARD_TYPES = [
-        "Commander", "Creature", "Artifact", 
-        "Enchantment", "Instant", "Sorcery", 
-        "Planeswalker", "Battle", "Land" 
-    ];
-
-    function groupCardsByType(deck: Deck) {
-        const groups: Record<string, Card[]> = {};
-        for (const type of CARD_TYPES) {
-            groups[type] = [];
-        }
-
-        console.log(groups);
-
-        deck.deckList.forEach((entry, index) => {
-            const { card } = entry;
-            const typeline = card.card_faces?.[0].type_line ?? card.type_line;
-            const isCreature = typeline.includes("Creature");
-            const isLand = typeline.includes("Land");
-
-            let commanders: typeof deck.commanders = [];
-            {
-                const potentialCommanders = deck.deckList.slice(-2); // les 3 dernières cartes
-    
-                const isCommanderType = (card: Card) => {
-                    const t = card.type_line;
-                    return (
-                        card.legalities.commander === "legal" && (
-                        t.includes("Legendary") ||
-                        t.includes("Background") ||
-                        card.oracle_text?.includes("can be your commander")
-                    ));
-                };
-    
-                const validCandidates = potentialCommanders.filter(entry => isCommanderType(entry.card));
-    
-                if (validCandidates.length === 1) {
-                    commanders = [validCandidates[0].card];
-                } else if (validCandidates.length >= 2) {
-                    const background = validCandidates.find(e => e.card.type_line.includes("Background"));
-                    const creature = validCandidates.find(e => e.card.type_line.includes("Legendary Creature"));
-    
-                    if (background && creature) {
-                        commanders = [creature.card, background.card];
-                    } else {
-                        // Par défaut, on prend la dernière carte légendaire/commandable
-                        const last = [...validCandidates].reverse().find(e => isCommanderType(e.card));
-                        if (last) commanders = [last.card];
-                    }
-                }
-    
-                groups.Commander = commanders;
-            }
-
-            if (isCreature && !commanders.includes(entry.card))
-                groups.Creature.push(entry.card);
-            else if (isLand)
-                groups.Land.push(entry.card);
-            else if (typeline.includes("Artifact"))      groups.Artifact.push(entry.card);
-            else if (typeline.includes("Enchantment"))   groups.Enchantment.push(entry.card);
-            else if (typeline.includes("Instant"))       groups.Instant.push(entry.card);
-            else if (typeline.includes("Sorcery"))       groups.Sorcery.push(entry.card);
-            else if (typeline.includes("Planeswalker"))  groups.Planeswalker.push(entry.card);
-            else if (typeline.includes("Battle"))        groups.Battle.push(entry.card);
-        })
-
-        return groups;
-    }
-
 
     useEffect(() => {
         async function fetchDeck() {
-            if (!id) return;
+            if (!deckId) return;
             try {
-                const deckData = await getDeckById(id);
-                setDeck({...deckData});
-            }
-            catch (error) {
+                const deckData = await getDeckById(deckId);
+                
+                setDeck({
+                    userId: deckData.user_id,
+                    name: deckData.name,
+                    colorIdentity: deckData.color_identity,
+                    commanders: deckData.commanders,
+                    
+                    mainboard: deckData.mainboard,
+                    sideboard: deckData.sideboard,
+                });
+            } catch (error) {
                 console.error("Erreur lors de la récupération du deck: ", error);
             }
-        } 
+        }
         fetchDeck();
-    }, [deck]);
-
-
-    if (!deck) return <Loading/>
+    }, [deck])
 
     return (
         <Box>
-            <Typography>{deck.name}</Typography>
+            <Typography sx={{ textAlign: "center", fontSize: "26px", fontWeight: "bold" }}>{deck?.name}</Typography>
+
+            <Tabs defaultValue={0}>
+                <TabList tabFlex={1}>
+                    <Tab className="deckbuilder-tab">
+                        <Typography sx={{ fontWeight: "bold" }}>Mainboard</Typography>
+                    </Tab>
+                    <Tab className="deckbuilder-tab">
+                        <Typography sx={{ fontWeight: "bold" }}>Sideboard</Typography>
+                    </Tab>
+                </TabList>
+
+                <TabPanel value={0} sx={{ padding: "0" }}>
+                    <Box sx={{ padding: "0" }}>
+                        {(deck && deck?.mainboard.length > 0) && (() => {
+                            const grouped = groupCardsByType(deck?.mainboard);
+                            const types = Object.keys(grouped).filter(type => grouped[type].length > 0);
+
+                            return (
+                                <Tabs defaultValue={0} className="main-editor">
+                                    <TabList className="deckbuilder">
+                                        {types.map((type, index) => {
+                                        
+                                        let sum = 0;
+                                        grouped[type].forEach(c => sum += c.qty);
+
+                                        return sum > 0 && (
+                                            <Tab key={index} className="deckbuilder-tab">
+                                                <img src={`/icons/other/${type}_symbol.svg`} height={15} style={{ filter: "invert(100%)" }}/> 
+                                                <Typography>{sum}</Typography>
+                                            </Tab>
+                                        )})}
+                                    </TabList>
+
+                                    {types.map((type, index) => (
+                                        <TabPanel key={index} value={index}>
+                                            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                                                {grouped[type].map((entry, i) => (
+                                                    <DeckCardDisplay
+                                                        isAuthor={false}
+                                                        key={i}
+                                                        card={entry.card}
+                                                        inSideboard={false}
+                                                        quantity={entry.qty}
+                                                    />
+                                                ))}
+                                            </Box>
+                                        </TabPanel>
+                                    ))}
+                                </Tabs>
+                            )
+                        })()}
+                    </Box>
+                </TabPanel>
+
+                <TabPanel value={1} sx={{ padding: "0" }}>
+                    {(deck && deck?.sideboard.length > 0) && (() => {
+                            const grouped = groupCardsByType(deck?.sideboard);
+                            const types = Object.keys(grouped).filter(type => grouped[type].length > 0);
+
+                            return (
+                                <Tabs defaultValue={0} className="main-editor">
+                                    <TabList className="deckbuilder">
+                                        {types.map((type, index) => {
+                                        
+                                        let sum = 0;
+                                        grouped[type].forEach(c => sum += c.qty);
+
+                                        return sum > 0 && (
+                                            <Tab key={index} className="deckbuilder-tab">
+                                                <img src={`/icons/other/${type}_symbol.svg`} height={15} style={{ filter: "invert(100%)" }}/> 
+                                                <Typography>{sum}</Typography>
+                                            </Tab>
+                                        )})}
+                                    </TabList>
+
+                                    {types.map((type, index) => (
+                                        <TabPanel key={index} value={index}>
+                                            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                                                {grouped[type].map((entry, i) => (
+                                                    <DeckCardDisplay
+                                                        isAuthor={false}
+                                                        key={i}
+                                                        card={entry.card}
+                                                        inSideboard={true}
+                                                        quantity={entry.qty}
+                                                    />
+                                                ))}
+                                            </Box>
+                                        </TabPanel>
+                                    ))}
+                                </Tabs>
+                            )
+                        })()}
+                </TabPanel>
+            </Tabs>
         </Box>
     )
 }

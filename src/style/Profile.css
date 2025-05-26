@@ -14,9 +14,10 @@
 
 
 .MuiAvatar-root.profile-avatar {
-    width: 125px;
-    height: 125px;
+    width: 100px;
+    height: 100px;
     outline: 5px solid white;
+    margin-bottom: 20px;
 }
 
 
@@ -121,14 +122,19 @@ div .avatar-profile {
     transition: opacity 0.2s;
 }
 
+.MuiTypography-root.subtitle {
+    font-weight: bold;
+    font-size: 24px;
+}
+
 
 .MuiBox-root.avatar-and-username {
-    margin-top: 100px;
+    margin-top: 130px;
 }
 
 
 .MuiBox-root.main-content {
-    padding-top: 80px;
+    padding-top: 115px;
     padding-bottom: 50px;
     width: 100%;
 }
@@ -142,4 +148,16 @@ div .avatar-profile {
 
 .MuiTable-root.profile-decks * {
     text-align: left;
+}
+
+
+.MuiTypography-root.followers {
+    margin-top: 10px;
+    color: var(--txt-color);
+    font-weight: bold;
+    width: 100%;
+}
+
+.MuiTypography-root.followers-count {
+    color: orange;
 }
