@@ -19,6 +19,7 @@
     "axios": "^1.7.9",
     "bcryptjs": "^3.0.0",
     "localtunnel": "^2.0.2",
+    "number-shortener": "^1.0.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-icons": "^5.4.0",

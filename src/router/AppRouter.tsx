@@ -14,6 +14,7 @@ import DeckDetails from "../screens/DeckDetails";
 import Page404 from "../screens/404";
 import { useUser } from "../context/UserContext";
 import Navbar from "../components/Navbar";
+import Test from "../screens/Test";
 
 
 export default function AppRouter() {
@@ -41,6 +42,9 @@ export default function AppRouter() {
 
                 {/* Page 404 */}
                 <Route path="*" element={<Page404 />} />
+
+                {/* Page de test */}
+                <Route path="/test" element={<Test/>} />
             </Routes>
         </>
     );

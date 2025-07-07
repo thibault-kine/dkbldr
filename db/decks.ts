@@ -1,5 +1,6 @@
 import { Card } from "scryfall-api";
 import { supabase } from "./supabase";
+import { Archetype } from "./archetypes";
 
 
 export type DeckList = { 
@@ -19,6 +20,7 @@ export type Deck = {
     sideboard: DeckList;
 
     createdAt?: string;
+    likes: number;
 }
 
 
@@ -28,15 +30,15 @@ export async function saveDeckToUser(deck: Deck) {
         .from("decks")
         .insert([{
             id: deck.id ?? "",
-            name: name,
-            commanders: commanders,
+            name,
+            commanders,
             color_identity: colorIdentity,
             mainboard,
             sideboard,
             user_id: userId,
         }]);
 
-    console.log(deck);
+    // console.log(deck);
 
     if (error) throw error;
     return data;

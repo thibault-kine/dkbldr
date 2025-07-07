@@ -46,11 +46,7 @@ export async function updateUser(
 ) {
     let _updates: Partial<User> = {};
 
-    if (updates.username)   _updates.username = updates.username;
-    if (updates.email)      _updates.email = updates.email;
-    if (updates.pfp)        _updates.pfp;
-    if (updates.header_bg)  _updates.header_bg;
-
+    _updates = updates;
 
     const { data, error } = await supabase
         .from('users')

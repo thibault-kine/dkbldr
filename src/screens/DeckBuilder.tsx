@@ -1,10 +1,10 @@
 import React, { use, useEffect, useState } from "react";
-import { Box, Button, Input, LinearProgress, Tab, TabList, TabPanel, Tabs, Textarea, Typography } from "@mui/joy";
+import { Box, Button, IconButton, Input, LinearProgress, Tab, TabList, TabPanel, Tabs, Textarea, Typography } from "@mui/joy";
 import { useNavigate, useParams } from "react-router-dom";
 import { DeckList, getAllDecksFromUser, getDeckById, saveDeckToUser } from "../../db/decks";
 import "../style/DeckBuilder.css"
 import BasicModal from "../components/BasicModal";
-import { CheckCircle, ContentPaste, MoreVert, Save, Settings } from "@mui/icons-material";
+import { Add, CheckCircle, ContentPaste, Man, MoreVert, Save, Settings } from "@mui/icons-material";
 import ExportDeck from "../components/ExportDeck";
 import { Card, Cards } from "scryfall-api";
 import DeckCardDisplay from "../components/DeckCardDisplay";
@@ -12,6 +12,7 @@ import Toast from "../components/Snackbar";
 import { Deck } from "../../db/decks";
 import { useDeckBuilder } from "../hooks/useDeckBuilder";
 import { groupCardsByType } from "../../utils/deck";
+import CardSearchbar from "../components/CardSearchbar";
 
 
 export default function DeckBuilder({ user }) {
@@ -57,11 +58,16 @@ export default function DeckBuilder({ user }) {
 
 
     async function loadDeckFromDb(id: string) {
-        const deck = await getDeckById(id);
-        if (deck) {
-            setDeckName(deck.name);
-            setMainboard(deck.mainboard);
-            setSideboard(deck.sideboard);
+        try {
+            const deck = await getDeckById(id);
+            if (deck) {
+                setDeckName(deck.name);
+                setMainboard(deck.mainboard);
+                setSideboard(deck.sideboard);
+            }
+        }
+        catch (e) {
+            return;
         }
     }
 
@@ -86,15 +92,26 @@ export default function DeckBuilder({ user }) {
     }, [deckId, user, deckName, mainboard])
 
 
+    function addToDeck(card: Card) {
+        if (!card) return;
+        
+        if (mainboard.find(entry => entry.card.name == card.name)) {
+            mainboard.find(entry => entry.qty++);
+        } else {
+            setMainboard([{ qty: 1, card: card }, ...mainboard])
+        }
+    }
+
+
     return (
         <Box>
             <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-evenly" }}>
             
             <Input
-                value={deckName}
+                // value={deckName}
                 onChange={(e) => setDeckName(e.target.value)}
                 sx={{ width: "100%" }}
-                placeholder="New Deck"
+                placeholder={deckName ?? "New Deck"}
             />
 
             <BasicModal icon={<Settings/>} title="">
@@ -108,7 +125,6 @@ export default function DeckBuilder({ user }) {
                     <TabPanel value={0}>
                         <Textarea 
                             className="text-area"
-                            value={deckListText}
                             onChange={(e) => setDeckListText(e.target.value)} 
                             placeholder={"Paste your deck here!"}
                             minRows={4} maxRows={4}
@@ -163,6 +179,14 @@ export default function DeckBuilder({ user }) {
                 <Save/>
             </Button>
             </Box>
+
+            <CardSearchbar 
+                onSelected={(card) => addToDeck(card)}
+                sx={{
+                    width: "100%",
+                    margin: "5px 0"
+                }}    
+            />
 
             <Tabs defaultValue={0}>
                 <TabList tabFlex={1}>
