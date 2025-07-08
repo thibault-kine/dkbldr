@@ -10,8 +10,8 @@ export type User = {
     pfp?: string;
     header_bg?: string;
     description?: string;
-    followers?: string[];
-    following?: string[];
+    followers: string[];
+    following: string[];
     liked_decks?: string[];
     favorite_card?: string;
     favorite_set?: string;

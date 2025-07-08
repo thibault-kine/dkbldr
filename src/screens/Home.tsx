@@ -55,20 +55,20 @@ export default function Home() {
     return (
         <Box>
             <section>
-                <Typography sx={{ fontWeight: "bold", fontSize: "44px", textAlign: "center" }}>Welcome home, {user?.username}!</Typography>
+                <Typography className="headline">Welcome home, {user?.username}!</Typography>
             </section>
 
             <section>
-                <Link sx={{ fontSize: 36, fontWeight: "bold", textAlign: "center" }}>
-                    START EXPL<img src={`/icons/mana/${currentCol}.svg`} width={26}/>RING!
-                </Link>
+                <Typography sx={{ fontSize: 36, fontWeight: "bold", textAlign: "center" }}>
+                    <Link>START EXPL<img src={`/icons/mana/${currentCol}.svg`} width={26}/>RING!</Link>
+                </Typography>
             </section>
 
             <section style={{
                 display: "flex",
                 flexDirection: "column"
             }}>
-                <Typography sx={{ fontWeight: "bold", fontSize: "44px", textAlign: "center" }}>Commander of the day</Typography>
+                <Typography className="headline">Commander of the day</Typography>
                 {cotd ? (
                     <Link className="daily-commander" href={cotd.scryfall_uri} target="_blank">
                         <img src={cotd.image_uris?.png} style={{ margin: "auto", width: "100%" }}/>
@@ -79,11 +79,11 @@ export default function Home() {
             </section>
 
             <section>
-                <Typography>Latest decks from people you follow</Typography>
+                <Typography className="headline">Latest decks from people you follow</Typography>
             </section>
 
             <section>
-                <Typography>These decks look interesting</Typography>
+                <Typography className="headline">These decks look interesting</Typography>
             </section>
         </Box>
     )

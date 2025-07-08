@@ -208,9 +208,9 @@ export default function Profile() {
                             )}
 
                             <Typography className="followers">
-                                <Typography className="followers-count">{profile.followers && "0"}</Typography> followers
+                                <Typography className="followers-count">{profile.followers.length}</Typography> followers
                                 •
-                                <Typography className="followers-count"> {profile.following && "0"}</Typography> following
+                                <Typography className="followers-count"> {profile.following.length}</Typography> following
                             </Typography>
                         </Box>
 
@@ -274,12 +274,12 @@ export default function Profile() {
                         <Box className="sep"></Box> */}
 
                         <Typography className="subtitle">{user?.username}'s decks</Typography>
-                        <Button 
+                        {isOwner ?? <Button 
                             startDecorator={<Add sx={{ paddingRight: "10px" }}/>}
                             onClick={() => navigate(`/deck/${uuidv4()}/builder`)}
                         >
                             Create a new deck
-                        </Button>
+                        </Button>}
 
                         {decks.length > 0 ? (
                             <Table className="user-decks" borderAxis="both">
@@ -307,7 +307,7 @@ export default function Profile() {
                                 </tbody>
                             </Table>
                         ) : (
-                            <Typography>No decks yet :(</Typography>
+                            <Typography>No decks yet ☹️</Typography>
                         )}
 
                     </Box>

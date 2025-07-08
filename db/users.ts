@@ -40,14 +40,7 @@ export async function getUserById(id: string): Promise<User | null> {
 }
 
 
-export async function updateUser(
-    id: string, 
-    updates: Partial<User>
-) {
-    let _updates: Partial<User> = {};
-
-    _updates = updates;
-
+export async function updateUser(id: string, updates: Partial<User>) {
     const { data, error } = await supabase
         .from('users')
         .update(updates)
@@ -68,3 +61,34 @@ export async function deleteUser(id: string) {
     return data;
 }
 
+
+/* FOLLOW / UNFOLLOW STUFF */
+
+export async function followUser(currentUserId: string, targetUserId: string) {
+    const currentUser   = await getUserById(currentUserId);
+    const targetUser    = await getUserById(targetUserId);
+
+    if (!currentUser || !targetUser) throw new Error("Utilisateur non trouvé");
+
+    if (currentUser.following.includes(targetUserId) || targetUser.followers.includes(currentUserId)) 
+        return;
+
+    currentUser.following.push(targetUserId);
+    targetUser.followers.push(currentUserId);
+
+    await supabase.rpc('follow_user', {
+        target_user_id: targetUser.id,
+    });
+}
+
+
+export async function unfollowUser(targetUserId: string) {
+    const { error } = await supabase.rpc("unfollow_user", {
+        target_user_id: targetUserId,
+    });
+
+    if (error) {
+        console.error("Erreur lors du unfollow :", error.message);
+        throw new Error("Unfollow échoué");
+    }
+}

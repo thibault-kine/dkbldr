@@ -2,3 +2,9 @@
     width: 80%;
     margin: auto;
 }
+
+.MuiTypography-root.headline {
+    font-size: 44px;
+    font-weight: bold;
+    text-align: center;
+}
