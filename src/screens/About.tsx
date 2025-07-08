@@ -1,9 +1,10 @@
+import { Box, Typography } from "@mui/joy"
 import React from "react"
 
 export default function About() {
     return (
-        <div>
-            Blablabla copyright blablabla TOS blablabla whatever...
-        </div>
+        <Box>
+            <Typography>Blablabla copyright blablabla TOS blablabla whatever...</Typography>
+        </Box>
     )
 }

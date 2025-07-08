@@ -1,11 +1,11 @@
+import { Box, Typography, Link } from "@mui/joy";
 import React from "react";
-import { Link } from "react-router-dom";
 
 export default function Page404() {
     return (
-        <div>
-            <h1>404: Page not found</h1>
-            <Link to={'/'}>Homepage</Link>
-        </div>
+        <Box>
+            <Typography level="h1">404: Page not found</Typography>
+            <Link href="/">Go back home</Link>
+        </Box>
     )
 }

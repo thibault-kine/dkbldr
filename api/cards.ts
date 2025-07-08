@@ -1,5 +1,8 @@
-import axios, { all } from "axios";
 import { Card, Cards } from "scryfall-api";
+import { getSeedFromDate, seededRandom } from "../utils/utils";
+
+
+export type CardEntry = { qty: number; card: Card };
 
 
 export async function getAllCards(query: string) {
@@ -26,14 +29,24 @@ export async function getRandomCard(): Promise<Card> {
 }
 
 
-export async function getRandomCommander(): Promise< Card > {
+export async function getRandomCommander(tzOffset = 60): Promise<Card> {
     try {
-        const allCommanders = await getAllCards("legal:edh is:commander");
-        if (allCommanders.length === 0)
-            throw new Error("No commander found!");
+        const now = new Date();
+        now.setMinutes(now.getMinutes() + tzOffset);
+        const seed = getSeedFromDate(now);
+        const rnd = seededRandom(seed);
 
-        const randomIndex = Math.floor(Math.random() * allCommanders.length);
-        return allCommanders[randomIndex];
+        const res = await fetch("https://api.scryfall.com/cards/random?q=legal:edh is:commander -t:background -otag:synergy-sticker", {
+            method: "GET", 
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+        
+        if (!res.ok) throw new Error("Erreur Scryfall: " + res.status);
+        const card = await res.json();
+
+        return card as Card;
     }
     catch (err) {
         console.log(err);
@@ -48,6 +61,31 @@ export async function searchCard(query: string) {
         return res;
     }
     catch (err) {
+        console.log(err);
+        throw err;
+    }
+}
+
+
+export async function getCardById(id: number) {
+    try {
+        const res = await Cards.byId(id.toString());
+        return res;
+    }
+    catch (err) {
+        console.log(err);
+        throw err;
+    }
+}
+
+
+export async function getAllPrints(card: Card): Promise<Card[]> {
+    try {
+        const res = await fetch(card.prints_search_uri);
+        const data = await res.json();
+        return data.data;
+    }
+    catch(err) {
         console.log(err);
         throw err;
     }

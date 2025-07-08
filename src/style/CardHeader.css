@@ -1,0 +1,55 @@
+@font-face {
+    font-family: "Beleren";
+    src: url("/public/fonts/beleren/Beleren2016-Bold.ttf");
+}
+
+
+.card-header {
+    padding: 2px 5px;
+    width: 300px;
+    border-radius: 50px / 100px;
+    color: black;
+    font-family: "Beleren";
+}
+
+/* Colorless */
+.card-header.C {
+    background-color: lightgrey;
+    border: 2px solid rgb(170, 170, 170);
+}
+
+/* White */
+.card-header.W {
+    background-color: #fff2d8;
+    border: 2px solid lightgray;
+}
+
+/* Blue */
+.card-header.U {
+    background-color: lightblue;
+    border: 2px solid cornflowerblue;
+}
+
+/* Black */
+.card-header.B {
+    background-color: grey;
+    border: 2px solid #454545;
+}
+
+/* Red */
+.card-header.R {
+    background-color: salmon;
+    border: 2px solid rgb(255, 65, 65);
+}
+
+/* Green */
+.card-header.G {
+    background-color: lightgreen;
+    border: 2px solid rgb(25, 147, 25);
+}
+
+/* Multicolored */
+.card-header.gold {
+    background-color: rgb(242, 209, 126);
+    border: 2px solid goldenrod;
+}

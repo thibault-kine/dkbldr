@@ -1,0 +1,53 @@
+.MuiBox-root.navbar {
+    position: fixed;
+    bottom: 10px;
+    width: fit-content;
+    left: calc(50% - 19px);
+    right: auto;
+    z-index: 99;
+}
+
+.MuiIconButton-root.open-icon {
+    background-color: var(--purple);
+    border-radius: 30px;
+}
+
+.MuiBox-root.menu-box {
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5;
+    margin-left: auto;
+    margin-top: 1;
+    margin-right: 2;
+    background-color: var(--bg-color-lighter);
+    width: 100%;
+    height: 100%;
+}
+
+
+.MuiButton-root.nav-btn {
+    background-color: var(--bg-color-lighter);
+    width: 100%;
+    height: 20%;
+    border-radius: 0;
+}
+
+.MuiButton-root.nav-btn:nth-child(even) {
+    background-color: var(--bg-color-lighter2);
+    width: 100%;
+    border-radius: 0;
+}
+
+.MuiButton-root.logout-1 {
+    color: red;
+}
+
+.MuiButton-root.logout-2 {
+    font-weight: bold;
+    color: white;
+    background-color: red;
+}

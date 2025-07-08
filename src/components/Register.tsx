@@ -1,8 +1,12 @@
 import React, { useState } from "react";
 import { login, logout } from "../../db/auth";
 import { createUser } from "../../db/users";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "../../db/supabase";
+import "../style/Forms.css"
+import { Box, Typography, Link, Input, Button } from "@mui/joy";
+import { FaLock, FaPerson, FaRegEnvelope } from "react-icons/fa6";
+import { FiLogIn } from "react-icons/fi";
 
 export default function Register() {
 
@@ -34,7 +38,7 @@ export default function Register() {
                 ]);
             }
     
-            alert("Inscription réussie !");
+            // alert("Inscription réussie !");
             navigate(`/login`);
         }
     }
@@ -43,33 +47,49 @@ export default function Register() {
 
     return (
         <div>
-            <h2>Register</h2>
-            <Link to='/login'>Already have an account?</Link>
-            {error && <p style={{ color: "red" }}>{error}</p>}
-            <form onSubmit={handleRegister}>
-                <input
+            <Box 
+                className="account-form"
+                component="form"
+                onSubmit={handleRegister} 
+            >
+                <Typography level="h2" textAlign="center">Register</Typography>
+                <Link href='/login' width="fit-content" m="auto">Already have an account?</Link>
+                {error && <p style={{ color: "red" }}>{error}</p>}
+
+                <Input
+                    className="form-input"
                     type="text"
                     placeholder="Username"
                     value={username}
+                    startDecorator={<FaPerson/>}
                     onChange={(e) => setUsername(e.target.value)}
                     required
                 />
-                <input
+                <Input
+                    className="form-input"
                     type="email"
                     placeholder="Email"
                     value={email}
+                    startDecorator={<FaRegEnvelope/>}
                     onChange={(e) => setEmail(e.target.value)}
                     required
                 />
-                <input
+                <Input
+                    className="form-input"
                     type="password"
                     placeholder="Mot de passe"
                     value={password}
+                    startDecorator={<FaLock/>}
                     onChange={(e) => setPassword(e.target.value)}
                     required
                 />
-                <button type="submit">Register</button>
-            </form>
+                <Button 
+                    className="form-btn"
+                    type="submit"
+                    variant="solid"
+                    endDecorator={<FiLogIn size="20px"/>}
+                >Register</Button>
+            </Box>
         </div>
     )
 

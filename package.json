@@ -10,13 +10,23 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/icons-material": "^6.4.5",
+    "@mui/joy": "^5.0.0-beta.51",
+    "@mui/material": "^6.4.5",
     "@supabase/supabase-js": "^2.48.1",
     "axios": "^1.7.9",
     "bcryptjs": "^3.0.0",
+    "localtunnel": "^2.0.2",
+    "number-shortener": "^1.0.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-icons": "^5.4.0",
     "react-router-dom": "^7.1.5",
-    "scryfall-api": "^4.0.2"
+    "scryfall-api": "^4.0.2",
+    "use-long-press": "^3.3.0",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
@@ -28,6 +38,7 @@
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.18",
     "globals": "^15.14.0",
-    "vite": "^6.1.0"
+    "vite": "^6.1.0",
+    "vite-plugin-pwa": "^1.0.0"
   }
 }

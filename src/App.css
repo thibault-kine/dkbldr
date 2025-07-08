@@ -1,7 +1,70 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap');
+
+* {
+    margin: 0;
+    font-family: "Montserrat", Arial, Helvetica, sans-serif;
+}
+
 :root {
-    background-color: cadetblue;
+    --lightgrey: #c3c3c3;
+    --bg-color: #2d2c39;
+    --bg-color-lighter: #3d3c4b;
+    --bg-color-lighter2: #4b4a5c;
+    --txt-color: #d1d1d1;
+
+    --purple: #d349bc;
+    
+    background-color: var(--bg-color);
 }
 
 .card {
     border-radius: 15px;
+}
+
+
+.MuiTypography-root {
+    color: var(--txt-color);
+}
+
+
+.MuiTypography-root.msg-ok {
+    color: green;
+    font-weight: bold;
+    font-style: italic;
+}
+
+
+.MuiButton-root.standard-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 30px;
+    transition: background-color 0.2s;
+}
+
+
+.MuiButton-root.standard-btn-sm {
+    width: 40px;
+    height: 40px;
+    border-radius: 100%;
+    transition: background-color 0.2s;
+}
+
+
+.MuiBox-root.sep {
+    width: 80%;
+    border-top: 1px solid #d7d7d7;
+    margin: 30px auto;
+}
+
+
+.MuiSnackbar-root.snack {
+    background-color: #3d3c4b;
+    border: 3px solid #4b4a5c;
+    border-radius: 2px;
+}
+
+
+.MuiButton-root.square-btn {
+    width: 40px;
+    height: 40px;
 }
