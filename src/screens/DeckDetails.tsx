@@ -27,9 +27,9 @@ export default function DeckDetails() {
                 const deckData = await getDeckById(deckId);
                 
                 setDeck({
-                    userId: deckData.user_id,
+                    user_id: deckData.user_id,
                     name: deckData.name,
-                    colorIdentity: deckData.color_identity,
+                    color_identity: deckData.color_identity,
                     commanders: deckData.commanders,
                     
                     mainboard: deckData.mainboard,

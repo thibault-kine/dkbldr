@@ -11,21 +11,21 @@ export type DeckList = {
 
 export type Deck = {
     id?: string;
-    userId: string;
+    user_id: string;
     name: string;
-    colorIdentity: string[];
+    color_identity: string[];
     commanders: Card[];
     
     mainboard: DeckList;
     sideboard: DeckList;
 
-    createdAt?: string;
+    created_at?: string;
     likes: number;
 }
 
 
 export async function saveDeckToUser(deck: Deck) {
-    const { userId, name, colorIdentity, commanders, mainboard, sideboard } = deck;
+    const { user_id: userId, name, color_identity: colorIdentity, commanders, mainboard, sideboard } = deck;
     const { data, error } = await supabase
         .from("decks")
         .insert([{
@@ -45,7 +45,7 @@ export async function saveDeckToUser(deck: Deck) {
 }
 
 
-export async function getAllDecksFromUser(userId: string) {
+export async function getAllDecksFromUser(userId: string): Promise<Deck[]> {
     const { data, error } = await supabase
         .from("decks")
         .select("*")
@@ -56,7 +56,7 @@ export async function getAllDecksFromUser(userId: string) {
 }
 
 
-export async function getDeckById(id: string) {
+export async function getDeckById(id: string): Promise<Deck> {
     const { data, error } = await supabase
         .from("decks")
         .select("*")

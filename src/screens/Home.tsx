@@ -8,6 +8,7 @@ import { getSeedFromDate, seededRandom } from "../../utils/utils";
 import DeckCardDisplay from "../components/DeckCardDisplay";
 import Loading from "../components/Loading";
 import "../style/Home.css"
+import DeckPreview from "../components/DeckPreviewCard";
 
 export default function Home() {
 

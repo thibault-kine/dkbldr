@@ -16,6 +16,7 @@ import { supabase } from "../../db/supabase";
 import { Card, Cards, Set, Sets } from "scryfall-api";
 import { Icon } from "@mui/material";
 import numberShortener from "number-shortener";
+import DeckPreviewCard from "../components/DeckPreviewCard";
 
 
 export default function Profile() {
@@ -162,7 +163,7 @@ export default function Profile() {
     
 
     return (
-        <Box sx={{ display: "flex" }}>
+        <Box>
             {profile ? (<>
                 <Box className="profile">
                     <Box 
@@ -219,96 +220,27 @@ export default function Profile() {
                     <Box className="main-content">
 
                         <Box className="sep"></Box>
-                        {/* <Typography className="subtitle">About {user?.username}</Typography>
-                        
-                        {isOwner ? (
-                            <Textarea
-                                placeholder="Write something interesting about you..."
-                                minRows={0}
-                                maxRows={5}
-                                value={editing ? "" : description}
-                                onChange={(e) => {
-                                    setDescription(e.target.value);
-                                    setEditing(true);
-                                }}
-                                endDecorator={
-                                    <Box>
-                                        <Button className="validate-desc-btn standard-btn-sm" onClick={handleDescriptionChange}>
-                                            {editing ? <Check/> : <Edit/>}
-                                        </Button> 
-                                    </Box>
-                                }
-                            />
-                        ) : (
-                            <Box>
-                                <Typography>
-                                    {user?.description ?? "No description..."}
-                                </Typography>
-                            </Box>
-                        )}
-
-                        <Box>
-                            <Box>
-                                <Typography>Favorite Colors:</Typography>
-                                <Box>
-                                    {user?.favorite_colors?.map((color, i) => (
-                                        <img key={i} src={`/icons/mana/${color}.svg`} width={20} height={20}/>
-                                    ))}
-                                </Box>
-                            </Box>
-
-                            <Box>
-                                <Typography>Favorite Card:</Typography>
-                                <Link style={{ color: "var(--purple)" }} to={{ pathname: user?.favorite_card }}>{favoriteCard?.name}</Link>
-                            </Box>
-
-                            <Box>
-                                <Typography>Favorite Set:</Typography>
-                                <Link style={{ color: "var(--purple)" }} to={{ pathname: user?.favorite_set }}>
-                                    <img src={favoriteSet?.icon_svg_uri} color="var(--purple)" height={20}/>
-                                    <Typography sx={{ color: "var(--purple)" }}>{favoriteSet?.code.toUpperCase()}</Typography>
-                                </Link>
-                            </Box>
-                        </Box> 
-
-                        <Box className="sep"></Box> */}
 
                         <Typography className="subtitle">{user?.username}'s decks</Typography>
-                        {isOwner ?? <Button 
-                            startDecorator={<Add sx={{ paddingRight: "10px" }}/>}
+                        <Box sx={{ display: "flex", justifyContent: "center", width: "100%", marginBottom: "20px" }}>
+                        {isOwner && <Button 
+                            startDecorator={<Add/>}
+                            // Redirects to a new URL with `uuidv4()`, which generates an UUID
                             onClick={() => navigate(`/deck/${uuidv4()}/builder`)}
                         >
                             Create a new deck
                         </Button>}
+                        </Box>
 
-                        {decks.length > 0 ? (
-                            <Table className="user-decks" borderAxis="both">
-                                <thead>
-                                    <tr>
-                                        <th style={{ width: "40%" }}>Name</th>
-                                        <th>Colors</th>
-                                        <th style={{ width: "10%" }}><FavoriteBorder/></th>
-                                    </tr>
-                                </thead>
-                                <tbody style={{ backgroundColor: "white", color: "var(--bg-color)" }}>
-                                    {decks.map((deck, i) => (
-                                        <tr>
-                                            <td style={{ textOverflow: "ellipsis" }}>
-                                                <Link key={i} to={`/deck/${deck.id}/${isOwner ? 'builder' : 'details'}`} style={{ color: "var(--purple)" }}>
-                                                    {deck.name}
-                                                </Link>
-                                            </td>
-                                            <td>{deck.colorIdentity ? deck.colorIdentity?.map((c, index) => (
-                                                <img style={{ filter: "drop-shadow(0 0 1px black)" }} key={index} width={15} height={15} src={`/icons/mana/${c}.svg`}/>
-                                            )) : <img style={{ filter: "drop-shadow(0 0 1px black)" }} width={15} height={15} src={`/icons/mana/C.svg`}/>}</td>
-                                            <td>{numberShortener(deck.likes)}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </Table>
-                        ) : (
-                            <Typography>No decks yet ☹️</Typography>
-                        )}
+                        <Box className="decks">
+                            {decks.length > 0 ? (
+                                decks.map((d, i) => (
+                                    <DeckPreviewCard deckId={d.id!} key={i}/>
+                                ))
+                            ) : (
+                                <Typography>No decks yet ☹️</Typography>
+                            )}
+                        </Box>
 
                     </Box>
 

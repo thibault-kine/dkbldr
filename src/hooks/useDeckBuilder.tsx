@@ -16,8 +16,8 @@ export function useDeckBuilder(user: User, initialId?: string) {
     const [deck, setDeck] = useState<Deck>({
         id: initialId ?? undefined,
         name: "",
-        userId: user?.id,
-        colorIdentity: [],
+        user_id: user?.id,
+        color_identity: [],
         commanders: [],
         mainboard: [],
         sideboard: []
@@ -123,9 +123,9 @@ export function useDeckBuilder(user: User, initialId?: string) {
 
         const newDeck: Deck = {
             id: deckId ?? "",
-            userId: user.id,
+            user_id: user.id,
             name: nameToSave,
-            colorIdentity: colorIdentity,
+            color_identity: colorIdentity,
             commanders: commanders,
             
             mainboard: mainboard,

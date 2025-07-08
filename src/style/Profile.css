@@ -6,11 +6,15 @@
     color: black;
 }
 
-.MuiBox-root.profile * {
-    width: fit-content;
+.MuiBox-root.background-profile * {
     margin: auto;
     text-align: center;
+    width: fit-content;
 } 
+
+.MuiBox-root.decks {
+    width: 100%;
+}
 
 
 .MuiAvatar-root.profile-avatar {
@@ -128,6 +132,7 @@ div .avatar-profile {
 .MuiTypography-root.subtitle {
     font-weight: bold;
     font-size: 24px;
+    text-align: center;
 }
 
 
@@ -142,18 +147,6 @@ div .avatar-profile {
     width: 100%;
 }
 
-
-.MuiTable-root.profile-decks {
-    width: 90%;
-    color: var(--txt-color);
-}
-
-
-.MuiTable-root.profile-decks * {
-    text-align: left;
-}
-
-
 .MuiTypography-root.followers {
     margin-top: 10px;
     color: var(--txt-color);
@@ -163,9 +156,4 @@ div .avatar-profile {
 
 .MuiTypography-root.followers-count {
     color: orange;
-}
-
-.MuiTable-root.user-decks {
-    width: 80%;
-    max-height: 400px;
 }
