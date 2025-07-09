@@ -52,6 +52,7 @@ export default function DeckBuilder({ user }) {
     } = useDeckBuilder(user, deckId);    
 
     const [pendingSaveAfterImport, setPendingSaveAfterImport] = useState(false);
+    const [checkDeckExists, setCheckDeckExists] = useState(false);
 
     const [importedDeckToast, setImportedDeckToast] = useState(false);
     const [savedDeckToast, setSavedDeckToast] = useState(false);
@@ -73,23 +74,37 @@ export default function DeckBuilder({ user }) {
 
 
     useEffect(() => {
+        const init = async () => {
+            if (deckId && !checkDeckExists) {
+                setDeckId(deckId);
+                const existingDeck = await getDeckById(deckId);
+                if (existingDeck) {
+                    setDeckName(existingDeck.name);
+                    setMainboard(existingDeck.mainboard);
+                    setSideboard(existingDeck.sideboard);
+                } else {
+                    // Si le deck n'existe pas en DB, ne pas lancer le chargement
+                    // et laisser l'utilisateur commencer à builder son deck
+                    console.log("Deck inexistant en base, démarrage d’un nouveau deck.");
+                }
 
-        if (deckId) {
-            setDeckId(deckId);
-            loadDeckFromDb(deckId);
-        }
+                setCheckDeckExists(true);
+            }
 
-        if (!deckId && user && deckName === "") {
-            getNextUnnamedDeckName(user.id).then(name => setDeckName(name));
-        }
+            if (!deckId && user && deckName === "") {
+                const name = await getNextUnnamedDeckName(user.id);
+                setDeckName(name);
+            }
 
-        if (pendingSaveAfterImport && mainboard.length > 0) {
-            save();
-            setPendingSaveAfterImport(false);
-            setSavedDeckToast(true);
-        }
+            if (pendingSaveAfterImport && mainboard.length > 0) {
+                save();
+                setPendingSaveAfterImport(false);
+                setSavedDeckToast(true);
+            }
+        };
 
-    }, [deckId, user, deckName, mainboard])
+        init();
+    }, [deckId, user, deckName, mainboard]);
 
 
     function addToDeck(card: Card) {
@@ -108,7 +123,7 @@ export default function DeckBuilder({ user }) {
             <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-evenly" }}>
             
             <Input
-                // value={deckName}
+                value={deckName}
                 onChange={(e) => setDeckName(e.target.value)}
                 sx={{ width: "100%" }}
                 placeholder={deckName ?? "New Deck"}

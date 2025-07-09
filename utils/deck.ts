@@ -14,27 +14,44 @@ export function groupCardsByType(deckList: DeckList) {
 
     const isCommander = (card: Card) => {
         const t = card.type_line;
-        
-        // Check commander legality by release date
+        const text = card.oracle_text ?? "";
+
         const releaseDate = Date.parse(new Date(card.released_at).toDateString());
         const today = Date.now();
-        
+
         return (
-            (card.legalities.commander === "legal" || today <= releaseDate) && 
-            (t.includes("Legendary") || t.includes("Background") || card.oracle_text?.includes("can be your commander"))
+            (card.legalities.commander === "legal" || today <= releaseDate) &&
+            (
+                t.includes("Legendary") ||
+                t.includes("Background") ||
+                text.includes("can be your commander") ||
+                text.includes("Partner")
+            )
         );
-    }
+    };
+
 
     let commanders: { card: Card; qty: number }[] = [];
-    const potential = deckList.slice(-2).filter(e => isCommander(e.card));
-    if (potential.length === 1) commanders = [potential[0]];
-    else if (potential.length >= 2) {
-        const background = potential.find(e => e.card.type_line.includes("Background"));
-        const creature = potential.find(e => e.card.type_line.includes("Legendary Creature"));
+    // Get last 5 entries to account for partners, backgrounds, etc.
+    const potential = deckList.slice(-5).filter(e => isCommander(e.card));
 
-        if (background && creature) commanders = [creature, background];
-        else commanders = [potential.reverse()[0]];
+    // Case: Background + Creature (still legal combo)
+    const background = potential.find(e => e.card.type_line.includes("Background"));
+    const legendaryCreature = potential.find(e => e.card.type_line.includes("Legendary Creature"));
+
+    if (background && legendaryCreature) {
+        commanders = [legendaryCreature, background];
+    } else {
+        // Check if multiple cards have "Partner" or "Partner with"
+        const partners = potential.filter(e => e.card.oracle_text?.includes("Partner"));
+        if (partners.length >= 2) {
+            commanders = partners.slice(0, 2); // pick 2 if found
+        } else if (potential.length > 0) {
+            // fallback: take most recent single commander-looking card
+            commanders = [potential[potential.length - 1]];
+        }
     }
+
 
     groups.Commander = commanders;
 

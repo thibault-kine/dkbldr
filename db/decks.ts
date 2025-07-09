@@ -56,14 +56,17 @@ export async function getAllDecksFromUser(userId: string): Promise<Deck[]> {
 }
 
 
-export async function getDeckById(id: string): Promise<Deck> {
+export async function getDeckById(id: string): Promise<Deck | null> {
     const { data, error } = await supabase
-        .from("decks")
-        .select("*")
-        .eq("id", id)
+        .from('decks')
+        .select('*')
+        .eq('id', id)
         .single();
-    
-    if (error) throw error;
+
+    if (error) {
+        return null;
+    }
+
     return data;
 }
 
