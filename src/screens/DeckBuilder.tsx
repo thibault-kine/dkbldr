@@ -1,10 +1,10 @@
 import React, { use, useEffect, useState } from "react";
-import { Box, Button, IconButton, Input, LinearProgress, Tab, TabList, TabPanel, Tabs, Textarea, Typography } from "@mui/joy";
+import { Box, Button, Chip, IconButton, Input, LinearProgress, Option, Select, Tab, TabList, TabPanel, Tabs, Textarea, Typography } from "@mui/joy";
 import { useNavigate, useParams } from "react-router-dom";
 import { DeckList, getAllDecksFromUser, getDeckById, saveDeckToUser } from "../../db/decks";
 import "../style/DeckBuilder.css"
 import BasicModal from "../components/BasicModal";
-import { Add, CheckCircle, ContentPaste, Man, MoreVert, Save, Settings } from "@mui/icons-material";
+import { Add, CheckCircle, ContentPaste, LocalOfferOutlined, Man, MoreVert, Save, Settings, Tag, TagOutlined } from "@mui/icons-material";
 import ExportDeck from "../components/ExportDeck";
 import { Card, Cards } from "scryfall-api";
 import DeckCardDisplay from "../components/DeckCardDisplay";
@@ -13,6 +13,8 @@ import { Deck } from "../../db/decks";
 import { useDeckBuilder } from "../hooks/useDeckBuilder";
 import { groupCardsByType } from "../../utils/deck";
 import CardSearchbar from "../components/CardSearchbar";
+import { Archetype, getAllArchetypes, getArchetypesForDeck } from "../../db/archetypes";
+import { supabase } from "../../db/supabase";
 
 
 export default function DeckBuilder({ user }) {
@@ -33,6 +35,9 @@ export default function DeckBuilder({ user }) {
 
         mainboard,
         setMainboard,
+
+        archetypes,
+        setArchetypes,
 
         sideboard,
         setSideboard,
@@ -72,6 +77,7 @@ export default function DeckBuilder({ user }) {
         }
     }
 
+    const [archetypeList, setArchetypeList] = useState<Archetype[]>();
 
     useEffect(() => {
         const init = async () => {
@@ -96,6 +102,8 @@ export default function DeckBuilder({ user }) {
                 setDeckName(name);
             }
 
+            getAllArchetypes().then(archs => setArchetypeList(archs));
+
             if (pendingSaveAfterImport && mainboard.length > 0) {
                 save();
                 setPendingSaveAfterImport(false);
@@ -117,6 +125,40 @@ export default function DeckBuilder({ user }) {
         }
     }
 
+    async function handleSaveTags() {
+        if (!deckId) return;
+
+        // Étape 1 : Supprimer les anciens liens
+        const { error: deleteError } = await supabase
+            .from("deck_archetype")
+            .delete()
+            .eq("deck_id", deckId);
+
+        if (deleteError) {
+            console.error("Erreur lors de la suppression des anciens tags :", deleteError);
+            return;
+        }
+
+        // Étape 2 : Insérer les nouveaux liens s'il y en a
+        if (archetypes.length > 0) {
+            const inserts = archetypes.map((archetype_id) => ({
+                deck_id: deckId,
+                archetype_id,
+            }));
+
+            const { error: insertError } = await supabase
+                .from("deck_archetype")
+                .insert(inserts);
+
+            if (insertError) {
+                console.error("Erreur lors de l'insertion des nouveaux tags :", insertError);
+                return;
+            }
+        }
+
+        console.log("Tags mis à jour avec succès !");
+    }
+
 
     return (
         <Box>
@@ -133,8 +175,9 @@ export default function DeckBuilder({ user }) {
 
                 <Tabs>
                     <TabList>
-                        <Tab>Import Deck</Tab>
-                        <Tab>Export Deck</Tab>
+                        <Tab>📋Import Deck</Tab>
+                        <Tab>📤Export Deck</Tab>
+                        <Tab>🏷️Tags</Tab>
                     </TabList>
 
                     <TabPanel value={0}>
@@ -179,6 +222,36 @@ export default function DeckBuilder({ user }) {
                     <TabPanel value={1}>
                         <ExportDeck decklist={deckListText}/>
                     </TabPanel>
+
+                    <TabPanel value={2}>
+                        <Typography>Set Tags & Archetypes</Typography>
+                        <Select
+                            multiple
+                            value={archetypes}
+                            onChange={(_, value) => setArchetypes(value)}
+                            placeholder="Choose archetypes"
+                            sx={{ mt: 1, mb: 2 }}
+                            renderValue={(selected) => (
+                                <Box sx={{ display: "flex", gap: "0.25rem", flexWrap: "wrap" }}>
+                                    {selected.map((option, index) => {
+                                        const entry = archetypeList?.find((a) => a.id === option.value);
+                                        return entry ? (
+                                            <Chip key={entry.id} variant="soft" color="primary">
+                                                {entry.name}
+                                            </Chip>
+                                        ) : null;
+                                    })}
+                                </Box>
+                            )}
+                        >
+                            {archetypeList?.map((arch, i) => (
+                                <Option key={i} value={arch.id}>{arch.name}</Option>
+                            ))}
+                        </Select>
+                        <Button onClick={handleSaveTags} startDecorator={<LocalOfferOutlined/>}>
+                            Save Tags
+                        </Button>
+                    </TabPanel>
                 </Tabs>
 
             </BasicModal>
@@ -193,6 +266,7 @@ export default function DeckBuilder({ user }) {
             >
                 <Save/>
             </Button>
+
             </Box>
 
             <CardSearchbar 

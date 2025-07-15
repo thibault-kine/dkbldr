@@ -3,6 +3,7 @@ import { Deck, DeckList, getAllDecksFromUser, saveDeckToUser } from "../../db/de
 import { User } from "@supabase/supabase-js";
 import { Card, Cards } from "scryfall-api";
 import { groupCardsByType } from "../../utils/deck";
+import { Archetype } from "../../db/archetypes";
 
 export function useDeckBuilder(user: User, initialId?: string) {
 
@@ -13,6 +14,8 @@ export function useDeckBuilder(user: User, initialId?: string) {
     const [mainboard, setMainboard] = useState<DeckList>([]);
     const [sideboard, setSideboard] = useState<DeckList>([]);
 
+    const [archetypes, setArchetypes] = useState<number[]>([]);
+
     const [deck, setDeck] = useState<Deck>({
         id: initialId ?? undefined,
         name: "",
@@ -20,7 +23,9 @@ export function useDeckBuilder(user: User, initialId?: string) {
         color_identity: [],
         commanders: [],
         mainboard: [],
-        sideboard: []
+        sideboard: [],
+        archetypes: [],
+        likes: 0
     });
 
     const [currentMBTab, setCurrentMBTab] = useState(0);
@@ -58,11 +63,6 @@ export function useDeckBuilder(user: User, initialId?: string) {
         const count = unnamedDecks.filter(d => d.name?.startsWith("Unnamed Deck")).length;
         
         return `Unnamed Deck ${count + 1}`;
-    }
-
-
-    function delay(ms: number) {
-        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
 
@@ -130,6 +130,9 @@ export function useDeckBuilder(user: User, initialId?: string) {
             
             mainboard: mainboard,
             sideboard: sideboard,
+
+            archetypes: archetypes,
+            likes: 0,
         }
 
         const updatedDeckId = await saveDeckToUser(newDeck);
@@ -156,6 +159,9 @@ export function useDeckBuilder(user: User, initialId?: string) {
 
         sideboard,
         setSideboard,
+
+        archetypes,
+        setArchetypes,
 
         currentMBTab,
         setCurrentMBTab,

@@ -20,6 +20,7 @@ export type Deck = {
     sideboard: DeckList;
 
     created_at?: string;
+    archetypes: number[];
     likes: number;
 }
 

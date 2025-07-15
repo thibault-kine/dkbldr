@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Card } from "scryfall-api";
-import { User } from "../context/UserContext";
+import { User, useUser } from "../context/UserContext";
 import { Deck, getDeckById } from "../../db/decks";
 import { getUserById } from "../../db/users";
 import { Box, Link, Typography } from "@mui/joy";
@@ -11,6 +11,9 @@ import numberShortener from "number-shortener";
 
 export default function DeckPreviewCard({ deckId }: { deckId: string }) {
 
+    const { user, refreshUser } = useUser();
+    const [authorId, setAuthorId] = useState<string>();
+ 
     const [commander, setCommander] = useState<Card | null>();
     const [name, setName] = useState("");
     const [colors, setColors] = useState<string[]>([]);
@@ -21,14 +24,15 @@ export default function DeckPreviewCard({ deckId }: { deckId: string }) {
 
     useEffect(() => {
         getDeckById(deckId).then(d => {
-            setCommander(d.commanders[0]);
-            setColors(d.color_identity);
-            setName(d.name);
-            setCreatedAt(new Date(d.created_at!));
-            setLikes(d.likes);
+            setCommander(d!.commanders[0]);
+            setColors(d!.color_identity);
+            setName(d!.name);
+            setCreatedAt(new Date(d!.created_at!));
+            setLikes(d!.likes);
             
-            if (d.user_id) {
-                getUserById(d.user_id).then(u => setAuthor(u?.username));
+            if (d!.user_id) {
+                setAuthorId(d?.user_id);
+                getUserById(d!.user_id).then(u => setAuthor(u?.username));
             }
         });
     }, [deckId]);
@@ -40,7 +44,7 @@ export default function DeckPreviewCard({ deckId }: { deckId: string }) {
             className="container"
             sx={{ backgroundImage: `url(${commander?.image_uris?.art_crop})`, backgroundSize: "cover", backgroundPositionY: "20%" }}
         >
-        <Link href={`/deck/${deckId}/details`} className="deck-link">
+        <Link href={`/deck/${deckId}/${user?.id === authorId ? "builder" : "details"}`} className="deck-link">
             <Box className="background-gradient">
                 <Box sx={{ display: "flex", flexDirection: "column" }}>
                     <Box sx={{ display: "flex", "flexDirection": "row", alignItems: "center", justifyContent: "space-between" }}>
