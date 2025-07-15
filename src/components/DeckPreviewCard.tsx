@@ -7,6 +7,7 @@ import { Box, Link, Typography } from "@mui/joy";
 import "../style/DeckPreviewCard.css";
 import { Favorite, FavoriteBorder, FavoriteOutlined } from "@mui/icons-material";
 import numberShortener from "number-shortener";
+import { format, formatDistanceToNow, isToday, isYesterday, differenceInDays, differenceInMonths } from 'date-fns';
 
 
 export default function DeckPreviewCard({ deckId }: { deckId: string }) {
@@ -21,6 +22,21 @@ export default function DeckPreviewCard({ deckId }: { deckId: string }) {
     const [createdAt, setCreatedAt] = useState<Date>();
     const [likes, setLikes] = useState(0);
 
+
+    function formatCreationDate(): string {
+        if (isToday(createdAt!)) 
+            return "created today";
+
+        if (isYesterday(createdAt!))
+            return "created yesterday";
+
+        const daysAgo = differenceInDays(new Date(), createdAt!);
+
+        if (daysAgo <= 30)
+            return `created at ${format(createdAt!, "dd/MM")}`;
+
+        return `created at ${format(createdAt!, "dd/MM/yyyy")}`;
+    }
 
     useEffect(() => {
         getDeckById(deckId).then(d => {
@@ -62,7 +78,7 @@ export default function DeckPreviewCard({ deckId }: { deckId: string }) {
                 </Box>
 
                 <Box sx={{ display: "flex", "flexDirection": "row", alignItems: "center", justifyContent: "space-between", paddingBottom: "2px" }}>
-                    <Typography sx={{ fontStyle: "italic", color: "grey" }}>created at {createdAt?.toLocaleDateString()}</Typography>
+                    {createdAt && <Typography sx={{ fontStyle: "italic", color: "grey" }}>{formatCreationDate()}</Typography>}
                     <Box sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
                         <Typography sx={{ textShadow: "0 0 3px black", color: "white", fontWeight: "normal" }}>{numberShortener(likes)}</Typography>
                         <FavoriteBorder sx={{ marginLeft: "2px", filter: "drop-shadow(0 0 3px black)" }}/>

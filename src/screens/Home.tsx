@@ -65,9 +65,15 @@ export default function Home() {
     }
 
 
-    const [suggestedDecks, setSuggestedDecks] = useState<Deck[] | []>();
-    async function getSuggestedDecks() {
-        
+    const [recommendedDecks, setRecommendedDecks] = useState<Deck[] | []>();
+    async function getRecommendedDecks() {
+        const { data, error } = await supabase
+            .rpc("get_recommended_decks", { user_uuid: user?.id });
+
+        if (error) console.error(error);
+        else console.log("Recommended decks :", data);
+
+        setRecommendedDecks(data);
     }
 
     
@@ -86,6 +92,7 @@ export default function Home() {
         }, 1500);
 
         getFollowDecks();
+        getRecommendedDecks();
 
         setLoading(false);
 
@@ -101,7 +108,7 @@ export default function Home() {
 
             <section>
                 <Typography sx={{ fontSize: 36, fontWeight: "bold", textAlign: "center" }}>
-                    <Link>START EXPL<img src={`/icons/mana/${currentCol}.svg`} width={26}/>RING!</Link>
+                    <Link href="/explore">START EXPL<img src={`/icons/mana/${currentCol}.svg`} width={26}/>RING!</Link>
                 </Typography>
             </section>
 
@@ -121,13 +128,20 @@ export default function Home() {
 
             <section>
                 <Typography className="headline">Latest decks from people you follow</Typography>
-                {followDecks?.map((deck, index) => (
+                {followDecks?.length! > 0 ? followDecks?.map((deck, index) => (
                     <DeckPreview key={index} deckId={deck.id} />
-                ))}
+                )) : (
+                    <Typography sx={{ textAlign: "center" }}>Seems like your friends haven't made anything in a while.</Typography>
+                )}
             </section>
 
             <section>
                 <Typography className="headline">These decks look interesting</Typography>
+                {recommendedDecks?.length! > 0 ? recommendedDecks?.map((deck, index) => (
+                    <DeckPreview key={index} deckId={deck.id} />
+                )) : (
+                    <Typography sx={{ textAlign: "center" }}>No recommended decks. Try building a few with 🏷️Tags!</Typography>
+                )}
             </section>
         </Box>
     )

@@ -18,6 +18,7 @@
     "@supabase/supabase-js": "^2.48.1",
     "axios": "^1.7.9",
     "bcryptjs": "^3.0.0",
+    "date-fns": "^4.1.0",
     "localtunnel": "^2.0.2",
     "number-shortener": "^1.0.1",
     "react": "^19.0.0",

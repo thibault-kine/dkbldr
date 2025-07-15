@@ -15,6 +15,7 @@ import Page404 from "../screens/404";
 import { useUser } from "../context/UserContext";
 import Navbar from "../components/Navbar";
 import Test from "../screens/Test";
+import ExplorePage from "../screens/ExplorePage";
 
 
 export default function AppRouter() {
@@ -31,13 +32,13 @@ export default function AppRouter() {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/about" element={<About />} />
+                <Route path="/explore" element={<ExplorePage />} />
 
                 {/* Routes protégées */}
                 <Route element={<ProtectedRoute />}>
                     <Route path="/user/:username/:id" element={<Profile />} />
                     <Route path="/deck/:id/builder" element={<DeckBuilder user={user} />} />
                     <Route path="/deck/:id/details" element={<DeckDetails />} />
-                    {/* <Route path="/user/:username/:id/decks" element={<DeckList />} /> */}
                 </Route>
 
                 {/* Page 404 */}

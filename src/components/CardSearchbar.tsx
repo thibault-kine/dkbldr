@@ -34,25 +34,7 @@ export default function CardSearchbar({ onSelected, sx } : { onSelected: (select
 
                     // setInputValue(val);
                 }}
-                // filterOptions={(options, state) => {
-                //     const displayOptions = options.filter(option => 
-                //         option.name 
-                //             .toLowerCase()
-                //             .trim()
-                //             .includes(state.inputValue.toLowerCase().trim())
-                //     );
-
-                //     const matchingOption = options.find(option => option.name.startsWith(state.inputValue));
-                //     if (displayOptions.length > 0 && state.inputValue && matchingOption) {
-                //         hint.current = matchingOption.name;
-                //     } else {
-                //         hint.current = '';
-                //     }
-                //     return displayOptions;
-                // }}
                 renderOption={(props, option) => {
-
-                    // if (inputValue.length <= 3) return;
 
                     return (
                         <AutocompleteOption 
