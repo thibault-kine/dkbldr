@@ -16,7 +16,7 @@ export default function ProtectedRoute() {
         });
     }, []);
 
-    if (loading) return <CircularProgress color="primary" value={33} variant="plain" sx={{ width: "fit-content", margin: 'auto' }}/>
+    if (loading) return;
 
     return user ? <Outlet /> : <Navigate to="/login" replace />;
 }

@@ -9,15 +9,21 @@ import DeckCardDisplay from "../components/DeckCardDisplay";
 import Loading from "../components/Loading";
 import "../style/Home.css"
 import DeckPreview from "../components/DeckPreviewCard";
+import { Deck } from "../../db/decks";
+import { getUsers } from "../../db/users";
+import { supabase } from "../../db/supabase";
 
 export default function Home() {
 
     const navigate = useNavigate();
     const { user, refreshUser } = useUser();
 
+    const [loading, setLoading] = useState(false);
     const [cotd, setCotd] = useState<Card | null>();
 
+
     async function getDailyCommander(): Promise<Card | null> {
+        setLoading(true);
         const now = new Date();
         now.setMinutes(now.getMinutes() + 60); // UTC+1
 
@@ -33,13 +39,42 @@ export default function Home() {
         if (card) {
             localStorage.setItem(storageKey, JSON.stringify(card));
         }
+        
+        setLoading(false);
         return card;
     }
 
+    
+    const [followDecks, setFollowDecks] = useState<Deck[] | []>();
+    async function getFollowDecks() {
+        if (user?.following.length === 0) setFollowDecks([]);
+
+        const { data, error } = await supabase
+            .from("decks")
+            .select("*")
+            .in("user_id", user?.following!)
+            .order("created_at", { ascending: false })
+            .limit(3);
+
+        if (error) {
+            setFollowDecks([]);
+            throw new Error("Erreur lors de la récupération des decks suivis :", error);
+        }
+
+        setFollowDecks(data);
+    }
+
+
+    const [suggestedDecks, setSuggestedDecks] = useState<Deck[] | []>();
+    async function getSuggestedDecks() {
+        
+    }
+
+    
     const [currentCol, setCurrentCol] = useState("W");
-
-
     useEffect(() => {
+        if (!user) return;
+
         getDailyCommander().then(c => setCotd(c));
 
         const colors = ["W", "U", "B", "R", "G", "C"];
@@ -50,9 +85,14 @@ export default function Home() {
             index = (index + 1) % colors.length;
         }, 1500);
 
-        return () => clearInterval(interval);
-    }, []);
+        getFollowDecks();
 
+        setLoading(false);
+
+        return () => clearInterval(interval);
+    }, [user]);
+    
+    
     return (
         <Box>
             <section>
@@ -81,6 +121,9 @@ export default function Home() {
 
             <section>
                 <Typography className="headline">Latest decks from people you follow</Typography>
+                {followDecks?.map((deck, index) => (
+                    <DeckPreview key={index} deckId={deck.id} />
+                ))}
             </section>
 
             <section>

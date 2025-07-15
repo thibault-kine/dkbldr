@@ -1,45 +1,37 @@
-import React, { useState, useEffect, useRef, HTMLInputTypeAttribute, use } from "react";
+import { useState, useEffect, useRef } from "react";
 import { User, useUser } from "../context/UserContext";
-import { Input, Button, Box, Typography, Avatar, Table, Textarea } from "@mui/joy";
+import { Input, Button, Box, Typography, Skeleton } from "@mui/joy";
 import { getUserById, updateUser } from "../../db/users";
-import Loading from "../components/Loading";
-import { Add, Check, Edit, FavoriteBorder } from "@mui/icons-material";
+import { Add, Check, Edit } from "@mui/icons-material";
 import { updateProfilePicture, uploadHeaderBgImage, uploadProfilePicture } from "../../db/storage";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import Page404 from "./404";
-import { DeckList, Deck, getAllDecksFromUser } from "../../db/decks"
+import { useNavigate, useParams } from "react-router-dom";
+import { Deck, getAllDecksFromUser } from "../../db/decks"
 import { v4 as uuidv4 } from "uuid";
-
 import "../style/Profile.css"
 import ProfileAvatar from "../components/ProfileAvatar";
-import { supabase } from "../../db/supabase";
-import { Card, Cards, Set, Sets } from "scryfall-api";
-import { Icon } from "@mui/material";
-import numberShortener from "number-shortener";
 import DeckPreviewCard from "../components/DeckPreviewCard";
 
 
 export default function Profile() {
-    
+
     const { id } = useParams();
     const { user, refreshUser } = useUser();
 
     const [profile, setProfile] = useState<User | null>(null);
-    const [loading, setLoading] = useState(true);
     const [decks, setDecks] = useState<Deck[]>([]);
+    const [loadingProfile, setLoadingProfile] = useState(true);
+    const [loadingDecks, setLoadingDecks] = useState(true);
 
     // Uniquement si l'utilisateur est le propriétaire du profil
     const [newUsername, setNewUsername] = useState("");
     const [editing, setEditing] = useState(false);
     const [description, setDescription] = useState("");
-    const [favoriteCard, setFavoriteCard] = useState<Card | null>(null);
-    const [favoriteSet, setFavoriteSet] = useState<Set | null>(null);
 
     const isOwner = user && profile && user.id === profile.id;
 
     const navigate = useNavigate();
 
-    
+
     async function handleUsernameChange() {
         if (!user || !isOwner) return;
 
@@ -89,7 +81,7 @@ export default function Profile() {
 
     async function handleDescriptionChange() {
         if (!user || !isOwner) return;
-        
+
         try {
             await updateUser(user.id, { description: description });
             await refreshUser();
@@ -100,154 +92,187 @@ export default function Profile() {
     }
 
 
-    // async function getFavoriteCard() {
-    //     try {
-    //         if (!user?.favorite_card) return;
-    //         const res = await Cards.byName(user?.favorite_card);
-    //         setFavoriteCard(res!);
-    //     }
-    //     catch (error) {
-    //         console.error(error);
-    //     }
-    // }
-
-
-    // async function getFavoriteSet() {
-    //     try {
-    //         if (!user?.favorite_set) return;
-    //         const res = await Sets.byCode(user.favorite_set);
-    //         setFavoriteSet(res!);    
-    //     }
-    //     catch (error) {
-    //         console.error(error);
-    //     }
-    // }
-
-
     useEffect(() => {
+        if (!id) return;
+
         (async () => {
-            if (!id) return;
             try {
                 const userData = await getUserById(id);
-                
+
                 setProfile(userData);
                 setNewUsername(userData?.username ?? "");
                 setDescription(userData?.description ?? "");
             } catch (error) {
                 console.error("Erreur lors de la récupération de l'utilisateur: ", error);
             } finally {
-                setLoading(false);
+                setLoadingProfile(false);
             }
         })();
 
         (async () => {
-            if (!id) return;
             try {
                 const userDecks = await getAllDecksFromUser(id);
                 setDecks(userDecks);
             } catch (error) {
                 console.error("Erreur lors de la récupération des decks de l'utilisateur: ", error);
             } finally {
-                setLoading(false);
+                setLoadingDecks(false);
             }
         })();
 
-        // getFavoriteCard();
-        // getFavoriteSet();
+    }, [id]);
 
-    }, [id, decks, profile /*favoriteCard, favoriteSet*/]);
-
-
-    if (loading) return <Loading/>;
-    if (!profile) return <Page404/>;
-    
 
     return (
-        <Box>
-            {profile ? (<>
-                <Box className="profile">
-                    <Box 
-                        className="background-profile"
-                        sx={{ 
-                            backgroundImage: `url(${profile.header_bg || ""})`,
-                            backgroundSize: "cover",
+        <Box className="profile">
+            {loadingProfile ? (
+                <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                    <Skeleton animation="wave" sx={{
+                        width: "100%", height: "200px",
+                    }}>
+                        <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" />
+                    </Skeleton>
+                    <Skeleton 
+                        animation="wave" 
+                        variant="circular"
+                        sx={{
+                            borderRadius: "50px",
+                            width: "100px", height: "100px",
+                            marginTop: "145px"
                         }}
                     >
-                        <Box className="avatar-and-username">
-                            <input 
-                                type="file"
-                                ref={fileInputRef}
-                                style={{ display: "none" }}
-                                accept="image/*"
-                                onChange={handleHeaderBgChange}
-                            />
-                            <ProfileAvatar
-                                user={profile}
-                                isOwner={profile.id === user?.id}
-                                onAvatarChange={handleAvatarChange}
-                            /> 
-                            {isOwner ? (<>
-                                <Button className="edit-background-profile standard-btn" onClick={handleUploadClick}>
-                                    <Edit/>
-                                </Button>
-                                <Input
-                                    className="username-input"
-                                    type="text"
-                                    value={editing ? "" : newUsername}
-                                    onChange={(e) => {
-                                        setNewUsername(e.target.value);
-                                        setEditing(true);
-                                    }}
-                                    endDecorator={
-                                        <Button className="validate-username-btn standard-btn-sm" onClick={handleUsernameChange}>
-                                            {editing ? <Check/> : <Edit/>}
-                                        </Button>
-                                    }
-                                />
-                            </>) : (
-                                <Typography className="username-input">{profile.username}</Typography>
-                            )}
+                        <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" />
+                    </Skeleton>
+                    <Skeleton animation="wave" sx={{
+                        borderRadius: "30px",
+                        width: "250px", height: "40px",
+                        marginTop: "260px"
+                    }}>
+                        <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" />
+                    </Skeleton>
 
-                            <Typography className="followers">
-                                <Typography className="followers-count">{profile.followers.length}</Typography> followers
-                                •
-                                <Typography className="followers-count"> {profile.following.length}</Typography> following
-                            </Typography>
-                        </Box>
-
+                    <Box sx={{ display: "flex", flexDirection: "row" }}>
+                        <Typography sx={{ marginTop: "70px" }}>
+                            <Skeleton animation="wave">
+                                X Followers
+                            </Skeleton>
+                        </Typography>
+                        <Typography sx={{ marginTop: "70px", fontWeight: "bold", marginLeft: "3px", marginRight: "3px" }}>•</Typography>
+                        <Typography sx={{ marginTop: "70px" }}>
+                            <Skeleton animation="wave">
+                                X Following
+                            </Skeleton>
+                        </Typography>
                     </Box>
-                    
-                    <Box className="main-content">
+                </Box>
+            ) : (
+                <Box
+                    className="background-profile"
+                    sx={{
+                        backgroundImage: `url(${profile?.header_bg || ""})`,
+                        backgroundSize: "cover",
+                    }}
+                >
+                    <Box className="avatar-and-username">
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            style={{ display: "none" }}
+                            accept="image/*"
+                            onChange={handleHeaderBgChange}
+                        />
+                        <ProfileAvatar
+                            user={profile}
+                            isOwner={profile?.id === user?.id}
+                            onAvatarChange={handleAvatarChange}
+                        />
+                        {isOwner ? (<>
+                            <Button className="edit-background-profile standard-btn" onClick={handleUploadClick}>
+                                <Edit />
+                            </Button>
+                            <Input
+                                className="username-input"
+                                type="text"
+                                value={editing ? "" : newUsername}
+                                onChange={(e) => {
+                                    setNewUsername(e.target.value);
+                                    setEditing(true);
+                                }}
+                                endDecorator={
+                                    <Button className="validate-username-btn standard-btn-sm" onClick={handleUsernameChange}>
+                                        {editing ? <Check /> : <Edit />}
+                                    </Button>
+                                }
+                            />
+                        </>) : (
+                            <Typography className="username-input">{profile?.username}</Typography>
+                        )}
 
-                        <Box className="sep"></Box>
-
-                        <Typography className="subtitle">{user?.username}'s decks</Typography>
-                        <Box sx={{ display: "flex", justifyContent: "center", width: "100%", marginBottom: "20px" }}>
-                        {isOwner && <Button 
-                            startDecorator={<Add/>}
-                            // Redirects to a new URL with `uuidv4()`, which generates an UUID
-                            onClick={() => navigate(`/deck/${uuidv4()}/builder`)}
-                        >
-                            Create a new deck
-                        </Button>}
-                        </Box>
-
-                        <Box className="decks">
-                            {decks.length > 0 ? (
-                                decks.map((d, i) => (
-                                    <DeckPreviewCard deckId={d.id!} key={i}/>
-                                ))
-                            ) : (
-                                <Typography>No decks yet ☹️</Typography>
-                            )}
-                        </Box>
-
+                        <Typography className="followers">
+                            <Typography className="followers-count">{profile?.followers.length}</Typography> followers
+                            •
+                            <Typography className="followers-count"> {profile?.following.length}</Typography> following
+                        </Typography>
                     </Box>
 
                 </Box>
-            </>) : (
-                <Loading/>
             )}
+
+            {loadingDecks ? (
+            <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+
+                <Box className="sep"></Box>
+
+                <Typography>
+                    <Skeleton animation="wave">
+                        Username's decks
+                    </Skeleton>
+                </Typography>
+
+                <Skeleton animation="wave" sx={{ width: "150px", height: "50px", marginTop: "100px" }}>
+                    <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" />
+                </Skeleton>
+
+                <Skeleton animation="wave" sx={{ width: "80%", height: "100px", marginTop: "180px", marginBottom: "10px" }}>
+                    <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" />
+                </Skeleton>
+
+                <Skeleton animation="wave" sx={{ width: "80%", height: "100px", marginTop: "290px", marginBottom: "10px" }}>
+                    <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" />
+                </Skeleton>
+
+                <Skeleton animation="wave" sx={{ width: "80%", height: "100px", marginTop: "400px", marginBottom: "10px" }}>
+                    <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" />
+                </Skeleton>
+            </Box>) 
+            :
+            (<Box className="main-content">
+            
+                <Box className="sep"></Box>
+
+                <Typography className="subtitle">{user?.username}'s decks</Typography>
+                <Box sx={{ display: "flex", justifyContent: "center", width: "100%", marginBottom: "20px" }}>
+                    {isOwner && <Button
+                        startDecorator={<Add />}
+                        // Redirects to a new URL with `uuidv4()`, which generates an UUID
+                        onClick={() => navigate(`/deck/${uuidv4()}/builder`)}
+                    >
+                        Create a new deck
+                    </Button>}
+                </Box>
+
+                <Box className="decks">
+                    {decks.length > 0 ? (
+                        decks.map((d, i) => (
+                            <DeckPreviewCard deckId={d.id!} key={i} />
+                        ))
+                    ) : (
+                        <Typography>No decks yet ☹️</Typography>
+                    )}
+                </Box>
+
+            </Box>)}
+
         </Box>
     );
 }
