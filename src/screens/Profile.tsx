@@ -182,7 +182,7 @@ export default function Profile() {
                             onChange={handleHeaderBgChange}
                         />
                         <ProfileAvatar
-                            user={profile}
+                            user={profile!}
                             isOwner={profile?.id === user?.id}
                             onAvatarChange={handleAvatarChange}
                         />

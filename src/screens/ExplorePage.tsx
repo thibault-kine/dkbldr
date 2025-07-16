@@ -1,9 +1,11 @@
 import { SearchOutlined } from "@mui/icons-material";
-import { Box, Button, Input, Link, ToggleButtonGroup, Typography } from "@mui/joy";
+import { Box, Button, IconButton, Input, Link, ToggleButtonGroup, Typography } from "@mui/joy";
 import { useState } from "react";
 import { Deck } from "../../db/decks";
 import { User } from "../context/UserContext";
 import { supabase } from "../../db/supabase";
+import DeckPreviewCard from "../components/DeckPreviewCard";
+import UserPreviewCard from "../components/UserPreviewCard";
 
 export default function ExplorePage() {
     
@@ -21,6 +23,7 @@ export default function ExplorePage() {
 
                 if (error) throw new Error("Error searching decks: ", error);
                 else setData(data);
+                break;
             }
             
             case "user": {
@@ -31,41 +34,73 @@ export default function ExplorePage() {
     
                 if (error) throw new Error("Error searching users: ", error);
                 else setData(data);
+                break;
             }
         }
     }
     
     return (
         <Box>
-            <ToggleButtonGroup
-                value={searchFor}
-                onChange={(event, val) => setSearchFor(val!)}
-            >
-                <Button value="user">User</Button>
-                <Button value="deck">Deck</Button>
-            </ToggleButtonGroup>
+            <Box sx={{ 
+                display: "flex", 
+                flexDirection: "row", 
+                justifyContent: "space-evenly", 
+                alignItems: "center", 
+                width: "250px", 
+                margin: "auto"
+            }}>
+                <Typography fontWeight="bold">Search for</Typography>
+                <ToggleButtonGroup
+                    value={searchFor}
+                    onChange={(event, val) => {
+                        setData(null);
+                        setSearchFor(val!);
+                    }}
+                    sx={{
+                        display: "flex", 
+                        flexDirection: "row", 
+                        justifyContent: "center",
+                        margin: "50px 0"
+                    }}
+                >
+                    <Button value="user">User</Button>
+                    <Button value="deck">Deck</Button>
+                </ToggleButtonGroup>
+            </Box>
 
-            <Input
-                type="text"
-                onChange={(e) => setSearchValue(e.target.value)}
-            />
-            <Button
-                startDecorator={<SearchOutlined/>}
-                onClick={() => {
-                    if (!searchValue) return;
-                    getSearchData();
-                }}
-            >
-                Tutor {`${searchFor}s`}
-            </Button>
+            <Box sx={{
+                display: "flex",
+                flexDirection: "column",
+                width: "80%",
+                margin: "20px auto",
+                justifyContent: "space-between"
+            }}>
+                <Input
+                    type="text"
+                    onChange={(e) => setSearchValue(e.target.value)}
+                    sx={{ flex: "1" }}
+                    endDecorator={
+                        <IconButton
+                            onClick={() => {
+                                if (!searchValue) return;
+                                getSearchData();
+                            }}
+                            color="primary"
+                            variant="solid"
+                        >
+                            <SearchOutlined/>
+                        </IconButton>
+                    }
+                />
 
-            <Box>
+            </Box>
+            <Box sx={{ display: "flex", flexDirection: "column" }}>
             {searchFor === "deck" ? 
                 data?.map((deck, i) => (
-                    <Link href={`/deck/${deck?.id}/details`} key={i}>{deck?.name}</Link>
+                    <DeckPreviewCard key={i} deckId={deck?.id}/>
                 )) :
                 data?.map((user, i) => (
-                    <Link href={`/user/${user?.username}/${user?.id}`} key={i}>{user?.username}</Link>
+                    <UserPreviewCard key={i} userId={user?.id}/>
                 ))
             }
             </Box>

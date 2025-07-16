@@ -1,8 +1,14 @@
 import { Edit } from "@mui/icons-material";
 import { Avatar, Box, Button, IconButton } from "@mui/joy";
 import React, { useRef, useState } from "react";
+import { User } from "../context/UserContext";
+import { SxProps } from "@mui/joy/styles/types";
 
-export default function ProfileAvatar({ user, isOwner, onAvatarChange }) {
+export default function ProfileAvatar({ 
+    user, isOwner, onAvatarChange, sx
+}: { 
+    user: User; isOwner: boolean; onAvatarChange?: (event) => any ; sx?: SxProps
+}) {
 
     const [hover, setHover] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -20,7 +26,7 @@ export default function ProfileAvatar({ user, isOwner, onAvatarChange }) {
         >
             <Avatar
                 className="profile-avatar"
-                src={user.pfp || ""}
+                src={user?.pfp || ""}
                 sx={{ width: "100%", height: "100%" }}
             />
 

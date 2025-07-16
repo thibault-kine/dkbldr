@@ -25,4 +25,5 @@
     flex-direction: column;
     justify-content: space-between;
     padding: 2px 8px;
+    border-radius: 5px;
 }

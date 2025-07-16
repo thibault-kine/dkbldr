@@ -53,12 +53,13 @@ export default function DeckPreviewCard({ deckId }: { deckId: string }) {
         });
     }, [deckId]);
 
+    const displayedFace = (commander?.card_faces && !commander.image_uris) ? commander?.card_faces?.[0] : commander;
 
 
     return (
         <Box 
             className="container"
-            sx={{ backgroundImage: `url(${commander?.image_uris?.art_crop})`, backgroundSize: "cover", backgroundPositionY: "20%" }}
+            sx={{ backgroundImage: `url(${displayedFace?.image_uris?.art_crop})`, backgroundSize: "cover", backgroundPositionY: "20%" }}
         >
         <Link href={`/deck/${deckId}/${user?.id === authorId ? "builder" : "details"}`} className="deck-link">
             <Box className="background-gradient">
