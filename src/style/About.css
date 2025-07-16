@@ -1,0 +1,15 @@
+.MuiTypography-root.question-header {
+    font-weight: bold;
+    font-size: 26px;
+}
+
+.MuiTypography-root.question-body {
+    font-size: 16px;
+    margin-bottom: 40px;
+}
+
+.MuiBox-root.sep-about {
+    width: 100%;
+    border-top: 1px solid #d7d7d7;
+    margin: 10px auto;
+}

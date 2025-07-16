@@ -13,6 +13,7 @@ export default function ExplorePage() {
     const [searchValue, setSearchValue] = useState<string>();
     const [data, setData] = useState<Deck[] | User[] | null>();
 
+
     async function getSearchData() {
         switch (searchFor) {
             case "deck": {
@@ -36,6 +37,17 @@ export default function ExplorePage() {
                 else setData(data);
                 break;
             }
+            
+            case "commander": {
+                const { data, error } = await supabase
+                .from("decks")
+                .select("*")
+                .or(`commanders->0->>name.ilike.%${searchValue}%,commanders->1->>name.ilike.%${searchValue}%`);
+                
+                if (error) throw new Error("Error searching users: ", error);
+                else setData(data);
+                break;
+            }
         }
     }
     
@@ -43,11 +55,11 @@ export default function ExplorePage() {
         <Box>
             <Box sx={{ 
                 display: "flex", 
-                flexDirection: "row", 
+                flexDirection: "column", 
                 justifyContent: "space-evenly", 
                 alignItems: "center", 
-                width: "250px", 
-                margin: "auto"
+                width: "350px", 
+                margin: "50px auto"
             }}>
                 <Typography fontWeight="bold">Search for</Typography>
                 <ToggleButtonGroup
@@ -60,11 +72,12 @@ export default function ExplorePage() {
                         display: "flex", 
                         flexDirection: "row", 
                         justifyContent: "center",
-                        margin: "50px 0"
+                        margin: "10px 0"
                     }}
                 >
-                    <Button value="user">User</Button>
                     <Button value="deck">Deck</Button>
+                    <Button value="commander">Commander</Button>
+                    <Button value="user">User</Button>
                 </ToggleButtonGroup>
             </Box>
 
@@ -95,10 +108,11 @@ export default function ExplorePage() {
 
             </Box>
             <Box sx={{ display: "flex", flexDirection: "column" }}>
-            {searchFor === "deck" ? 
+            {(searchFor === "deck" || searchFor === "commander") ? 
                 data?.map((deck, i) => (
                     <DeckPreviewCard key={i} deckId={deck?.id}/>
-                )) :
+                )) 
+                :
                 data?.map((user, i) => (
                     <UserPreviewCard key={i} userId={user?.id}/>
                 ))
