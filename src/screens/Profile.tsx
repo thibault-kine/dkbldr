@@ -10,6 +10,7 @@ import { v4 as uuidv4 } from "uuid";
 import "../style/Profile.css"
 import ProfileAvatar from "../components/ProfileAvatar";
 import DeckPreviewCard from "../components/DeckPreviewCard";
+import FollowButton from "../components/FollowButton";
 
 
 export default function Profile() {
@@ -213,6 +214,10 @@ export default function Profile() {
                             •
                             <Typography className="followers-count"> {profile?.following.length}</Typography> following
                         </Typography>
+
+                        {(profile && user) && (profile?.id !== user?.id) ? (
+                            <FollowButton currentUserId={user.id} targetUser={profile} />
+                        ) : ''}
                     </Box>
 
                 </Box>
@@ -250,7 +255,7 @@ export default function Profile() {
             
                 <Box className="sep"></Box>
 
-                <Typography className="subtitle">{user?.username}'s decks</Typography>
+                <Typography className="subtitle">{profile?.username}'s decks</Typography>
                 <Box sx={{ display: "flex", justifyContent: "center", width: "100%", marginBottom: "20px" }}>
                     {isOwner && <Button
                         startDecorator={<Add />}

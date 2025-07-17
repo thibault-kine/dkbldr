@@ -142,13 +142,14 @@ div .avatar-profile {
 
 
 .MuiBox-root.main-content {
-    padding-top: 115px;
+    padding-top: 155px;
     padding-bottom: 50px;
     width: 100%;
 }
 
 .MuiTypography-root.followers {
     margin-top: 10px;
+    margin-bottom: 10px;
     color: var(--txt-color);
     font-weight: bold;
     width: 100%;

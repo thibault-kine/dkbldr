@@ -4,6 +4,39 @@ import { getSeedFromDate, seededRandom } from "../utils/utils";
 
 export type CardEntry = { qty: number; card: Card };
 
+export type CardType = {
+    id: string;
+    name: string;
+    scryfall_uri: string;
+    layout: "normal" 
+            | "split" 
+            | "flip" 
+            | "transform" 
+            | "modal_dfc" 
+            | "meld" 
+            | "leveler"
+            | "class"
+            | "case"
+            | "saga" 
+            | "adventure" 
+            | "mutate" 
+            | "prototype" 
+            | "battle";
+    image_uris?: { png: string; art_crop: string };
+    mana_cost: string;
+    cmc: number;
+    type_line: string;
+    oracle_text: string;
+    power: string; toughness: string;
+    colors: string[];
+    color_identity: string[];
+    keywords: string[];
+    game_changer: boolean;
+    rulings_uri: string;
+    collector_number: string;
+    set: string;
+}
+
 
 export async function getAllCards(query: string) {
     try {

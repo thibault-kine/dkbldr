@@ -27,7 +27,6 @@ export default function About() {
                     <ListItem sx={{ color: "var(--txt-color)" }}>🏷️ Helpful tagging system that helps users filter decks by their themes</ListItem>
                     <ListItem sx={{ color: "var(--txt-color)" }}>💭 An app-wide search engine that allows users to search decks, commanders, and other users</ListItem>
                     <ListItem sx={{ color: "var(--txt-color)" }}>🫂 An integrated social network aspect. Users can follow eachother and promote decks</ListItem>
-                    <ListItem sx={{ color: "var(--txt-color)" }}>🔐 A secure authentication process using 2FA</ListItem>
                 </List>
                 <Typography>
                     And here are the upcoming main features:

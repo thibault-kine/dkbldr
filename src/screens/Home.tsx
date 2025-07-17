@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Button, Link, Typography } from "@mui/joy"
+import { Box, Button, Link, Skeleton, Typography } from "@mui/joy"
 import { useUser } from "../context/UserContext";
 import { Card, Cards } from "scryfall-api";
 import { getRandomCommander } from "../../api/cards";
@@ -19,9 +19,9 @@ export default function Home() {
     const { user, refreshUser } = useUser();
 
     const [loading, setLoading] = useState(false);
+
+    
     const [cotd, setCotd] = useState<Card | null>();
-
-
     async function getDailyCommander(): Promise<Card | null> {
         setLoading(true);
         const now = new Date();
@@ -32,6 +32,7 @@ export default function Home() {
 
         const cached = localStorage.getItem(storageKey);
         if (cached) {
+            setLoading(false);
             return JSON.parse(cached) as Card;
         }
 
@@ -47,7 +48,12 @@ export default function Home() {
     
     const [followDecks, setFollowDecks] = useState<Deck[] | []>();
     async function getFollowDecks() {
-        if (user?.following.length === 0) setFollowDecks([]);
+        setLoading(true);
+        if (user?.following.length === 0) {
+            setFollowDecks([]);
+            setLoading(false);
+            return;
+        }
 
         const { data, error } = await supabase
             .from("decks")
@@ -59,9 +65,11 @@ export default function Home() {
         if (error) {
             setFollowDecks([]);
             throw new Error("Erreur lors de la récupération des decks suivis :", error);
+        } else {
+            setFollowDecks(data)
         }
 
-        setFollowDecks(data);
+        setLoading(false);
     }
 
 
@@ -79,7 +87,7 @@ export default function Home() {
     
     const [currentCol, setCurrentCol] = useState("W");
     useEffect(() => {
-        if (!user) return;
+        setLoading(true);
 
         getDailyCommander().then(c => setCotd(c));
 
@@ -91,9 +99,11 @@ export default function Home() {
             index = (index + 1) % colors.length;
         }, 1500);
 
-        getFollowDecks();
-        getRecommendedDecks();
-
+        if (user) {
+            getFollowDecks();
+            getRecommendedDecks();
+        }
+        
         setLoading(false);
 
         return () => clearInterval(interval);
@@ -125,24 +135,26 @@ export default function Home() {
                     <Loading/>
                 )}
             </section>
+            
+            {user && (<>
+                <section>
+                    <Typography className="headline">Latest decks from people you follow</Typography>
+                    {followDecks?.length! > 0 ? followDecks?.map((deck, index) => (
+                        <DeckPreview key={index} deckId={deck.id} />
+                    )) : (
+                        <Typography sx={{ textAlign: "center" }}>{"Seems like your friends haven't made anything in a while."}</Typography>
+                    )}
+                </section>
 
-            <section>
-                <Typography className="headline">Latest decks from people you follow</Typography>
-                {followDecks?.length! > 0 ? followDecks?.map((deck, index) => (
-                    <DeckPreview key={index} deckId={deck.id} />
-                )) : (
-                    <Typography sx={{ textAlign: "center" }}>Seems like your friends haven't made anything in a while.</Typography>
-                )}
-            </section>
-
-            <section>
-                <Typography className="headline">These decks look interesting</Typography>
-                {recommendedDecks?.length! > 0 ? recommendedDecks?.map((deck, index) => (
-                    <DeckPreview key={index} deckId={deck.id} />
-                )) : (
-                    <Typography sx={{ textAlign: "center" }}>No recommended decks. Try building a few with 🏷️Tags!</Typography>
-                )}
-            </section>
+                <section>
+                    <Typography className="headline">These decks look interesting</Typography>
+                    {recommendedDecks?.length! > 0 ? recommendedDecks?.map((deck, index) => (
+                        <DeckPreview key={index} deckId={deck.id} />
+                    )) : (
+                        <Typography sx={{ textAlign: "center" }}>No recommended decks. Try building a few with 🏷️Tags!</Typography>
+                    )}
+                </section>
+            </>)}
         </Box>
     )
 

@@ -43,29 +43,15 @@ export default function Navbar() {
                             Home
                         </Button>
 
-                        {user ? (<>
-                            <Button
-                                onClick={() => {
-                                    navigate(`/user/${profile?.username}/${user?.id}`)
-                                    setOpen(false)
-                                }}
-                                className="nav-btn"
-                            >
-                                {profile?.username}
-                            </Button>
-
-                            <LogoutButton/>
-                        </>) : (
-                            <Button
-                                onClick={() => {
-                                    navigate("/login")
-                                    setOpen(false)
-                                }}
-                                className="nav-btn"
-                            >
-                                Login
-                            </Button>
-                        )}
+                    <Button
+                        onClick={() => {
+                            navigate("/explore")
+                            setOpen(false)
+                        }}
+                        className="nav-btn"
+                        >
+                        Explore
+                    </Button>
 
                     <Button
                         onClick={() => {
@@ -73,9 +59,32 @@ export default function Navbar() {
                             setOpen(false)
                         }}
                         className="nav-btn"
-                    >
+                        >
                         About
                     </Button>
+                        
+                    {user ? (<>
+                        <Button
+                            onClick={() => {
+                                navigate(`/user/${profile?.username}/${user?.id}`)
+                                setOpen(false)
+                            }}
+                            className="nav-btn"
+                        >
+                            {profile?.username}
+                        </Button>
+                        <LogoutButton/>
+                    </>) : (
+                        <Button
+                            onClick={() => {
+                                navigate("/login")
+                                setOpen(false)
+                            }}
+                            className="nav-btn"
+                        >
+                            Login
+                        </Button>
+                    )}
 
                     </Box>
 

@@ -16,6 +16,7 @@ export default function LogoutButton() {
         await supabase.auth.signOut();
         sessionStorage.removeItem("jwt");
         navigate("/");
+        window.location.reload();
     }
 
     function handleClick() {
