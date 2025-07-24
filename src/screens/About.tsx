@@ -46,9 +46,8 @@ export default function About() {
                 <Box className="sep-about"></Box>
                 <Typography className="question-body">
                     The app itself was made using <Link href="https://vite.dev/">ReactJS + Vite</Link>.
-                    Dkbldr uses <Link href="https://scryfall.com/docs/api">Scryfall's api</Link> to fetch the card's informations, via
-                    <Link href="https://www.npmjs.com/package/scryfall-api"><pre>scryfall-api</pre></Link>.
-                    The non-API data is stored using <Link href="https://supabase.com/">Supabase</Link>.
+                    Dkbldr uses <Link href="https://scryfall.com/docs/api">Scryfall's api</Link> to fetch the card's informations.
+                    The non-API data is stored using <Link href="https://supabase.com/">Supabase</Link>, which also manages the authentication part.
                 </Typography>
             </section>
         </Box>

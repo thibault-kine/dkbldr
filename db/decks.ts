@@ -26,20 +26,20 @@ export type Deck = {
 
 
 export async function saveDeckToUser(deck: Deck) {
-    const { user_id: userId, name, color_identity: colorIdentity, commanders, mainboard, sideboard } = deck;
+    const { user_id, name, color_identity: colorIdentity, commanders, mainboard, sideboard } = deck;
     const { data, error } = await supabase
         .from("decks")
         .insert([{
-            id: deck.id ?? "",
+            id: deck.id,
             name,
             commanders,
             color_identity: colorIdentity,
             mainboard,
             sideboard,
-            user_id: userId,
+            user_id,
         }]);
 
-    // console.log(deck);
+    console.log(deck);
 
     if (error) throw error;
     return data;

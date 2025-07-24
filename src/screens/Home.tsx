@@ -1,22 +1,16 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Box, Button, Link, Skeleton, Typography } from "@mui/joy"
+import { useEffect, useState, lazy, Suspense } from "react";
+import { Box, Link, Skeleton, Typography } from "@mui/joy"
 import { useUser } from "../context/UserContext";
-import { Card, Cards } from "scryfall-api";
+import { Card } from "scryfall-api";
 import { getRandomCommander } from "../../api/cards";
-import { getSeedFromDate, seededRandom } from "../../utils/utils";
-import DeckCardDisplay from "../components/DeckCardDisplay";
 import Loading from "../components/Loading";
 import "../style/Home.css"
-import DeckPreview from "../components/DeckPreviewCard";
 import { Deck } from "../../db/decks";
-import { getUsers } from "../../db/users";
 import { supabase } from "../../db/supabase";
 
 export default function Home() {
 
-    const navigate = useNavigate();
-    const { user, refreshUser } = useUser();
+    const { user } = useUser();
 
     const [loading, setLoading] = useState(false);
 
@@ -109,22 +103,24 @@ export default function Home() {
         return () => clearInterval(interval);
     }, [user]);
     
+
+    const DeckPreview = lazy(() => import("../components/DeckPreviewCard"));
     
     return (
         <Box>
-            <section>
+            <section style={{ padding: "40px 0" }}>
                 <Typography className="headline">Welcome home, {user?.username}!</Typography>
-            </section>
-
-            <section>
-                <Typography sx={{ fontSize: 36, fontWeight: "bold", textAlign: "center" }}>
+                
+                <Typography sx={{ fontSize: 28, fontWeight: "bold", textAlign: "center" }}>
                     <Link href="/explore">START EXPL<img src={`/icons/mana/${currentCol}.svg`} width={26}/>RING!</Link>
                 </Typography>
             </section>
 
             <section style={{
                 display: "flex",
-                flexDirection: "column"
+                flexDirection: "column",
+                backgroundColor: "var(--bg-color-lighter)",
+                padding: "40px 0"
             }}>
                 <Typography className="headline">Commander of the day</Typography>
                 {cotd ? (
@@ -137,18 +133,23 @@ export default function Home() {
             </section>
             
             {user && (<>
-                <section>
+                <section style={{ padding: "40px 0" }}>
                     <Typography className="headline">Latest decks from people you follow</Typography>
-                    {followDecks?.length! > 0 ? followDecks?.map((deck, index) => (
+                    {followDecks ? followDecks?.map((deck, index) => (
                         <DeckPreview key={index} deckId={deck.id} />
                     )) : (
                         <Typography sx={{ textAlign: "center" }}>{"Seems like your friends haven't made anything in a while."}</Typography>
                     )}
                 </section>
 
-                <section>
+                <section 
+                    style={{
+                        backgroundColor: "var(--bg-color-lighter)",
+                        padding: "40px 0"
+                    }}
+                >
                     <Typography className="headline">These decks look interesting</Typography>
-                    {recommendedDecks?.length! > 0 ? recommendedDecks?.map((deck, index) => (
+                    {recommendedDecks ? recommendedDecks?.map((deck, index) => (
                         <DeckPreview key={index} deckId={deck.id} />
                     )) : (
                         <Typography sx={{ textAlign: "center" }}>No recommended decks. Try building a few with 🏷️Tags!</Typography>

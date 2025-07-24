@@ -31,7 +31,7 @@ export default function Header() {
 
     return (
         <Box className="header">
-            <img src="/icons/icon-512x512.png" className="logo" onClick={() => navigate("/")}/>
+            <img src="/icons/icon.png" className="logo" onClick={() => navigate("/")}/>
 
             <Typography>
                 {getPageName()}
