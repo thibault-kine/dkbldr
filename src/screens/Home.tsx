@@ -73,9 +73,7 @@ export default function Home() {
             .rpc("get_recommended_decks", { user_uuid: user?.id });
 
         if (error) console.error(error);
-        else console.log("Recommended decks :", data);
-
-        setRecommendedDecks(data);
+        else setRecommendedDecks(data);
     }
 
     
@@ -109,7 +107,7 @@ export default function Home() {
     return (
         <Box>
             <section style={{ padding: "40px 0" }}>
-                <Typography className="headline">Welcome home, {user?.username}!</Typography>
+                <Typography className="headline">Welcome home, {user ? user.username : "player"}!</Typography>
                 
                 <Typography sx={{ fontSize: 28, fontWeight: "bold", textAlign: "center" }}>
                     <Link href="/explore">START EXPL<img src={`/icons/mana/${currentCol}.svg`} width={26}/>RING!</Link>
@@ -135,7 +133,7 @@ export default function Home() {
             {user && (<>
                 <section style={{ padding: "40px 0" }}>
                     <Typography className="headline">Latest decks from people you follow</Typography>
-                    {followDecks ? followDecks?.map((deck, index) => (
+                    {followDecks?.length! > 0 ? followDecks?.map((deck, index) => (
                         <DeckPreview key={index} deckId={deck.id} />
                     )) : (
                         <Typography sx={{ textAlign: "center" }}>{"Seems like your friends haven't made anything in a while."}</Typography>
@@ -149,7 +147,7 @@ export default function Home() {
                     }}
                 >
                     <Typography className="headline">These decks look interesting</Typography>
-                    {recommendedDecks ? recommendedDecks?.map((deck, index) => (
+                    {recommendedDecks?.length! > 0 ? recommendedDecks?.map((deck, index) => (
                         <DeckPreview key={index} deckId={deck.id} />
                     )) : (
                         <Typography sx={{ textAlign: "center" }}>No recommended decks. Try building a few with 🏷️Tags!</Typography>
