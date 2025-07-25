@@ -22,7 +22,7 @@ deploy:
   # "serve" est un serveur statique qui sert les fichiers du dossier /dist
   # -s : mode Single Page Application (redirige tout vers index.html)
   # -p $PORT : utilise le port fourni par Railway
-  startCommand: npx serve -s dist -p 8080
+  startCommand: npx serve -s dist -p $PORT
   
   # Nombre d'instances de l'application à exécuter
   numReplicas: 1
