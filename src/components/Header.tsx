@@ -38,7 +38,7 @@ export default function Header() {
             </Typography>
 
             <IconButton className="logo">
-                <Notifications sx={{ color: "white" }}/>
+                {/* <Notifications sx={{ color: "white" }}/> */}
             </IconButton>
         </Box>
     )

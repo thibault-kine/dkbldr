@@ -1,70 +1,22 @@
-# railway.yml - Configuration de déploiement pour Railway
-
-# ========================================
-# CONFIGURATION DE BUILD
-# ========================================
 build:
-  # Utilise Nixpacks comme système de build (optimisé pour Node.js/React)
   builder: NIXPACKS
-  
-  # Commande exécutée pour compiler l'application
-  # "npm run build" lance Vite qui génère les fichiers statiques dans /dist
   buildCommand: npm run build
-  
-  # Fichier de configuration supplémentaire pour Nixpacks
   nixpacksConfigPath: nixpacks.toml
 
-# ========================================
-# CONFIGURATION DE DÉPLOIEMENT
-# ========================================
 deploy:
-  # Commande pour démarrer l'application en production
-  # "serve" est un serveur statique qui sert les fichiers du dossier /dist
-  # -s : mode Single Page Application (redirige tout vers index.html)
-  # -p $PORT : utilise le port fourni par Railway
   startCommand: echo "Starting on port $PORT" && npx serve -s dist -p $PORT
   
-  # Nombre d'instances de l'application à exécuter
   numReplicas: 1
   
-  # Politique de redémarrage en cas d'échec
   restartPolicyType: ON_FAILURE
-  
-  # Nombre maximum de tentatives de redémarrage
   restartPolicyMaxRetries: 3
-
-# ========================================
-# VARIABLES D'ENVIRONNEMENT
-# ========================================
+  
 variables:
-  # Définit l'environnement comme production
   NODE_ENV: production
-  
-  # URL de votre projet Supabase (à définir dans Railway)
-  # ${{}} indique que c'est une variable Railway à résoudre
   VITE_SUPABASE_URL: ${{VITE_SUPABASE_URL}}
-  
-  # Clé publique Supabase pour l'authentification (à définir dans Railway)
   VITE_SUPABASE_ANON_KEY: ${{VITE_SUPABASE_ANON_KEY}}
 
-# ========================================
-# MONITORING ET SANTÉ
-# ========================================
-# Endpoint utilisé par Railway pour vérifier que l'app fonctionne
-healthcheckPath: /
-
-# Temps d'attente maximum pour le healthcheck (en secondes)
 healthcheckTimeout: 300
 
-# ========================================
-# TÂCHES PROGRAMMÉES
-# ========================================
-# Aucune tâche cron définie pour ce projet
-cron: []
-
-# ========================================
-# CONFIGURATION GÉOGRAPHIQUE
-# ========================================
-# Région où déployer l'application (côte ouest des États-Unis)
 regions:
   - us-west1
