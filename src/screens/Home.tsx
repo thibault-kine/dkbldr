@@ -2,7 +2,7 @@ import { useEffect, useState, lazy, Suspense } from "react";
 import { Box, Link, Skeleton, Typography } from "@mui/joy"
 import { useUser } from "../context/UserContext";
 import { Card } from "scryfall-api";
-import { getRandomCommander } from "../../api/cards";
+import { getRandomCommander } from "../../db/cards";
 import Loading from "../components/Loading";
 import "../style/Home.css"
 import { Deck } from "../../db/decks";

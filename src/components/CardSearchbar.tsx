@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { getAllCards, searchCard } from '../../api/cards';
+import { getAllCards, searchCard } from '../../db/cards';
 import { Autocomplete, AutocompleteOption, Box, Button, Input, Typography } from '@mui/joy';
 import { Search } from '@mui/icons-material';
 import { Card, Cards, Set, Sets } from 'scryfall-api';

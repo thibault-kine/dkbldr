@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Card } from "scryfall-api";
-import { getCardById } from "../../api/cards";
+import { getCardById } from "../../db/cards";
 import { Box, Typography } from "@mui/joy";
 import "../style/CardHeader.css"
 
