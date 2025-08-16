@@ -5,17 +5,17 @@ const router = express.Router();
 
 router.post("/", createUser);
 
-router.get("/:userId", getUserById);
+router.post("/follow", followUser);
+
+router.post("/unfollow", unfollowUser);
 
 router.get("/all", getUsers);
+
+router.get("/:userId", getUserById);
 
 router.patch("/:userId", updateUser);
 
 router.delete("/:userId", deleteUser);
-
-router.post("/follow", followUser);
-
-router.post("/unfollow", unfollowUser);
 
 
 module.exports = router;

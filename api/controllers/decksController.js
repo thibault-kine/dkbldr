@@ -1,19 +1,6 @@
 const { supabase } = require("../services/supabase");
 
 
-async function getDeckById(req, res) {
-    const deckId = req.params.deckId;
-
-    const { data, error } = await supabase
-        .from("decks")
-        .select("*")
-        .eq("id", deckId);
-
-    if (error) return res.status(500).json({ error: error.message });
-
-    return res.json(data);
-}
-
 async function getAllDecksFromUser(req, res) {
     const userId = req.params.userId;
 
@@ -53,11 +40,11 @@ async function saveDeckToUser(req, res) {
     try {
         const user_id = req.params.userId;
         
-        const { name, color_identity, commanders, mainboard, sideboard } = req.body.deck;
+        const { id, name, color_identity, commanders, mainboard, sideboard } = req.body.deck;
         const { data, error } = await supabase
             .from("decks")
             .insert([{
-                id: deck.id,
+                id,
                 name,
                 commanders,
                 color_identity,
@@ -78,7 +65,6 @@ async function saveDeckToUser(req, res) {
 
 
 module.exports = {
-    getDeckById,
     getAllDecksFromUser,
     updateDeckList,
     saveDeckToUser,
