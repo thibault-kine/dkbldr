@@ -1,87 +1,126 @@
-import { expect, it, test, vi } from "vitest";
-import { followUser, getUserById } from "../controllers/usersController";
+import { afterAll, beforeAll, expect, it, test, vi, describe } from "vitest";
+import * as userController from "../controllers/usersController";
+
+// Import du vrai Supabase pour les tests d'intégration
 import { supabase } from "../services/supabase";
-import { describe } from "node:test";
 
+function mockReqRes(body = {}, params = {}) {
+    const req = { body, params };
+    const res = {
+        status: vi.fn().mockReturnThis(),
+        json: vi.fn().mockReturnThis(),
+    };
 
-vi.mock("../services/supabase", () => ({
-    supabase: {
-        rpc: vi.fn(() => Promise.resolve({ data: null, error: null })),
-    },
-}));
-
-
-function createMockResponse() {
-    const res = {};
-    res.status = vi.fn().mockReturnValue(res);
-    res.json = vi.fn().mockReturnValue(res);
-    return res;
+    return { req, res };
 }
 
 
-describe("followUser", () => {
-    it("successfuly follows an user", async () => {
-        const req = {
-            body: {
-                userId: "user-1",
-                targetId: "user-2"
-            }
-        };
+let testUserId;
 
-        getUserById.mockImplementation(id => {
-            if (id === "user-1") return Promise.resolve({ id: "user-1", following: [] });
-            if (id === "user-2") return Promise.resolve({ id: "user-2", followers: [] });
+describe("Users Controller - CRUD Operations", () => {
+
+    describe("createUser", () => {
+        it("should create a user successfully", async () => {
+            const { req, res } = mockReqRes({
+                username: "TestUser",
+                email: "test@example.com",
+                password: "password123",
+            });
+
+            await userController.createUser(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(201);
+            expect(res.json).toHaveBeenCalled();
+            
+            // Récupérer l'ID du user créé pour les tests suivants
+            const call = res.json.mock.calls[0][0];
+            if (call && call.id) {
+                testUserId = call.id;
+            }
         });
 
-        const res = createMockResponse();
+        it("should return 500 if required fields are missing", async () => {
+            const { req, res } = mockReqRes({
+                username: "TestUser"
+                // email et password manquants
+            });
 
-        await followUser(req, res);
+            await userController.createUser(req, res);
 
-        expect(res.status).toHaveBeenCalledWith(200);
-        expect(res.json).toHaveBeenCalledWith({ success: true });
-        expect(supabase.rpc).toHaveBeenCalledWith("follow_user", { taregt_user_id: "user-2" });
-    })
-})
+            expect(res.status).toHaveBeenCalledWith(500);
+        });
+    });
 
+    describe("updateUser", () => {
+        it("should update a user successfully", async () => {
+            if (!testUserId) {
+                const { data, error } = await supabase  
+                    .from("users")
+                    .select("id")
+                    .eq("is_test", true);
 
-// test("get an user account", async () => {
-//     const userId = "8e3c9213-b02f-434f-b2aa-b4a23c0ce5fb";
-//     const response = await fetch(`http://localhost:4000/api/users/${userId}`, {
-//         method: "GET",
-//         headers: { "Content-Type": "application/json" }
-//     });
+                testUserId = data.id;
+            }
 
-//     const data = await response.json();
+            const { req, res } = mockReqRes(
+                {
+                    username: "UpdatedUsername",
+                    email: "updated@example.com"
+                },
+                { userId: testUserId }
+            );
 
-//     expect(data).toMatchObject({
-//         username: "Elchetibo",
-//         email: "chez.tibo84@gmail.com",
-//     });
-// })
+            await userController.updateUser(req, res);
 
+            expect(res.status).toHaveBeenCalledWith(200);
+            expect(res.json).toHaveBeenCalled();
+        });
 
-// test("make an user account follow and unfollow another one", async () => {
-//     const userId_1 = "8e3c9213-b02f-434f-b2aa-b4a23c0ce5fb";    // "Elchetibo"
-//     const userId_2 = "12294f67-2f94-45e4-a7cb-40b57f1b1a2f";    // "RakdosMaster11"
+        it("should return 500 if user ID is invalid", async () => {
+            const { req, res } = mockReqRes(
+                { username: "UpdatedUsername" },
+                { userId: "invalid-id" }
+            );
 
-//     const follow = await fetch("http://localhost:4000/api/users/follow", {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify({
-//             userId: userId_1,
-//             targetId: userId_2
-//         })
-//     });
+            await userController.updateUser(req, res);
 
-//     expect(follow.ok).toBeTruthy();
+            expect(res.status).toHaveBeenCalledWith(500);
+        });
+    });
 
-//     const unfollow = await fetch("http://localhost:4000/api/users/unfollow", {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify({
-//             userId: userId_2
-//         })
-//     });
+    describe("deleteUser", () => {
+        it("should delete a user successfully", async () => {
+            if (!testUserId) {
+                const { data, error } = await supabase  
+                    .from("users")
+                    .select("id")
+                    .eq("is_test", true);
 
-//     expect(unfollow.ok).toBeTruthy();
-// })
+                testUserId = data.id;
+            }
+
+            const { req, res } = mockReqRes({}, { userId: testUserId });
+
+            await userController.deleteUser(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(200);
+            expect(res.json).toHaveBeenCalled();
+        });
+
+        it("should return 500 if user ID is invalid", async () => {
+            const { req, res } = mockReqRes({}, { userId: "invalid-id" });
+
+            await userController.deleteUser(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(500);
+        });
+    });
+
+    afterAll(async () => {
+        // Nettoyer tous les users de test
+        await supabase
+            .from("users")
+            .delete()
+            .eq("is_test", true);
+    });
+});

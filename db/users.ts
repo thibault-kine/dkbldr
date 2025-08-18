@@ -4,13 +4,13 @@ import { User } from "../src/context/UserContext";
 
 
 
-export async function createUser(username: string, email: string, password: string) {
+export async function createUser(username: string, email: string, password: string, is_test: boolean = false) {
     const salt = bcrypt.genSaltSync(10);
     const passwordHash = bcrypt.hashSync(password, salt);
 
     const { data, error } = await supabase
         .from("users")
-        .insert([{ username, email, pass_hash: passwordHash }]);
+        .insert([{ username, email, pass_hash: passwordHash, is_test }]);
     
     if (error) throw error;
 

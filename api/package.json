@@ -4,11 +4,12 @@
   "description": "\"API for Dkbldr app\"",
   "main": "index.js",
   "scripts": {
-    "test": "vitest"
+    "test": "vitest --config ./vitest.config.mjs"
   },
   "author": "thibault-kine",
   "license": "ISC",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",

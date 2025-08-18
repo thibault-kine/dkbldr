@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const { getDeckById, getAllDecksFromUser, updateDeckList, saveDeckToUser } = require("../controllers/decksController");
+const { getAllDecksFromUser, updateDeckList, saveDeckToUser } = require("../controllers/decksController");
+const { getDeckById } = require("../services/deckService");
 
 
 router.get("/:deckId", getDeckById);

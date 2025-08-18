@@ -1,3 +1,4 @@
+const bcrypt = require("bcryptjs")
 const { supabase } = require("../services/supabase");
 const { validate: isUuid } = require("uuid");
 
@@ -11,11 +12,12 @@ async function createUser(req, res) {
     
         const { data, error } = await supabase
             .from("users")
-            .insert([{ username, email, pass_hash: passwordHash }]);
+            .insert([{ username, email, pass_hash: passwordHash }])
+            .select();
         
         if (error) return res.status(500).json({ error: error.message });
             
-        return res.status(201).json(data);
+        return res.status(201).json(data[0]); 
     } catch(err) {
         return res.status(500).json({ error: err.message });
     }
@@ -40,15 +42,22 @@ async function getUsers(req, res) {
 async function updateUser(req, res) {
     try {
         const userId = req.params.userId;
+        const updates = req.body;
 
         const { data, error } = await supabase
             .from('users')
             .update(updates)
-            .eq('id', userId);
+            .eq('id', userId)
+            .select();
         
         if (error) return res.status(500).json({ error: error.message });
         
-        return res.status(201).json(data);
+        // Vérifier si l'utilisateur a été trouvé et mis à jour
+        if (!data || data.length === 0) {
+            return res.status(404).json({ error: "Utilisateur non trouvé" });
+        }
+        
+        return res.status(200).json(data[0]); 
     } catch(err) {
         return res.status(500).json({ error: err.message });
     }
@@ -62,11 +71,17 @@ async function deleteUser(req, res) {
         const { data, error } = await supabase
             .from('users')
             .delete()
-            .eq('id', userId);
+            .eq('id', userId)
+            .select();
         
-        if (error) throw error;
+        if (error) return res.status(500).json({ error: error.message });
         
-        return res.status(200).json(data);
+        // Vérifier si l'utilisateur a été trouvé et supprimé
+        if (!data || data.length === 0) {
+            return res.status(404).json({ error: "Utilisateur non trouvé" });
+        }
+        
+        return res.status(200).json({ message: "Utilisateur supprimé", user: data[0] });
     } catch(err) {
         return res.status(500).json({ error: err.message });
     }

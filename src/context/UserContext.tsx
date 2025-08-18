@@ -16,6 +16,8 @@ export type User = {
     favorite_card?: string;
     favorite_set?: string;
     favorite_colors?: string[];
+
+    is_test: boolean;
 };
 
 interface UserContextType {
