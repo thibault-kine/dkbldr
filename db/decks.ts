@@ -22,10 +22,12 @@ export type Deck = {
     created_at?: string;
     archetypes: number[];
     likes: number;
+
+    is_test: boolean;
 }
 
 
-export async function saveDeckToUser(deck: Deck) {
+export async function saveDeckToUser(deck: Deck, is_test: boolean = false) {
     const { user_id, name, color_identity: colorIdentity, commanders, mainboard, sideboard } = deck;
     const { data, error } = await supabase
         .from("decks")
@@ -37,6 +39,7 @@ export async function saveDeckToUser(deck: Deck) {
             mainboard,
             sideboard,
             user_id,
+            is_test
         }]);
 
     console.log(deck);
@@ -83,4 +86,16 @@ export async function updateDeckList(id: string, mainboard: DeckList, sideboard:
 
     if (error) throw error;
     return data;    
+}
+
+
+export async function deleteDeck(id: string) {
+    const { data, error } = await supabase
+        .from("decks")
+        .delete()
+        .eq("id", id)
+        .select();
+
+    if (error) throw error;
+    return data;
 }

@@ -32,11 +32,105 @@ paths:
                 - Decks
             parameters:
                 - in: path
-                  name: userId
+                  name: deckId
                   required: true
                   schema:
                     type: string
-                  description: The ID of the user
+                  description: The deck's UUID
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                mainboard:
+                                    type: array
+                                    items:
+                                        type: object
+                                        properties:
+                                            qty:
+                                                type: integer
+                                            card:
+                                                type: object
+                                sideboard:
+                                    type: array
+                                    items:
+                                        type: object
+                                        properties:
+                                            qty:
+                                                type: integer
+                                            card:
+                                                type: object
+                        example:
+                            mainboard:
+                                - qty: 1
+                                  card:
+                                      id: "card-id"
+                                      name: "Lightning Bolt"
+                            sideboard:
+                                - qty: 1
+                                  card:
+                                      id: "side-id"
+                                      name: "Negate"
+            responses:
+                "200":
+                    description: Deck updated successfully
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    type: object
+                "500":
+                    description: Internal server error
+        delete:
+            summary: Delete a deck by its UUID
+            tags:
+                - Decks
+            parameters:
+                - in: path
+                  name: deckId
+                  required: true
+                  schema:
+                    type: string
+                  description: The deck's UUID to delete
+            responses:
+                "200":
+                    description: Deck deleted successfully
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    type: object
+                                    properties:
+                                        id:
+                                            type: string
+                                            description: Deleted deck ID
+                                        name:
+                                            type: string
+                                            description: Deleted deck name
+                                        user_id:
+                                            type: string
+                                            description: Owner user ID
+                            example:
+                                - id: "deck-uuid"
+                                  name: "My Deleted Deck"
+                                  user_id: "user-uuid"
+                                  color_identity: ["U", "R"]
+                                  commanders: []
+                                  mainboard: []
+                                  sideboard: []
+                "500":
+                    description: Internal server error
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    error:
+                                        type: string
     /api/decks/user/{userId}:
         get:
             summary: Get all decks from a specific user
