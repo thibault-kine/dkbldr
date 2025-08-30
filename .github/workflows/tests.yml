@@ -20,10 +20,12 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
+        working-directory: ./api
         run: npm i
 
       - name: Run tests
         run: npm run test
+        working-directory: ./api
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
