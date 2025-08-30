@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { User } from "../context/UserContext";
-import { followUser, getUserById, unfollowUser } from "../../db/users";
+import { AppUser } from "../context/UserContext";
 import { Button } from "@mui/joy";
 import { Add, Remove } from "@mui/icons-material";
+import { usersApi } from "../services/api";
 
-export default function FollowButton({ currentUserId, targetUser }: { currentUserId: string, targetUser: User }) {
+export default function FollowButton({ currentUserId, targetUser }: { currentUserId: string, targetUser: AppUser }) {
     
     const [loading, setLoading] = useState(false);
     const [isFollowing, setIsFollowing] = useState(false);
@@ -12,10 +12,10 @@ export default function FollowButton({ currentUserId, targetUser }: { currentUse
     async function handleClick() {
         setLoading(true);
         if (isFollowing) {
-            await unfollowUser(targetUser.id);
+            await usersApi.unfollow(targetUser.id);
             window.location.reload();
         } else {
-            await followUser(currentUserId, targetUser.id);
+            await usersApi.follow(currentUserId, targetUser.id);
             window.location.reload();
         }
         setLoading(false);

@@ -1,10 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { getAllCards, searchCard } from '../../api/cards';
 import { Autocomplete, AutocompleteOption, Box, Button, Input, Typography } from '@mui/joy';
-import { Search } from '@mui/icons-material';
 import { Card, Cards, Set, Sets } from 'scryfall-api';
-import { User } from '../context/UserContext';
 import { SxProps } from '@mui/joy/styles/types';
+import { cardsApi } from '../services/api';
 
 export default function CardSearchbar({ onSelected, sx } : { onSelected: (selected: Card) => void; sx?: SxProps | undefined }) {
 

@@ -1,0 +1,28 @@
+{
+  "name": "dkbldr-api",
+  "version": "1.0.0",
+  "description": "\"API for Dkbldr app\"",
+  "main": "index.js",
+  "scripts": {
+    "test": "vitest --config ./vitest.config.mjs"
+  },
+  "author": "thibault-kine",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "multer": "^2.0.2",
+    "nodemon": "^3.1.10",
+    "scryfall-api": "^4.0.3",
+    "supabase": "^2.33.3",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "uuid": "^11.1.0",
+    "yamljs": "^0.3.0"
+  },
+  "devDependencies": {
+    "vitest": "^3.2.4"
+  }
+}

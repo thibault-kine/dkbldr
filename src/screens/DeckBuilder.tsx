@@ -1,7 +1,6 @@
 import React, { use, useEffect, useState } from "react";
 import { Box, Button, Chip, IconButton, Input, LinearProgress, Option, Select, Tab, TabList, TabPanel, Tabs, Textarea, Typography } from "@mui/joy";
 import { useNavigate, useParams } from "react-router-dom";
-import { DeckList, getAllDecksFromUser, getDeckById, saveDeckToUser } from "../../db/decks";
 import "../style/DeckBuilder.css"
 import BasicModal from "../components/BasicModal";
 import { Add, CheckCircle, ContentPaste, LocalOfferOutlined, Man, MoreVert, Save, Settings, Tag, TagOutlined } from "@mui/icons-material";
@@ -9,12 +8,11 @@ import ExportDeck from "../components/ExportDeck";
 import { Card, Cards } from "scryfall-api";
 import DeckCardDisplay from "../components/DeckCardDisplay";
 import Toast from "../components/Snackbar";
-import { Deck } from "../../db/decks";
 import { useDeckBuilder } from "../hooks/useDeckBuilder";
 import { groupCardsByType } from "../../utils/deck";
 import CardSearchbar from "../components/CardSearchbar";
-import { Archetype, getAllArchetypes, getArchetypesForDeck } from "../../db/archetypes";
 import { supabase } from "../../db/supabase";
+import { Archetype, archetypesApi, decksApi } from "../services/api";
 
 
 export default function DeckBuilder({ user }) {
@@ -65,7 +63,7 @@ export default function DeckBuilder({ user }) {
 
     async function loadDeckFromDb(id: string) {
         try {
-            const deck = await getDeckById(id);
+            const deck = await decksApi.getById(id);
             if (deck) {
                 setDeckName(deck.name);
                 setMainboard(deck.mainboard);
@@ -83,7 +81,7 @@ export default function DeckBuilder({ user }) {
         const init = async () => {
             if (deckId && !checkDeckExists) {
                 setDeckId(deckId);
-                const existingDeck = await getDeckById(deckId);
+                const existingDeck = await decksApi.getById(deckId);
                 if (existingDeck) {
                     setDeckName(existingDeck.name);
                     setMainboard(existingDeck.mainboard);
@@ -102,7 +100,7 @@ export default function DeckBuilder({ user }) {
                 setDeckName(name);
             }
 
-            getAllArchetypes().then(archs => setArchetypeList(archs));
+            archetypesApi.getAll().then(archs => setArchetypeList(archs));
 
             if (pendingSaveAfterImport && mainboard.length > 0) {
                 save();
@@ -234,7 +232,7 @@ export default function DeckBuilder({ user }) {
                             renderValue={(selected) => (
                                 <Box sx={{ display: "flex", gap: "0.25rem", flexWrap: "wrap" }}>
                                     {selected.map((option, index) => {
-                                        const entry = archetypeList?.find((a) => a.id === option.value);
+                                        const entry = archetypeList?.find((a) => a.id === option.value.toString());
                                         return entry ? (
                                             <Chip key={entry.id} variant="soft" color="primary">
                                                 {entry.name}

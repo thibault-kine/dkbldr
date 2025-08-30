@@ -2,15 +2,14 @@ import { useEffect, useState, lazy, Suspense } from "react";
 import { Box, Link, Skeleton, Typography } from "@mui/joy"
 import { useUser } from "../context/UserContext";
 import { Card } from "scryfall-api";
-import { getRandomCommander } from "../../api/cards";
 import Loading from "../components/Loading";
 import "../style/Home.css"
-import { Deck } from "../../db/decks";
 import { supabase } from "../../db/supabase";
+import { cardsApi, Deck } from "../services/api";
 
 export default function Home() {
 
-    const { user } = useUser();
+    const { user, setUser } = useUser();
 
     const [loading, setLoading] = useState(false);
 
@@ -30,7 +29,7 @@ export default function Home() {
             return JSON.parse(cached) as Card;
         }
 
-        const card = await getRandomCommander();
+        const card = await cardsApi.getRandomCommander();
         if (card) {
             localStorage.setItem(storageKey, JSON.stringify(card));
         }

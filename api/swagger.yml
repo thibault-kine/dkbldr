@@ -1,0 +1,989 @@
+openapi: 3.0.0
+info:
+    title: Dkbldg API
+    description: API documentation for the Dkbldg deckbuilder backend
+    version: 1.0.0
+servers:
+    - url: http://localhost:3000
+paths:
+    /api/decks/{deckId}:
+        get:
+            summary: Get one specific deck by its UUID
+            tags:
+                - Decks
+            parameters:
+                - in: path
+                  name: deckId
+                  required: true
+                  schema:
+                    type: string
+                  description: The deck's UUID
+            responses:
+                200:
+                    description: A single deck
+                    content:
+                        application/json:
+                            schema:
+                                items:
+                                    type: object
+        patch:
+            summary: Updates an existing deck
+            tags:
+                - Decks
+            parameters:
+                - in: path
+                  name: deckId
+                  required: true
+                  schema:
+                    type: string
+                  description: The deck's UUID
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                mainboard:
+                                    type: array
+                                    items:
+                                        type: object
+                                        properties:
+                                            qty:
+                                                type: integer
+                                            card:
+                                                type: object
+                                sideboard:
+                                    type: array
+                                    items:
+                                        type: object
+                                        properties:
+                                            qty:
+                                                type: integer
+                                            card:
+                                                type: object
+                        example:
+                            mainboard:
+                                - qty: 1
+                                  card:
+                                      id: "card-id"
+                                      name: "Lightning Bolt"
+                            sideboard:
+                                - qty: 1
+                                  card:
+                                      id: "side-id"
+                                      name: "Negate"
+            responses:
+                "200":
+                    description: Deck updated successfully
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    type: object
+                "500":
+                    description: Internal server error
+        delete:
+            summary: Delete a deck by its UUID
+            tags:
+                - Decks
+            parameters:
+                - in: path
+                  name: deckId
+                  required: true
+                  schema:
+                    type: string
+                  description: The deck's UUID to delete
+            responses:
+                "200":
+                    description: Deck deleted successfully
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    type: object
+                                    properties:
+                                        id:
+                                            type: string
+                                            description: Deleted deck ID
+                                        name:
+                                            type: string
+                                            description: Deleted deck name
+                                        user_id:
+                                            type: string
+                                            description: Owner user ID
+                            example:
+                                - id: "deck-uuid"
+                                  name: "My Deleted Deck"
+                                  user_id: "user-uuid"
+                                  color_identity: ["U", "R"]
+                                  commanders: []
+                                  mainboard: []
+                                  sideboard: []
+                "500":
+                    description: Internal server error
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    error:
+                                        type: string
+    /api/decks/user/{userId}:
+        get:
+            summary: Get all decks from a specific user
+            tags:
+            - Decks
+            parameters:
+                - in: path
+                  name: userId
+                  required: true
+                  schema:
+                    type: string
+                  description: The user's ID
+            responses:
+                200:
+                description: A list of decks
+                content:
+                    application/json:
+                    schema:
+                        type: array
+                        items:
+                            type: object
+        post:
+            summary: Create a new deck for a user
+            tags:
+                - Decks
+            parameters:
+                - in: path
+                  name: userId
+                  required: true
+                  schema:
+                      type: string
+                  description: The ID of the user
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                deck:
+                                    type: object
+                                    properties:
+                                        id:
+                                            type: string
+                                        name:
+                                            type: string
+                                        color_identity:
+                                            type: array
+                                            items:
+                                                type: string
+                                        commanders:
+                                            type: array
+                                            items:
+                                                type: object
+                                        mainboard:
+                                            type: array
+                                            items:
+                                                type: object
+                                                properties:
+                                                    qty:
+                                                        type: integer
+                                                    card:
+                                                        type: object
+                                        sideboard:
+                                            type: array
+                                            items:
+                                                type: object
+                                                properties:
+                                                    qty:
+                                                        type: integer
+                                                    card:
+                                                        type: object
+                        example:
+                            deck:
+                                id: "deck-uuid"
+                                name: "My Commander Deck"
+                                color_identity: ["U", "R"]
+                                commanders:
+                                    - id: "card-uuid"
+                                      name: "Niv-Mizzet, Parun"
+                                      scryfall_uri: "https://scryfall.com/card/grn/192/niv-mizzet-parun"
+                                      mana_cost: "{U}{U}{U}{R}{R}{R}"
+                                      type_line: "Legendary Creature — Dragon Wizard"
+                                mainboard:
+                                    - qty: 1
+                                      card:
+                                          id: "card-id"
+                                          name: "Counterspell"
+                                sideboard:
+                                    - qty: 1
+                                      card:
+                                          id: "side-id"
+                                          name: "Negate"
+            responses:
+                "201":
+                    description: Deck created successfully
+                "500":
+                    description: Internal server error
+    /api/users/:
+        post:
+            summary: Create a new user
+            tags:
+                - Users
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                username:
+                                    type: string
+                                email:
+                                    type: string
+                                    format: email
+                                password:
+                                    type: string
+                        example:
+                            username: "john_doe"
+                            email: "john@example.com"
+                            password: "securePassword123"
+            responses:
+                "201":
+                    description: User created successfully
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                "500":
+                    description: Internal server error
+    /api/users/all:
+        get:
+            summary: Get all users
+            tags:
+                - Users
+            responses:
+                "200":
+                    description: A list of all users
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    type: object
+                                    properties:
+                                        id:
+                                            type: string
+                                        username:
+                                            type: string
+                                        email:
+                                            type: string
+                                        created_at:
+                                            type: string
+                                            format: date-time
+                "500":
+                    description: Internal server error
+    /api/users/{userId}:
+        get:
+            summary: Get a user by ID
+            tags:
+                - Users
+            parameters:
+                - in: path
+                  name: userId
+                  required: true
+                  schema:
+                    type: string
+                  description: The user's ID
+            responses:
+                "200":
+                    description: A single user
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    id:
+                                        type: string
+                                    username:
+                                        type: string
+                                    email:
+                                        type: string
+                                    created_at:
+                                        type: string
+                                        format: date-time
+                                    followers:
+                                        type: array
+                                        items:
+                                            type: string
+                                    following:
+                                        type: array
+                                        items:
+                                            type: string
+                "500":
+                    description: Internal server error
+        patch:
+            summary: Update a user
+            tags:
+                - Users
+            parameters:
+                - in: path
+                  name: userId
+                  required: true
+                  schema:
+                    type: string
+                  description: The user's ID
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                username:
+                                    type: string
+                                email:
+                                    type: string
+                                    format: email
+                        example:
+                            username: "updated_username"
+                            email: "updated@example.com"
+            responses:
+                "201":
+                    description: User updated successfully
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                "500":
+                    description: Internal server error
+        delete:
+            summary: Delete a user
+            tags:
+                - Users
+            parameters:
+                - in: path
+                  name: userId
+                  required: true
+                  schema:
+                    type: string
+                  description: The user's ID
+            responses:
+                "200":
+                    description: User deleted successfully
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                "500":
+                    description: Internal server error
+    /api/users/follow:
+        post:
+            summary: Follow a user
+            tags:
+                - Users
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                userId:
+                                    type: string
+                                    description: The ID of the current user
+                                targetId:
+                                    type: string
+                                    description: The ID of the user to follow
+                        example:
+                            userId: "current-user-id"
+                            targetId: "target-user-id"
+            responses:
+                "200":
+                    description: User followed successfully
+                "500":
+                    description: Internal server error
+    /api/users/unfollow:
+        post:
+            summary: Unfollow a user
+            tags:
+                - Users
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                userId:
+                                    type: string
+                                    description: The ID of the user to unfollow
+                        example:
+                            userId: "target-user-id"
+            responses:
+                "200":
+                    description: User unfollowed successfully
+                "500":
+                    description: Internal server error
+    /api/cards/random:
+        get:
+            summary: Get a random Magic The Gathering card
+            tags:
+                - Cards
+            responses:
+                "200":
+                    description: A random card from Scryfall
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    id:
+                                        type: string
+                                        description: Scryfall card ID
+                                    name:
+                                        type: string
+                                        description: Card name
+                                    mana_cost:
+                                        type: string
+                                        description: Mana cost
+                                    type_line:
+                                        type: string
+                                        description: Card type
+                                    oracle_text:
+                                        type: string
+                                        description: Card text
+                                    image_uris:
+                                        type: object
+                                        description: Card image URLs
+                                    scryfall_uri:
+                                        type: string
+                                        description: Scryfall page URL
+                "500":
+                    description: Internal server error
+    /api/cards/random/edh:
+        get:
+            summary: Get a random Commander EDH legal commander
+            tags:
+                - Cards
+            responses:
+                "200":
+                    description: A random EDH legal commander card
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    id:
+                                        type: string
+                                        description: Scryfall card ID
+                                    name:
+                                        type: string
+                                        description: Commander name
+                                    mana_cost:
+                                        type: string
+                                        description: Mana cost
+                                    type_line:
+                                        type: string
+                                        description: Card type contains Legendary
+                                    oracle_text:
+                                        type: string
+                                        description: Card text
+                                    color_identity:
+                                        type: array
+                                        items:
+                                            type: string
+                                        description: Color identity for EDH
+                                    image_uris:
+                                        type: object
+                                        description: Card image URLs
+                                    scryfall_uri:
+                                        type: string
+                                        description: Scryfall page URL
+                "500":
+                    description: Internal server error
+    /api/cards/search/{q}:
+        post:
+            summary: Search for a card by name
+            tags:
+                - Cards
+            parameters:
+                - in: path
+                  name: q
+                  required: true
+                  schema:
+                    type: string
+                  description: The name of the card to search for
+            responses:
+                "200":
+                    description: Card found
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    id:
+                                        type: string
+                                        description: Scryfall card ID
+                                    name:
+                                        type: string
+                                        description: Card name
+                                    mana_cost:
+                                        type: string
+                                        description: Mana cost
+                                    type_line:
+                                        type: string
+                                        description: Card type
+                                    oracle_text:
+                                        type: string
+                                        description: Card text
+                                    image_uris:
+                                        type: object
+                                        description: Card image URLs
+                                    scryfall_uri:
+                                        type: string
+                                        description: Scryfall page URL
+                "404":
+                    description: Card not found
+                "500":
+                    description: Internal server error
+    /api/cards/{cardId}:
+        get:
+            summary: Get a specific card by its Scryfall ID
+            tags:
+                - Cards
+            parameters:
+                - in: path
+                  name: cardId
+                  required: true
+                  schema:
+                    type: string
+                  description: The Scryfall ID of the card
+            responses:
+                "200":
+                    description: Card details
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    id:
+                                        type: string
+                                        description: Scryfall card ID
+                                    name:
+                                        type: string
+                                        description: Card name
+                                    mana_cost:
+                                        type: string
+                                        description: Mana cost
+                                    type_line:
+                                        type: string
+                                        description: Card type
+                                    oracle_text:
+                                        type: string
+                                        description: Card text
+                                    power:
+                                        type: string
+                                        description: Creature power if applicable
+                                    toughness:
+                                        type: string
+                                        description: Creature toughness if applicable
+                                    loyalty:
+                                        type: string
+                                        description: Planeswalker loyalty if applicable
+                                    image_uris:
+                                        type: object
+                                        description: Card image URLs
+                                    scryfall_uri:
+                                        type: string
+                                        description: Scryfall page URL
+                                    set:
+                                        type: string
+                                        description: Set code
+                                    set_name:
+                                        type: string
+                                        description: Set name
+                                    rarity:
+                                        type: string
+                                        description: Card rarity
+                "404":
+                    description: Card not found
+                "500":
+                    description: Internal server error
+    /api/cards/{cardId}/prints:
+        get:
+            summary: Get all prints versions of a specific card
+            tags:
+                - Cards
+            parameters:
+                - in: path
+                  name: cardId
+                  required: true
+                  schema:
+                    type: string
+                  description: The Scryfall ID of the card
+            responses:
+                "200":
+                    description: All prints of the card
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    object:
+                                        type: string
+                                        description: Object type list
+                                    total_cards:
+                                        type: integer
+                                        description: Total number of prints
+                                    has_more:
+                                        type: boolean
+                                        description: Whether there are more results
+                                    data:
+                                        type: array
+                                        items:
+                                            type: object
+                                            properties:
+                                                id:
+                                                    type: string
+                                                    description: Scryfall card ID
+                                                name:
+                                                    type: string
+                                                    description: Card name
+                                                set:
+                                                    type: string
+                                                    description: Set code
+                                                set_name:
+                                                    type: string
+                                                    description: Set name
+                                                collector_number:
+                                                    type: string
+                                                    description: Collector number
+                                                image_uris:
+                                                    type: object
+                                                    description: Card image URLs
+                                                rarity:
+                                                    type: string
+                                                    description: Card rarity
+                                                released_at:
+                                                    type: string
+                                                    format: date
+                                                    description: Release date
+                "500":
+                    description: Internal server error
+    /api/tags/all:
+        get:
+            summary: Get all available archetypes/tags
+            tags:
+                - Archetypes
+            responses:
+                "200":
+                    description: A list of all archetypes
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    type: object
+                                    properties:
+                                        id:
+                                            type: string
+                                            description: Archetype ID
+                                        name:
+                                            type: string
+                                            description: Archetype name
+                            example:
+                                - id: "1"
+                                  name: "Aggro"
+                                - id: "2"
+                                  name: "Control"
+                "500":
+                    description: Internal server error
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    error:
+                                        type: string
+    /api/tags/decks/{deckId}:
+        get:
+            summary: Get all archetypes/tags assigned to a specific deck
+            tags:
+                - Archetypes
+            parameters:
+                - in: path
+                  name: deckId
+                  required: true
+                  schema:
+                    type: string
+                  description: The deck's UUID
+            responses:
+                "200":
+                    description: List of archetypes for the deck
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    type: object
+                                    properties:
+                                        id:
+                                            type: string
+                                            description: Archetype ID
+                                        name:
+                                            type: string
+                                            description: Archetype name
+                            example:
+                                - id: "1"
+                                  name: "Aggro"
+                                - id: "3"
+                                  name: "Combo"
+                "500":
+                    description: Internal server error
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    error:
+                                        type: string
+    /api/tags/deck/{deckId}:
+        post:
+            summary: Add archetypes/tags to a deck
+            tags:
+                - Archetypes
+            parameters:
+                - in: path
+                  name: deckId
+                  required: true
+                  schema:
+                    type: string
+                  description: The deck's UUID
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                archetypes:
+                                    type: array
+                                    items:
+                                        type: object
+                                        properties:
+                                            id:
+                                                type: string
+                                                description: Archetype ID to assign
+                            required:
+                                - archetypes
+                        example:
+                            archetypes:
+                                - id: "1"
+                                - id: "2"
+                                - id: "3"
+            responses:
+                "200":
+                    description: Archetypes successfully added to deck
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    message:
+                                        type: string
+                                        example: "Archetypes added successfully"
+                "500":
+                    description: Internal server error
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    error:
+                                        type: string
+    /api/storage/avatar/{userId}:
+        post:
+            summary: Upload a profile picture for a user
+            tags:
+                - Storage
+            parameters:
+                - in: path
+                  name: userId
+                  required: true
+                  schema:
+                    type: string
+                  description: The user's ID
+            requestBody:
+                required: true
+                content:
+                    multipart/form-data:
+                        schema:
+                            type: object
+                            properties:
+                                file:
+                                    type: string
+                                    format: binary
+                                    description: The image file to upload (JPEG, PNG, etc.)
+            responses:
+                "200":
+                    description: Profile picture uploaded successfully
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    url:
+                                        type: string
+                                        description: Public URL of the uploaded image
+                                        example: "https://supabase-url/storage/v1/object/public/profiles/user-id/avatar_1640995200000.jpg"
+                "400":
+                    description: No file received
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    error:
+                                        type: string
+                                        example: "Aucun fichier reçu"
+                "500":
+                    description: Internal server error
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    error:
+                                        type: string
+        patch:
+            summary: Update user's profile picture URL in database
+            tags:
+                - Storage
+            parameters:
+                - in: path
+                  name: userId
+                  required: true
+                  schema:
+                    type: string
+                  description: The user's ID
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                url:
+                                    type: string
+                                    description: The public URL of the profile picture
+                                    example: "https://supabase-url/storage/v1/object/public/profiles/user-id/avatar_1640995200000.jpg"
+                            required:
+                                - url
+            responses:
+                "200":
+                    description: Profile picture URL updated successfully
+                "500":
+                    description: Internal server error
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    error:
+                                        type: string
+    /api/storage/header/{userId}:
+        post:
+            summary: Upload a header background image for a user
+            tags:
+                - Storage
+            parameters:
+                - in: path
+                  name: userId
+                  required: true
+                  schema:
+                    type: string
+                  description: The user's ID
+            requestBody:
+                required: true
+                content:
+                    multipart/form-data:
+                        schema:
+                            type: object
+                            properties:
+                                file:
+                                    type: string
+                                    format: binary
+                                    description: The header background image file to upload (JPEG, PNG, etc.)
+            responses:
+                "200":
+                    description: Header background image uploaded successfully
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    url:
+                                        type: string
+                                        description: Public URL of the uploaded header image
+                                        example: "https://supabase-url/storage/v1/object/public/profiles/user-id/header_1640995200000.jpg"
+                "400":
+                    description: No file received
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    error:
+                                        type: string
+                                        example: "Aucun fichier reçu"
+                "500":
+                    description: Internal server error
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    error:
+                                        type: string
+        patch:
+            summary: Update user's header background image URL in database
+            tags:
+                - Storage
+            parameters:
+                - in: path
+                  name: userId
+                  required: true
+                  schema:
+                    type: string
+                  description: The user's ID
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                url:
+                                    type: string
+                                    description: The public URL of the header background image
+                                    example: "https://supabase-url/storage/v1/object/public/profiles/user-id/header_1640995200000.jpg"
+                            required:
+                                - url
+            responses:
+                "200":
+                    description: Header background image URL updated successfully
+                "500":
+                    description: Internal server error
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    error:
+                                        type: string
+

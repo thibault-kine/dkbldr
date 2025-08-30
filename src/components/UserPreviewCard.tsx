@@ -1,14 +1,9 @@
 import { useEffect, useState } from "react";
 import { Card } from "scryfall-api";
 import { User, useUser } from "../context/UserContext";
-import { Deck, getDeckById } from "../../db/decks";
-import { getUserById } from "../../db/users";
 import { Avatar, Box, Link, Typography } from "@mui/joy";
 import "../style/DeckPreviewCard.css";
-import { Favorite, FavoriteBorder, FavoriteOutlined } from "@mui/icons-material";
-import numberShortener from "number-shortener";
-import { format, formatDistanceToNow, isToday, isYesterday, differenceInDays, differenceInMonths } from 'date-fns';
-import ProfileAvatar from "./ProfileAvatar";
+import { usersApi } from "../services/api";
 
 
 export default function UserPreviewCard({ userId }: { userId: string }) {
@@ -16,7 +11,7 @@ export default function UserPreviewCard({ userId }: { userId: string }) {
     const [profile, setProfile] = useState<User>();
 
     useEffect(() => {
-        getUserById(userId).then(u => setProfile(u!));
+        usersApi.getById(userId).then(u => setProfile(u!));
     }, [userId]);
 
 

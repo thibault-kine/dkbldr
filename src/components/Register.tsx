@@ -1,12 +1,11 @@
 import React, { useState } from "react";
-import { login, logout } from "../../db/auth";
-import { createUser } from "../../db/users";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../../db/supabase";
 import "../style/Forms.css"
 import { Box, Typography, Link, Input, Button } from "@mui/joy";
 import { FaLock, FaPerson, FaRegEnvelope } from "react-icons/fa6";
 import { FiLogIn } from "react-icons/fi";
+import { usersApi } from "../services/api";
 
 export default function Register() {
 

@@ -1,5 +1,5 @@
 import { Card } from "scryfall-api";
-import { DeckList } from "../db/decks";
+import { DeckList } from "../src/services/api";
 
 export function groupCardsByType(deckList: DeckList) {
 

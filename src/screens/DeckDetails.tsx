@@ -1,17 +1,10 @@
-import React, { use, useEffect, useState } from "react";
-import { Box, Button, Input, LinearProgress, Tab, TabList, TabPanel, Tabs, Textarea, Typography } from "@mui/joy";
-import { useNavigate, useParams } from "react-router-dom";
-import { DeckList, getAllDecksFromUser, getDeckById, saveDeckToUser } from "../../db/decks";
+import { useEffect, useState } from "react";
+import { Box, Tab, TabList, TabPanel, Tabs, Typography } from "@mui/joy";
+import { useParams } from "react-router-dom";
 import "../style/DeckBuilder.css"
-import BasicModal from "../components/BasicModal";
-import { CheckCircle, ContentPaste, MoreVert, Save, Settings } from "@mui/icons-material";
-import ExportDeck from "../components/ExportDeck";
-import { Card, Cards } from "scryfall-api";
 import DeckCardDisplay from "../components/DeckCardDisplay";
-import Toast from "../components/Snackbar";
-import { Deck } from "../../db/decks";
-import { useDeckBuilder } from "../hooks/useDeckBuilder";
 import { groupCardsByType } from "../../utils/deck";
+import { Deck, decksApi } from "../services/api";
 
 
 export default function DeckDetails() {
@@ -24,17 +17,9 @@ export default function DeckDetails() {
         async function fetchDeck() {
             if (!deckId) return;
             try {
-                const deckData = await getDeckById(deckId);
+                const deckData = await decksApi.getById(deckId);
                 
-                setDeck({
-                    user_id: deckData.user_id,
-                    name: deckData.name,
-                    color_identity: deckData.color_identity,
-                    commanders: deckData.commanders,
-                    
-                    mainboard: deckData.mainboard,
-                    sideboard: deckData.sideboard,
-                });
+                setDeck({ ...deckData });
             } catch (error) {
                 console.error("Erreur lors de la récupération du deck: ", error);
             }

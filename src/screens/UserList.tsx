@@ -1,18 +1,18 @@
 import { useEffect, useState } from "react";
-import { User, useUser } from "../context/UserContext";
-import { getUsers } from "../../db/users";
+import { AppUser, useUser } from "../context/UserContext";
 import { Box, Button, Table } from "@mui/joy";
 import FollowButton from "../components/FollowButton";
 import Loading from "../components/Loading";
 import { Link } from "react-router-dom";
+import { usersApi } from "../services/api";
 
 export default function UserList() {
 
     const { user } = useUser();
-    const [users, setUsers] = useState<User[] | null>();
+    const [users, setUsers] = useState<AppUser[] | null>();
 
     useEffect(() => {
-        getUsers().then(data => setUsers(data));
+        usersApi.getAll().then(data => setUsers(data));
     }, [users]);
 
     return (
