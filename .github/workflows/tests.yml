@@ -27,5 +27,5 @@ jobs:
         run: npm i
 
       - name: Run tests
-        run: npm run test
+        run: SUPABASE_URL=${{ secrets.SUPABASE_URL }} SUPABASE_KEY=${{ secrets.SUPABASE_KEY }} npm run test
         working-directory: ./api
