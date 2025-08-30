@@ -2,9 +2,6 @@ import { AutoAwesome, Loop, SwapHoriz } from "@mui/icons-material";
 import { Badge, Box, Dropdown, IconButton, Input, Menu, MenuButton, MenuItem } from "@mui/joy";
 import React, { use, useRef, useState } from "react";
 import { Card } from "scryfall-api";
-import { getAllPrints } from "../../db/cards";
-import { DeckList } from "../../db/decks";
-
 
 export default function DeckCardDisplay({ 
     card, 

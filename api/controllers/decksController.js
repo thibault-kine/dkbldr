@@ -29,7 +29,8 @@ async function updateDeckList(req, res) {
             .select();
     
         if (error) return res.status(500).json({ error: error.message });
-        
+
+        console.log("🔵 updateDeckList - 200");
         return res.status(200).json(data);
     } catch(err) {
         return res.status(500).json({ error: err.message });
@@ -40,7 +41,7 @@ async function saveDeckToUser(req, res) {
     try {
         const user_id = req.params.userId;
         
-        const { id, name, color_identity, commanders, mainboard, sideboard } = req.body;
+        const { id, name, color_identity, commanders, mainboard, sideboard } = req.body.deck;
         const { data, error } = await supabase
             .from("decks")
             .insert([{
@@ -52,10 +53,14 @@ async function saveDeckToUser(req, res) {
                 sideboard,
                 user_id,
             }]);
+
+        console.log("deck id", id);
+        
         
         if (error) return res.status(500).json({ error: error.message });
-    
-        return res.status(200).json(data);
+        
+        console.log("🔵 saveDeckToUser - 201");
+        return res.status(201).json(data);
     } catch(err) {
         return res.status(500).json({ error: err.message });
     }
@@ -73,6 +78,7 @@ async function deleteDeck(req, res) {
         
         if (error) return res.status(500).json({ error: error.message });
         
+        console.log("🔵 deleteDeck - 200");
         return res.status(200).json(data);
     } catch (err) {
         return res.status(500).json({ error: err.message });

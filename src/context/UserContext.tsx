@@ -1,28 +1,11 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "../../db/supabase";
-import { getUserById } from "../../db/users";
+import { usersApi, AppUser } from "../services/api";
 
-
-export type User = {
-    id: string;
-    username: string;
-    email: string;
-    pfp?: string;
-    header_bg?: string;
-    description?: string;
-    followers: string[];
-    following: string[];
-    liked_decks?: string[];
-    favorite_card?: string;
-    favorite_set?: string;
-    favorite_colors?: string[];
-
-    is_test: boolean;
-};
 
 interface UserContextType {
-    user: User | null;
-    setUser: (user: User | null) => void;
+    user: AppUser | null;
+    setUser: (user: AppUser | null) => void;
     refreshUser: () => Promise<void>;
 }
 
@@ -32,7 +15,7 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
 
-    const [user, setUser] = useState<User | null>(null);
+    const [user, setUser] = useState<AppUser | null>(null);
 
     async function fetchUser() {
         const { data: authUser, error } = await supabase.auth.getUser();
@@ -43,10 +26,10 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         }
 
         try {
-            const userData = await getUserById(authUser.user.id);
+            const userData = await usersApi.getById(authUser.user.id);
             setUser(userData);
         } catch (err) {
-            console.error("Erreur lors de la récupération du profil : ", err);
+            console.error("Erreur lors de la récupération de l'utilisteur : ", err);
         }
     }
 
@@ -54,7 +37,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
         const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
             if (session?.user) {
-                getUserById(session.user.id)
+                usersApi.getById(session.user.id)
                     .then(userData => setUser(userData))
                     .catch(err => {
                         console.error("Erreur lors de la récupération du profil : ", err);

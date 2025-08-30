@@ -20,10 +20,11 @@ async function uploadProfilePicture(req, res) {
         const { data } = await supabase.storage
             .from("profiles")
             .getPublicUrl(filePath);
-            
+
+        console.log("🔵 uploadProfilePicture - 200");
         return res.status(200).json({ url: data.publicUrl });
     } catch(err) {
-	    return res.status(500).json({ error: err.message });
+        return res.status(500).json({ error: err.message });
     }
 }
 
@@ -32,17 +33,18 @@ async function updateProfilePicture(req, res) {
     try {
         const userId = req.params.userId;
         const url = req.body.url;
-
+        
         const { error } = await supabase
-            .from('users')
-            .update({ pfp: url })
-            .eq('id', userId);
-
+        .from('users')
+        .update({ pfp: url })
+        .eq('id', userId);
+        
 	    if (error) return res.status(500).json({ error: error.message });
         
+        console.log("🔵 updateProfilePicture - 200");
 	    return res.status(200);
     } catch(err) {
-	    return res.status(500).json({ error: err.message });
+        return res.status(500).json({ error: err.message });
     }
 }
 
@@ -58,18 +60,19 @@ async function uploadHeaderBgImage(req, res) {
         const filePath = `${userId}/header_${Date.now()}.${extension}`;
         
         const { error } = await supabase.storage
-            .from("profiles")
-            .upload(filePath, file, { upsert: true });
-
+        .from("profiles")
+        .upload(filePath, file, { upsert: true });
+        
         if (error) return res.status(500).json({ error: error.message });
-
+        
         const { data } = await supabase.storage
-            .from("profiles")
-            .getPublicUrl(filePath);
-            
+        .from("profiles")
+        .getPublicUrl(filePath);
+        
+        console.log("🔵 uploadHeaderBgImage - 200");
         return res.status(200).json({ url: data.publicUrl });
     } catch(err) {
-	    return res.status(500).json({ error: err.message });
+        return res.status(500).json({ error: err.message });
     }
 }
 
@@ -78,14 +81,15 @@ async function updateHeaderBgImage(req, res) {
     try {
         const userId = req.params.userId;
         const url = req.body.url;
-
+        
         const { error } = await supabase
-            .from('users')
-            .update({ header_bg: url })
-            .eq('id', userId);
-
+        .from('users')
+        .update({ header_bg: url })
+        .eq('id', userId);
+        
 	    if (error) return res.status(500).json({ error: error.message });
         
+        console.log("🔵 updateHeaderBgImage - 200");
 	    return res.status(200);
     } catch(err) {
 	    return res.status(500).json({ error: err.message });

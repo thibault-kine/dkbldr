@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Card } from "scryfall-api";
-import { getCardById } from "../../db/cards";
 import { Box, Typography } from "@mui/joy";
 import "../style/CardHeader.css"
+import { cardsApi } from "../services/api";
 
 
 function manaCostParser(manaCost: string) {
@@ -16,7 +16,7 @@ export default function CardHeader({ id }) {
     const [style, setStyle] = useState("card-header");
     
     useEffect(() => {
-        getCardById(id).then(c => {
+        cardsApi.getById(id).then(c => {
             setCard(c);
             console.log(c);
 

@@ -5,8 +5,12 @@ import { Button, Link, Input, Box, Typography } from "@mui/joy";
 import { FiLogIn } from "react-icons/fi";
 import { FaLock, FaRegEnvelope } from "react-icons/fa6";
 import "../style/Forms.css";
- 
+import { useUser } from "../context/UserContext";
+import { usersApi } from "../services/api";
+
 export default function Login() {
+
+    const { setUser } = useUser();
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -16,39 +20,45 @@ export default function Login() {
 
     async function handleLogin(e: React.FormEvent) {
         e.preventDefault();
+        
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    
+        
         if (error) {
             setError(error.message);
-        } else {
-            const { user, session } = data;
-    
-            // Stocker le JWT dans sessionStorage
-            if (session?.access_token) {
-                sessionStorage.setItem("jwt", session.access_token);
-            }
-    
-            // alert("Login successful");
-            // navigate(`/user/${username}/${user.id}`);
-            navigate(`/`);
+            return;
         }
+        
+        const { user, session } = data;
+
+        // Stocker le JWT dans sessionStorage
+        if (session?.access_token) {
+            session.user = user;
+            sessionStorage.setItem("jwt", session.access_token);
+            console.log("jwt:", sessionStorage.getItem("jwt"));
+            
+        }
+
+        const appUser = await usersApi.getById(user.id);
+        setUser(appUser);
+        navigate(`/`);
     }
 
 
     return (
         <div>
-            <Box 
+            <Box
                 className="account-form"
-                component='form' 
-                onSubmit={handleLogin}
+                component='form'
+                onSubmit={(e) => handleLogin(e)}
             >
                 <Typography level="h2" textAlign="center">Login</Typography>
                 <Link href="/register" width="fit-content" m="auto">First time here?</Link>
                 {error && <p style={{ color: "red" }}>{error}</p>}
-                
+
                 <Input
+                    id="login-email"
                     className="form-input"
-                    startDecorator={<FaRegEnvelope/>}
+                    startDecorator={<FaRegEnvelope />}
                     type="email"
                     placeholder="Email"
                     value={email}
@@ -56,19 +66,20 @@ export default function Login() {
                     required
                 />
                 <Input
+                    id="login-pwd"
                     className="form-input"
-                    startDecorator={<FaLock/>}
+                    startDecorator={<FaLock />}
                     type="password"
                     placeholder="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
                 />
-                <Button 
+                <Button
                     className="form-btn"
                     type="submit"
                     variant="solid"
-                    endDecorator={<FiLogIn size="20px"/>}
+                    endDecorator={<FiLogIn size="20px" />}
                 >Log In</Button>
             </Box>
         </div>

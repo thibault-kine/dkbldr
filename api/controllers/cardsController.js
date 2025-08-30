@@ -33,6 +33,7 @@ async function getRandomCommander(req, res) {
         if (!result.ok) return res.status(result.status).json({ error: result.text });
         const card = await result.json();
 
+        console.log("🔵 getRandomCommander - 200");
         return res.status(200).json(card);
     }
     catch (err) {
@@ -49,6 +50,7 @@ async function searchCard(req, res) {
         if (!result) return res.status(404).json({ error: "Data not found" });
         const card = await result.json();
         
+        console.log("🔵 searchCard - 200");
         return res.status(200).json(card);
     }
     catch (err) {
@@ -65,6 +67,7 @@ async function getCardById(req, res) {
         if (!result) return res.status(404).json({ error: "Data not found" });
         const card = await result.json();
         
+        console.log("🔵 getCardById - 200");
         return res.status(200).json(card);
     }
     catch (err) {
@@ -77,12 +80,13 @@ async function getAllPrints(req, res) {
     try {
         const cardId = req.params.cardId;
         const _card = Cards.byId(cardId);
-
+        
         const result = await fetch(_card.prints_search_uri);
-
+        
         if (!result.ok) return res.status(result.status).json({ error: result.text });
         
         const card = await result.json();
+        console.log("🔵 getAllPrints - 200");
         return res.status(200).json(card);
     }
     catch(err) {

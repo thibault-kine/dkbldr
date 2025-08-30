@@ -1,11 +1,11 @@
 import { SearchOutlined } from "@mui/icons-material";
 import { Box, Button, IconButton, Input, Link, ToggleButtonGroup, Typography } from "@mui/joy";
 import { useState } from "react";
-import { Deck } from "../../db/decks";
 import { User } from "../context/UserContext";
 import { supabase } from "../../db/supabase";
 import DeckPreviewCard from "../components/DeckPreviewCard";
 import UserPreviewCard from "../components/UserPreviewCard";
+import { Deck } from "../services/api";
 
 export default function ExplorePage() {
     

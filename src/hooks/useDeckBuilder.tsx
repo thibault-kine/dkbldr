@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
-import { Deck, DeckList, getAllDecksFromUser, saveDeckToUser } from "../../db/decks";
 import { User } from "@supabase/supabase-js";
 import { Card, Cards } from "scryfall-api";
 import { groupCardsByType } from "../../utils/deck";
-import { Archetype } from "../../db/archetypes";
+import { Archetype, Deck, DeckList, decksApi } from "../services/api";
 
 export function useDeckBuilder(user: User, initialId?: string) {
 
@@ -14,7 +13,7 @@ export function useDeckBuilder(user: User, initialId?: string) {
     const [mainboard, setMainboard] = useState<DeckList>([]);
     const [sideboard, setSideboard] = useState<DeckList>([]);
 
-    const [archetypes, setArchetypes] = useState<number[]>([]);
+    const [archetypes, setArchetypes] = useState<Archetype[]>([]);
 
     const [deck, setDeck] = useState<Deck>({
         id: initialId ?? undefined,
@@ -42,7 +41,7 @@ export function useDeckBuilder(user: User, initialId?: string) {
 
 
     async function getNextUnnamedDeckName(userId: string): Promise<string> {
-        const decks = await getAllDecksFromUser(userId);
+        const decks = await decksApi.getAllFromUser(userId);
         const unnamedNumbers = decks
             .map(deck => {
                 const match = deck.name.match(/^Unnamed Deck (\d+)$/);
@@ -59,7 +58,7 @@ export function useDeckBuilder(user: User, initialId?: string) {
         if (deckName.trim()) return deckName.trim();
 
         // Sinon on l'appelle "Unnamed Deck <n++>"
-        const unnamedDecks = await getAllDecksFromUser(user.id);
+        const unnamedDecks = await decksApi.getAllFromUser(user.id);
         const count = unnamedDecks.filter(d => d.name?.startsWith("Unnamed Deck")).length;
         
         return `Unnamed Deck ${count + 1}`;
@@ -135,9 +134,9 @@ export function useDeckBuilder(user: User, initialId?: string) {
             likes: 0,
         }
 
-        const updatedDeckId = await saveDeckToUser(newDeck);
-        setDeckId(updatedDeckId);
-        return updatedDeckId;
+        const updatedDeck = await decksApi.create(user.id, newDeck);
+        setDeckId(updatedDeck.id!);
+        return updatedDeck;
     }
 
 

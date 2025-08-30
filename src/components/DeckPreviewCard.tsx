@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
 import { Card } from "scryfall-api";
-import { User, useUser } from "../context/UserContext";
-import { Deck, getDeckById } from "../../db/decks";
-import { getUserById } from "../../db/users";
+import { useUser } from "../context/UserContext";
 import { Box, Link, Typography } from "@mui/joy";
 import "../style/DeckPreviewCard.css";
 import { Favorite, FavoriteBorder, FavoriteOutlined } from "@mui/icons-material";
 import numberShortener from "number-shortener";
 import { format, formatDistanceToNow, isToday, isYesterday, differenceInDays, differenceInMonths } from 'date-fns';
+import { decksApi, usersApi } from "../services/api";
 
 
 export default function DeckPreviewCard({ deckId }: { deckId: string }) {
@@ -39,7 +38,7 @@ export default function DeckPreviewCard({ deckId }: { deckId: string }) {
     }
 
     useEffect(() => {
-        getDeckById(deckId).then(d => {
+        decksApi.getById(deckId).then(d => {
             setCommander(d!.commanders[0]);
             setColors(d!.color_identity);
             setName(d!.name);
@@ -48,7 +47,7 @@ export default function DeckPreviewCard({ deckId }: { deckId: string }) {
             
             if (d!.user_id) {
                 setAuthorId(d?.user_id);
-                getUserById(d!.user_id).then(u => setAuthor(u?.username));
+                usersApi.getById(d!.user_id).then(u => setAuthor(u?.username));
             }
         });
     }, [deckId]);
@@ -67,10 +66,14 @@ export default function DeckPreviewCard({ deckId }: { deckId: string }) {
                     <Box sx={{ display: "flex", "flexDirection": "row", alignItems: "center", justifyContent: "space-between" }}>
                         <Typography sx={{ fontWeight: "bold", fontSize: 22 }}>{name}</Typography>
                         <Box>
-                        {colors ? colors.map((c, i) => (
-                            <img key={i} src={`/icons/mana/${c}.svg`} width={20} height={20} style={{ filter: "drop-shadow(0 0 3px black)", marginLeft: "2px" }}/>
-                        )) : (
-                            <img src="/icons/mana/C.svg" width={20} height={20} style={{ filter: "drop-shadow(0 0 3px black)" }}/>
+                        {colors && colors.length >= 5 ? (
+                        <img src="/icons/mana/M.svg" width={20} height={20} style={{ filter: "drop-shadow(0 0 3px black)" }} />
+                        ) : colors && colors.length > 0 ? (
+                        colors.map((c, i) => (
+                            <img key={i} src={`/icons/mana/${c}.svg`} width={20} height={20} style={{ filter: "drop-shadow(0 0 3px black)" }} />
+                        ))
+                        ) : (
+                        <img src="/icons/mana/C.svg" width={20} height={20} style={{ filter: "drop-shadow(0 0 3px black)" }} />
                         )}
                         </Box>
                     </Box>

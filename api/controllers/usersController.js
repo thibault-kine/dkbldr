@@ -17,6 +17,7 @@ async function createUser(req, res) {
         
         if (error) return res.status(500).json({ error: error.message });
             
+        console.log("🔵 createUser - 201");
         return res.status(201).json(data[0]); 
     } catch(err) {
         return res.status(500).json({ error: err.message });
@@ -27,11 +28,12 @@ async function createUser(req, res) {
 async function getUsers(req, res) {
     try {
         const { data, error } = await supabase
-            .from('users')
-            .select("*");
+        .from('users')
+        .select("*");
         
         if (error) return res.status(500).json({ error: error.message });
         
+        console.log("🔵 getUsers - 200");
         return res.status(200).json(data);
     } catch(err) {
         return res.status(500).json({ error: err.message });
@@ -43,12 +45,12 @@ async function updateUser(req, res) {
     try {
         const userId = req.params.userId;
         const updates = req.body;
-
+        
         const { data, error } = await supabase
-            .from('users')
-            .update(updates)
-            .eq('id', userId)
-            .select();
+        .from('users')
+        .update(updates)
+        .eq('id', userId)
+        .select();
         
         if (error) return res.status(500).json({ error: error.message });
         
@@ -57,6 +59,7 @@ async function updateUser(req, res) {
             return res.status(404).json({ error: "Utilisateur non trouvé" });
         }
         
+        console.log("🔵 updateUser - 200");
         return res.status(200).json(data[0]); 
     } catch(err) {
         return res.status(500).json({ error: err.message });
@@ -67,12 +70,12 @@ async function updateUser(req, res) {
 async function deleteUser(req, res) {
     try {
         const userId = req.params.userId;
-
+        
         const { data, error } = await supabase
-            .from('users')
-            .delete()
-            .eq('id', userId)
-            .select();
+        .from('users')
+        .delete()
+        .eq('id', userId)
+        .select();
         
         if (error) return res.status(500).json({ error: error.message });
         
@@ -81,6 +84,7 @@ async function deleteUser(req, res) {
             return res.status(404).json({ error: "Utilisateur non trouvé" });
         }
         
+        console.log("🔵 deleteUser - 200");
         return res.status(200).json({ message: "Utilisateur supprimé", user: data[0] });
     } catch(err) {
         return res.status(500).json({ error: err.message });
@@ -96,23 +100,24 @@ async function followUser(req, res) {
         
         if (!isUuid(currentUserId) || !isUuid(targetUserId))
             return res.status(400).json({ error: "UUID invalide" });
-
+        
         const currentUser   = await getUserById(currentUserId);
         const targetUser    = await getUserById(targetUserId);
-    
+        
         if (!currentUser || !targetUser) 
             return res.status(404).json({ error: "Utilisateur non-trouvé" });
-    
+        
         if (currentUser.following.includes(targetUserId) || targetUser.followers.includes(currentUserId)) 
             return res.status(409).json({ error: "Utilisateur déjà suivi" });
     
         currentUser.following.push(targetUserId);
         targetUser.followers.push(currentUserId);
-    
+        
         await supabase.rpc('follow_user', {
             target_user_id: targetUser.id,
         });
-
+        
+        console.log("🔵 followUser - 200");
         return res.status(200).json({ success: true });
     } catch(err) {
         return res.status(500).json({ error: err.message });
@@ -126,13 +131,14 @@ async function unfollowUser(req, res) {
 
         if (!isUuid(targetUserId))
             return res.status(400).json({ error: "UUID invalide" });
-    
+        
         const { error } = await supabase.rpc("unfollow_user", {
             target_user_id: targetUserId,
         });
-
+        
         if (error) return res.status(500).json({ error: error.message });
-
+        
+        console.log("🔵 unfollowUser - 200");
         return res.status(200).json({ success: true });
     } catch(err) {
         return res.status(500).json({ error: err.message });

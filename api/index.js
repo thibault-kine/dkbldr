@@ -12,7 +12,8 @@ const port = process.env.PORT || 4000;
 
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: "5mb" }));
+app.use(express.urlencoded({ limit: '5mb', extended: true }));
 
 const swaggerDocument = yaml.load(path.join(__dirname, 'swagger.yml'));
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));

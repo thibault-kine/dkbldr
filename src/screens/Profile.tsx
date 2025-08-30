@@ -1,16 +1,14 @@
 import { useState, useEffect, useRef } from "react";
 import { User, useUser } from "../context/UserContext";
 import { Input, Button, Box, Typography, Skeleton } from "@mui/joy";
-import { getUserById, updateUser } from "../../db/users";
 import { Add, Check, Edit } from "@mui/icons-material";
-import { updateProfilePicture, uploadHeaderBgImage, uploadProfilePicture } from "../../db/storage";
 import { useNavigate, useParams } from "react-router-dom";
-import { Deck, getAllDecksFromUser } from "../../db/decks"
 import { v4 as uuidv4 } from "uuid";
 import "../style/Profile.css"
 import ProfileAvatar from "../components/ProfileAvatar";
 import DeckPreviewCard from "../components/DeckPreviewCard";
 import FollowButton from "../components/FollowButton";
+import { Deck, decksApi, storageApi, usersApi } from "../services/api";
 
 
 export default function Profile() {
@@ -37,7 +35,7 @@ export default function Profile() {
         if (!user || !isOwner) return;
 
         try {
-            await updateUser(user.id, { username: newUsername.trim() });
+            await usersApi.update(user.id, { username: newUsername.trim() });
             await refreshUser();
             setEditing(false);
         } catch (error) {
@@ -57,9 +55,9 @@ export default function Profile() {
         if (!file || !user) return;
 
         try {
-            const imageUrl = await uploadProfilePicture(file, user.id);
+            const imageUrl = await storageApi.uploadAvatar(user.id, file);
             if (imageUrl) {
-                await updateProfilePicture(user.id, imageUrl);
+                await storageApi.updateAvatarUrl(user.id, imageUrl.url);
                 await refreshUser().then(() => window.location.reload());
             }
         } catch (err) {
@@ -72,23 +70,11 @@ export default function Profile() {
         if (!file || !user) return;
 
         try {
-            const imageUrl = await uploadHeaderBgImage(user.id, file);
-            await updateUser(user.id, { header_bg: imageUrl })
+            const imageUrl = await storageApi.uploadHeader(user.id, file);
+            await storageApi.updateHeaderUrl(user.id, imageUrl.url);
             await refreshUser().then(() => window.location.reload());
         } catch (err) {
             console.error("Erreur d'upload : ", err);
-        }
-    }
-
-    async function handleDescriptionChange() {
-        if (!user || !isOwner) return;
-
-        try {
-            await updateUser(user.id, { description: description });
-            await refreshUser();
-            setEditing(false);
-        } catch (error) {
-            console.error("Erreur lors de la mise à jour :", error);
         }
     }
 
@@ -98,7 +84,7 @@ export default function Profile() {
 
         (async () => {
             try {
-                const userData = await getUserById(id);
+                const userData = await usersApi.getById(id);
 
                 setProfile(userData);
                 setNewUsername(userData?.username ?? "");
@@ -112,7 +98,7 @@ export default function Profile() {
 
         (async () => {
             try {
-                const userDecks = await getAllDecksFromUser(id);
+                const userDecks = await decksApi.getAllFromUser(id);
                 setDecks(userDecks);
             } catch (error) {
                 console.error("Erreur lors de la récupération des decks de l'utilisateur: ", error);
