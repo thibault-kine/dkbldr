@@ -26,6 +26,12 @@ jobs:
         working-directory: ./api
         run: npm i
 
+      - name: Create .env
+        working-directory: ./api
+        run: |
+          printf "SUPABASE_URL=%s\nSUPABASE_KEY=%s" \
+            "${SUPABASE_URL}" "${SUPABASE_KEY}" > .env
+
       - name: Run tests
         run: npm run test
         working-directory: ./api
