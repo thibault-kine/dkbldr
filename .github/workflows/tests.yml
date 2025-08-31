@@ -27,7 +27,7 @@ jobs:
         run: npm i
 
       - name: quick check
-        run: echo "${SUPABASE_KEY}\n${SUPABASE_URL}" 
+        run: echo "${env.SUPABASE_KEY}\n${env.SUPABASE_URL}" 
 
       - name: Run tests
         run: npm run test
