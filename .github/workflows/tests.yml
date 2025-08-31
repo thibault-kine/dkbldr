@@ -7,8 +7,8 @@ on:
     branches: [ "main" ]
 
 env:
-  SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-  SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+  SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+  SUPABASE_KEY: ${{ secrets.VITE_SUPABASE_KEY }}
 
 jobs:
   test:
@@ -20,10 +20,10 @@ jobs:
 
       - name: quick check
         run: |
-          if [ -z "${{secrets.SUPABASE_URL}}" ]; then
+          if [ -z "$SUPABASE_URL" ]; then
             echo "SUPABASE_URL is empty"
           else
-            echo "SUPABASE_URL is set (length=$(echo -n ${{secrets.SUPABASE_URL}} | wc -c))"
+            echo "SUPABASE_URL is set (length=$(echo -n $SUPABASE_URL | wc -c))"
           fi
 
       - name: Setup Node.js
