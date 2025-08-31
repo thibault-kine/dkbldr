@@ -7,12 +7,13 @@ on:
     branches: [ "main" ]
 
 env:
-  SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-  SUPABASE_KEY: ${{ secrets.VITE_SUPABASE_KEY }}
+  SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+  SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    environment: "production"
     
     steps:
       - name: Checkout repo
