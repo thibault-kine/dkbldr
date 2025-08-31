@@ -10,8 +10,8 @@ jobs:
   test:
     runs-on: ubuntu-latest
     env:
-      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-      SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+      SUPABASE_URL: ${{ env.SUPABASE_URL }}
+      SUPABASE_KEY: ${{ env.SUPABASE_KEY }}
 
     steps:
       - name: Checkout repo
@@ -27,5 +27,5 @@ jobs:
         run: npm i
 
       - name: Run tests
-        run: SUPABASE_URL=${{ secrets.SUPABASE_URL }} SUPABASE_KEY=${{ secrets.SUPABASE_KEY }} npm run test
+        run: npm run test
         working-directory: ./api
