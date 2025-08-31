@@ -20,8 +20,11 @@ jobs:
 
       - name: quick check
         run: |
-          echo "$SUPABASE_URL" 
-          echo "$SUPABASE_KEY"
+          if [ -z "$SUPABASE_URL" ]; then
+            echo "SUPABASE_URL is empty"
+          else
+            echo "SUPABASE_URL is set (length=$(echo -n $SUPABASE_URL | wc -c))"
+          fi
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
