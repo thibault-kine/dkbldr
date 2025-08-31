@@ -18,7 +18,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: quick check
-        run: echo "$SUPABASE_KEY\n$SUPABASE_URL" 
+        run: |
+          echo "$SUPABASE_URL" 
+          echo "$SUPABASE_KEY"
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
