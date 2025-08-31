@@ -17,6 +17,9 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      - name: quick check
+        run: echo "$SUPABASE_KEY\n$SUPABASE_URL" 
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -25,9 +28,6 @@ jobs:
       - name: Install dependencies
         working-directory: ./api
         run: npm i
-
-      - name: quick check
-        run: echo "${env.SUPABASE_KEY}\n${env.SUPABASE_URL}" 
 
       - name: Run tests
         run: npm run test
