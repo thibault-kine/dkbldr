@@ -1,4 +1,4 @@
-name: Run Unit & Integration Tests
+name: Run Unit Tests
 
 on:
   push:
@@ -10,7 +10,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
     env:
-      NODE_ENV: test
       SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
       SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
 
@@ -23,36 +22,13 @@ jobs:
         with:
           node-version: 18
 
-      - name: Quick check - secrets presence
-        run: |
-          if [ -z "${SUPABASE_URL}" ] || [ -z "${SUPABASE_KEY}" ]; then
-            echo "ERROR: SUPABASE secrets are missing (check repo Settings → Secrets)."
-            exit 1
-          else
-            echo "Secrets present (will not print values)."
-          fi
-
       - name: Install dependencies
         working-directory: ./api
-        run: npm ci
+        run: npm i
 
-      - name: Write .env for tests (safe)
-        working-directory: ./api
-        run: |
-          cat > .env <<EOF
-          NODE_ENV=test
-          SUPABASE_URL=${SUPABASE_URL}
-          SUPABASE_KEY=${SUPABASE_KEY}
-          EOF
-          echo ".env created in $(pwd)"
-
-      - name: show .env exists (redacted)
-        working-directory: ./api
-        run: |
-          ls -la .env
-          # print lines but redact values so we don't leak secrets in logs
-          sed -n '1,10p' .env | sed 's/=.*/=REDACTED/'
+      - name: quick check
+        run: echo "${SUPABASE_KEY}\n${SUPABASE_URL}" 
 
       - name: Run tests
+        run: npm run test
         working-directory: ./api
-        run: npm test -- --ci
