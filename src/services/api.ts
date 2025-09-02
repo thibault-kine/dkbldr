@@ -1,7 +1,7 @@
 import { Card } from "scryfall-api";
 
 // Service API centralisé pour remplacer les appels directs à la DB
-const API_BASE_URL = 'http://localhost:4000/api';
+const API_BASE_URL = `https://${process.env.API_URL}:${process.env.API_PORT}/`;
 
 export type DeckList = { 
     qty: number; 
@@ -42,7 +42,7 @@ export type Archetype = {
 
 // Utility function for API calls
 async function apiCall(endpoint: string, options: RequestInit = {}) {
-    const url = `${process.env.API_URL}${endpoint}`;
+    const url = `${API_BASE_URL}${endpoint}`;
     const config: RequestInit = {
         headers: {
             'Content-Type': 'application/json',
