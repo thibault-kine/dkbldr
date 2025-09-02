@@ -8,7 +8,7 @@ const path = require("path");
 
 
 const app = express();
-const port = process.env.PORT || 4000;
+const port = process.env.API_PORT || 4000;
 
 
 app.use(cors());
@@ -37,5 +37,5 @@ app.use("/api/storage", storageRoutes);
 
 app.listen(port, () => {
     console.log(`🟢 dkbldr-api listening on port ${port}`);
-    console.log(`API documentation available at http://localhost:${port}/api-docs`);
+    console.log(`API documentation available at http://${process.env.API_URL}/api-docs`);
 });
