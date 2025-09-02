@@ -5,7 +5,7 @@ services:
     build: ./api
     container_name: dkbldr-api
     ports:
-      - "4000:4000"
+      - "8080:4000"
     env_file:
       - ./api/.env
     restart: unless-stopped
@@ -14,7 +14,7 @@ services:
     build: ./
     container_name: dkbldr-app
     ports:
-      - "5173:5173"
+      - "8081:3000"
     env_file:
       - ./.env
     depends_on:
