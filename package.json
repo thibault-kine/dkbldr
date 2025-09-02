@@ -19,7 +19,6 @@
     "axios": "^1.7.9",
     "bcryptjs": "^3.0.0",
     "date-fns": "^4.1.0",
-    "deno": "^2.4.2",
     "express": "^5.1.0",
     "localtunnel": "^2.0.2",
     "number-shortener": "^1.0.1",
