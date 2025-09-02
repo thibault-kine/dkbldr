@@ -1,7 +1,7 @@
 import { Card } from "scryfall-api";
 
 // Service API centralisé pour remplacer les appels directs à la DB
-const API_BASE_URL = `${process.env.VITE_API_URL}:${process.env.VITE_API_PORT}`;
+const API_BASE_URL = `${import.meta.env.VITE_API_URL}:${import.meta.env.VITE_API_PORT}`;
 
 export type DeckList = { 
     qty: number; 

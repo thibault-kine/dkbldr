@@ -37,5 +37,5 @@ app.use("/api/storage", storageRoutes);
 
 app.listen(port, () => {
     console.log(`🟢 dkbldr-api listening on port ${port}`);
-    console.log(`API documentation available at http://${process.env.API_URL}/api-docs`);
+    console.log(`API documentation available at ${process.env.API_URL}/api-docs`);
 });
