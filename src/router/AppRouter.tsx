@@ -17,7 +17,7 @@ import Navbar from "../components/Navbar";
 import Test from "../screens/Test";
 import ExplorePage from "../screens/ExplorePage";
 
-export const BASE_ROUTE = "/dkbldr";
+export const BASE_ROUTE = "/dkbldr/";
 
 export default function AppRouter() {
 
@@ -29,24 +29,24 @@ export default function AppRouter() {
             <Navbar/>
             <Routes>
                     {/* Routes publiques */}
-                    <Route path={`${BASE_ROUTE}/`} element={<Home />} />
-                    <Route path={`${BASE_ROUTE}/login`} element={<LoginPage />} />
-                    <Route path={`${BASE_ROUTE}/register`} element={<RegisterPage />} />
-                    <Route path={`${BASE_ROUTE}/about`} element={<About />} />
-                    <Route path={`${BASE_ROUTE}/explore`} element={<ExplorePage />} />
+                    <Route path={`${BASE_ROUTE}`} element={<Home />} />
+                    <Route path={`${BASE_ROUTE}login`} element={<LoginPage />} />
+                    <Route path={`${BASE_ROUTE}register`} element={<RegisterPage />} />
+                    <Route path={`${BASE_ROUTE}about`} element={<About />} />
+                    <Route path={`${BASE_ROUTE}explore`} element={<ExplorePage />} />
 
                     {/* Routes protégées */}
                     <Route element={<ProtectedRoute />}>
-                        <Route path={`${BASE_ROUTE}/user/:username/:id`} element={<Profile />} />
-                        <Route path={`${BASE_ROUTE}/deck/:id/builder`} element={<DeckBuilder user={user} />} />
-                        <Route path={`${BASE_ROUTE}/deck/:id/details`} element={<DeckDetails />} />
+                        <Route path={`${BASE_ROUTE}user/:username/:id`} element={<Profile />} />
+                        <Route path={`${BASE_ROUTE}deck/:id/builder`} element={<DeckBuilder user={user} />} />
+                        <Route path={`${BASE_ROUTE}deck/:id/details`} element={<DeckDetails />} />
                     </Route>
 
                     {/* Page 404 */}
-                    <Route path={`${BASE_ROUTE}/*`} element={<Page404 />} />
+                    <Route path={`${BASE_ROUTE}*`} element={<Page404 />} />
 
                     {/* Page de test */}
-                    <Route path={`${BASE_ROUTE}/test`} element={<Test/>} />
+                    <Route path={`${BASE_ROUTE}test`} element={<Test/>} />
             </Routes>
         </>
     );
