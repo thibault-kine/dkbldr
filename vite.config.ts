@@ -18,5 +18,5 @@ export default defineConfig({
         host: true,
         allowedHosts: ["*"]
     },
-    base: "/dkbldr"
+    base: "/dkbldr/"
 })
