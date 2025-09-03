@@ -1,5 +1,6 @@
 {
   "name": "dkbldg",
+  "homepage": "https://thibault-kine.github.io/dkbldr/",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -7,7 +8,9 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -20,6 +23,7 @@
     "bcryptjs": "^3.0.0",
     "date-fns": "^4.1.0",
     "express": "^5.1.0",
+    "gh-pages": "^6.3.0",
     "localtunnel": "^2.0.2",
     "number-shortener": "^1.0.1",
     "pwa-asset-generator": "^8.0.5",
