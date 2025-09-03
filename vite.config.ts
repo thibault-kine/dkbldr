@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
+import { ghPages } from 'vite-plugin-gh-pages'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -12,11 +13,11 @@ export default defineConfig({
             manifestFilename: "manifest.json",
             includeAssets: [ '/icons/icon-512x512.png' ],
             filename: "sw.js",
-        })
+        }),
+        ghPages(),
     ],
     server: {
         host: true,
         allowedHosts: ["*"]
-    },
-    base: "/dkbldr/"
+    }
 })
