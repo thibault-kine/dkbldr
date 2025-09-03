@@ -1,15 +1,27 @@
-# Étape build
-FROM node:20-alpine AS build
+FROM node:20-alpine AS builder
+
 WORKDIR /app
+
 COPY package*.json ./
-RUN npm install
+RUN npm ci
+
 COPY . .
 RUN npm run build
 
-# Étape run (serve avec Vite ou un serveur statique)
-FROM node:20-alpine
+FROM node:20-alpine AS runner
+
 WORKDIR /app
-COPY --from=build /app/dist ./dist
+
+# Installer serve globalement
 RUN npm install -g serve
-EXPOSE 3000
-CMD ["serve", "-s", "dist", "-l", "3000", "-n", "--listen", "tcp://0.0.0.0:3000"]
+
+# Copier les fichiers buildés
+COPY --from=builder /app/dist ./dist
+
+# Utilise la variable PORT de Railway, avec 3000 comme fallback
+ENV PORT=${PORT:-3000}
+
+EXPOSE $PORT
+
+# Utiliser la variable PORT pour serve
+CMD ["sh", "-c", "serve -s dist -p $PORT"]

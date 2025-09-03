@@ -8,6 +8,9 @@ RUN npm i --production
 
 COPY . .
 
-EXPOSE 4000
+# Utilise la variable PORT de Railway, avec 4000 comme fallback
+ENV PORT=${PORT:-4000}
+
+EXPOSE $PORT
 
 CMD [ "node", "index.js" ]
