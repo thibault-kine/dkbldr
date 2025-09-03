@@ -6,6 +6,7 @@ import "../style/Header.css"
 import { Icon, Toolbar } from "@mui/material";
 import { useUser } from "../context/UserContext";
 import { ArrowDropDown, Home, Info, Login, Logout, Notifications, Person } from "@mui/icons-material";
+import { BASE_ROUTE } from "../router/AppRouter";
 
 export default function Header() {
 
@@ -18,20 +19,20 @@ export default function Header() {
 
         const params = location.pathname.split("/");
 
-        if (location.pathname === "/") return "Home";
-        if (location.pathname === "/login") return "Login";
-        if (location.pathname === "/register") return "Register";
-        if (location.pathname === "/about") return "About";
-        if (location.pathname === "/builder") return "Deck Builder";
+        if (location.pathname === `${BASE_ROUTE}/`) return "Home";
+        if (location.pathname === `${BASE_ROUTE}/login`) return "Login";
+        if (location.pathname === `${BASE_ROUTE}/register`) return "Register";
+        if (location.pathname === `${BASE_ROUTE}/about`) return "About";
+        if (location.pathname === `${BASE_ROUTE}/builder`) return "Deck Builder";
         
-        if (location.pathname.startsWith("/user")) return `${params[2]}'s Profile`;
+        if (location.pathname.startsWith(`${BASE_ROUTE}/user`)) return `${params[2]}'s Profile`;
         
         return "";
     }
 
     return (
         <Box className="header">
-            <img src="/icons/icon.png" className="logo" onClick={() => navigate("/")}/>
+            <img src="/icons/icon.png" className="logo" onClick={() => navigate(`${BASE_ROUTE}`)}/>
 
             <Typography>
                 {getPageName()}

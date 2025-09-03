@@ -17,7 +17,7 @@ import Navbar from "../components/Navbar";
 import Test from "../screens/Test";
 import ExplorePage from "../screens/ExplorePage";
 
-const BASE_ROUTE = "/dkbldr/"
+export const BASE_ROUTE = "/dkbldr/";
 
 export default function AppRouter() {
 
