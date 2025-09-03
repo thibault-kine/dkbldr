@@ -17,13 +17,5 @@ REM ---- PUSH API ----
 echo Pushing API image...
 docker push %DOCKER_USER%/%API_NAME%:%TAG%
 
-REM ---- BUILD APP ----
-echo Building App...
-docker build -t %DOCKER_USER%/%APP_NAME%:%TAG% ./
-
-REM ---- PUSH APP ----
-echo Pushing App image...
-docker push %DOCKER_USER%/%APP_NAME%:%TAG%
-
 echo Deployment images pushed successfully!
 echo Use tag %TAG% on Railway for deployment.
