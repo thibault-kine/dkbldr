@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { User, useUser } from "../context/UserContext";
+import { useUser } from "../context/UserContext";
 import { Input, Button, Box, Typography, Skeleton } from "@mui/joy";
 import { Add, Check, Edit } from "@mui/icons-material";
 import { useNavigate, useParams } from "react-router-dom";
@@ -8,7 +8,7 @@ import "../style/Profile.css"
 import ProfileAvatar from "../components/ProfileAvatar";
 import DeckPreviewCard from "../components/DeckPreviewCard";
 import FollowButton from "../components/FollowButton";
-import { Deck, decksApi, storageApi, usersApi } from "../services/api";
+import { AppUser, Deck, decksApi, storageApi, usersApi } from "../services/api";
 import { BASE_ROUTE } from "../router/AppRouter";
 
 
@@ -17,7 +17,7 @@ export default function Profile() {
     const { id } = useParams();
     const { user, refreshUser } = useUser();
 
-    const [profile, setProfile] = useState<User | null>(null);
+    const [profile, setProfile] = useState<AppUser | null>(null);
     const [decks, setDecks] = useState<Deck[]>([]);
     const [loadingProfile, setLoadingProfile] = useState(true);
     const [loadingDecks, setLoadingDecks] = useState(true);

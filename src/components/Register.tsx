@@ -53,7 +53,7 @@ export default function Register() {
                 onSubmit={handleRegister} 
             >
                 <Typography level="h2" textAlign="center">Register</Typography>
-                <Link href='/login' width="fit-content" m="auto">Already have an account?</Link>
+                <Link href={`${BASE_ROUTE}/login`} width="fit-content" m="auto">Already have an account?</Link>
                 {error && <p style={{ color: "red" }}>{error}</p>}
 
                 <Input

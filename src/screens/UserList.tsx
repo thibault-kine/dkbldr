@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { AppUser, useUser } from "../context/UserContext";
+import { useUser } from "../context/UserContext";
 import { Box, Button, Table } from "@mui/joy";
 import FollowButton from "../components/FollowButton";
 import Loading from "../components/Loading";
 import { Link } from "react-router-dom";
-import { usersApi } from "../services/api";
+import { AppUser, usersApi } from "../services/api";
+import { BASE_ROUTE } from "../router/AppRouter";
 
 export default function UserList() {
 
@@ -31,8 +32,8 @@ export default function UserList() {
                         {users?.map((_user, index) => (
                             <tr key={index} style={{ backgroundColor: _user.id === user?.id ? "lime" : "" }}>
                                 <td>{_user.id}</td>
-                                <td><Link to={`/user/${_user.username}/${_user.id}`}>{_user.username}</Link></td>
-                                <td><img src={_user.pfp ?? "/placeholders/default_pfp.jpg"} style={{ width: "50px", height: "50px", borderRadius: "30px", border: "2px solid black" }}/></td>
+                                <td><Link to={`${BASE_ROUTE}/user/${_user.username}/${_user.id}`}>{_user.username}</Link></td>
+                                <td><img src={_user.pfp ?? `${BASE_ROUTE}/placeholders/default_pfp.jpg`} style={{ width: "50px", height: "50px", borderRadius: "30px", border: "2px solid black" }}/></td>
                                 <td>{_user.id !== user?.id ? (<FollowButton currentUserId={user!.id} targetUser={_user} />) : ''}</td>
                             </tr>
                         ))}

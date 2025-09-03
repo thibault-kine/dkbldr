@@ -3,6 +3,7 @@ import { Card } from "scryfall-api";
 import { Box, Typography } from "@mui/joy";
 import "../style/CardHeader.css"
 import { cardsApi } from "../services/api";
+import { BASE_ROUTE } from "../router/AppRouter";
 
 
 function manaCostParser(manaCost: string) {
@@ -48,7 +49,7 @@ export default function CardHeader({ id }) {
                     <h3>{card?.name}</h3>
                     <div>
                     {manaCostParser(card.mana_cost ?? "").map((c, i) => (
-                        <img key={i} src={`/icons/mana/${c}.svg`} height="16px" style={{ filter: 'drop-shadow(-1px 1px 0 #000)', marginLeft: '1px' }} />
+                        <img key={i} src={`${BASE_ROUTE}/icons/mana/${c}.svg`} height="16px" style={{ filter: 'drop-shadow(-1px 1px 0 #000)', marginLeft: '1px' }} />
                     ))}
                     </div>
                 </Box>

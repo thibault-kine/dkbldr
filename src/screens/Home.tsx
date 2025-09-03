@@ -6,6 +6,7 @@ import Loading from "../components/Loading";
 import "../style/Home.css"
 import { supabase } from "../../db/supabase";
 import { cardsApi, Deck } from "../services/api";
+import { BASE_ROUTE } from "../router/AppRouter";
 
 export default function Home() {
 
@@ -109,7 +110,7 @@ export default function Home() {
                 <Typography className="headline">Welcome home, {user ? user.username : "player"}!</Typography>
                 
                 <Typography sx={{ fontSize: 28, fontWeight: "bold", textAlign: "center" }}>
-                    <Link href="/explore">START EXPL<img src={`/icons/mana/${currentCol}.svg`} width={26}/>RING!</Link>
+                    <Link href={`${BASE_ROUTE}/explore`}>START EXPL<img src={`${BASE_ROUTE}/icons/mana/${currentCol}.svg`} width={26}/>RING!</Link>
                 </Typography>
             </section>
 

@@ -13,6 +13,7 @@ import { groupCardsByType } from "../../utils/deck";
 import CardSearchbar from "../components/CardSearchbar";
 import { supabase } from "../../db/supabase";
 import { Archetype, archetypesApi, decksApi } from "../services/api";
+import { BASE_ROUTE } from "../router/AppRouter";
 
 
 export default function DeckBuilder({ user }) {
@@ -301,7 +302,7 @@ export default function DeckBuilder({ user }) {
 
                                         return sum > 0 && (
                                             <Tab key={index} className="deckbuilder-tab">
-                                                <img src={`/icons/other/${type}_symbol.svg`} height={15} style={{ filter: "invert(100%)" }}/> 
+                                                <img src={`${BASE_ROUTE}/icons/other/${type}_symbol.svg`} height={15} style={{ filter: "invert(100%)" }}/> 
                                                 <Typography>{sum}</Typography>
                                             </Tab>
                                         )})}
@@ -343,7 +344,7 @@ export default function DeckBuilder({ user }) {
 
                                         return sum > 0 && (
                                             <Tab key={index} className="deckbuilder-tab">
-                                                <img src={`/icons/other/${type}_symbol.svg`} height={15} style={{ filter: "invert(100%)" }}/> 
+                                                <img src={`${BASE_ROUTE}/icons/other/${type}_symbol.svg`} height={15} style={{ filter: "invert(100%)" }}/> 
                                                 <Typography>{sum}</Typography>
                                             </Tab>
                                         )})}
