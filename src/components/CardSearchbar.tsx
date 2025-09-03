@@ -3,7 +3,6 @@ import { Autocomplete, AutocompleteOption, Box, Button, Input, Typography } from
 import { Card, Cards, Set, Sets } from 'scryfall-api';
 import { SxProps } from '@mui/joy/styles/types';
 import { cardsApi } from '../services/api';
-import { BASE_ROUTE } from '../router/AppRouter';
 
 export default function CardSearchbar({ onSelected, sx } : { onSelected: (selected: Card) => void; sx?: SxProps | undefined }) {
 
@@ -61,9 +60,9 @@ export default function CardSearchbar({ onSelected, sx } : { onSelected: (select
                         }}>
                             <Box sx={{ display: "flex", alignItems: "center", marginRight: "10px" }}>
                                 {option.colors?.length! > 0 ? option.color_identity.map((c, k) => (
-                                    <img key={k} src={`${BASE_ROUTE}/icons/mana/${c}.svg`} width={20} />
+                                    <img key={k} src={`/icons/mana/${c}.svg`} width={20} />
                                 )) : (
-                                    <img src={`${BASE_ROUTE}/icons/mana/C.svg`} width={20} />
+                                    <img src={`/icons/mana/C.svg`} width={20} />
                                 )}
                             </Box>
                             <Typography sx={{ color: "white", fontWeight: "bold" }}>

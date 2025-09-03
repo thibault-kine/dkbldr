@@ -53,7 +53,7 @@ export default function Login() {
                 onSubmit={(e) => handleLogin(e)}
             >
                 <Typography level="h2" textAlign="center">Login</Typography>
-                <Link href={`${BASE_ROUTE}/register`} width="fit-content" m="auto">First time here?</Link>
+                <Link href="/register" width="fit-content" m="auto">First time here?</Link>
                 {error && <p style={{ color: "red" }}>{error}</p>}
 
                 <Input

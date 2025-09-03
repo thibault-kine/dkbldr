@@ -2,7 +2,6 @@ import { AutoAwesome, Loop, SwapHoriz } from "@mui/icons-material";
 import { Badge, Box, Dropdown, IconButton, Input, Menu, MenuButton, MenuItem } from "@mui/joy";
 import React, { use, useRef, useState } from "react";
 import { Card } from "scryfall-api";
-import { BASE_ROUTE } from "../router/AppRouter";
 
 export default function DeckCardDisplay({ 
     card, 
@@ -78,7 +77,7 @@ export default function DeckCardDisplay({
                     className="card-menu"
                     onClick={() => window.open(card.scryfall_uri, '_blank', 'noreferrer')}
                 >
-                    See card on Scryfall <img src={`${BASE_ROUTE}/icons/other/scryfall.svg`} width={25}/>
+                    See card on Scryfall <img src="/icons/other/scryfall.svg" width={25}/>
                 </MenuItem>
                 {isAuthor ?? 
                     <MenuItem 

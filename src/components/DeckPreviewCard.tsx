@@ -7,7 +7,6 @@ import { Favorite, FavoriteBorder, FavoriteOutlined } from "@mui/icons-material"
 import numberShortener from "number-shortener";
 import { format, formatDistanceToNow, isToday, isYesterday, differenceInDays, differenceInMonths } from 'date-fns';
 import { decksApi, usersApi } from "../services/api";
-import { BASE_ROUTE } from "../router/AppRouter"
 
 
 export default function DeckPreviewCard({ deckId }: { deckId: string }) {
@@ -61,20 +60,20 @@ export default function DeckPreviewCard({ deckId }: { deckId: string }) {
             className="container"
             sx={{ backgroundImage: `url(${displayedFace?.image_uris?.art_crop})`, backgroundSize: "cover", backgroundPositionY: "20%" }}
         >
-        <Link href={`${BASE_ROUTE}/deck/${deckId}/${user?.id === authorId ? "builder" : "details"}`} className="deck-link">
+        <Link href={`/deck/${deckId}/${user?.id === authorId ? "builder" : "details"}`} className="deck-link">
             <Box className="background-gradient">
                 <Box sx={{ display: "flex", flexDirection: "column" }}>
                     <Box sx={{ display: "flex", "flexDirection": "row", alignItems: "center", justifyContent: "space-between" }}>
                         <Typography sx={{ fontWeight: "bold", fontSize: 22 }}>{name}</Typography>
                         <Box>
                         {colors && colors.length >= 5 ? (
-                        <img src={`${BASE_ROUTE}/icons/mana/M.svg`} width={20} height={20} style={{ filter: "drop-shadow(0 0 3px black)" }} />
+                        <img src="/icons/mana/M.svg" width={20} height={20} style={{ filter: "drop-shadow(0 0 3px black)" }} />
                         ) : colors && colors.length > 0 ? (
                         colors.map((c, i) => (
-                            <img key={i} src={`${BASE_ROUTE}/icons/mana/${c}.svg`} width={20} height={20} style={{ filter: "drop-shadow(0 0 3px black)" }} />
+                            <img key={i} src={`/icons/mana/${c}.svg`} width={20} height={20} style={{ filter: "drop-shadow(0 0 3px black)" }} />
                         ))
                         ) : (
-                        <img src={`${BASE_ROUTE}/icons/mana/C.svg`} width={20} height={20} style={{ filter: "drop-shadow(0 0 3px black)" }} />
+                        <img src="/icons/mana/C.svg" width={20} height={20} style={{ filter: "drop-shadow(0 0 3px black)" }} />
                         )}
                         </Box>
                     </Box>

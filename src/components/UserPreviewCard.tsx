@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { Card } from "scryfall-api";
+import { User, useUser } from "../context/UserContext";
 import { Avatar, Box, Link, Typography } from "@mui/joy";
 import "../style/DeckPreviewCard.css";
-import { AppUser, usersApi } from "../services/api";
-import { BASE_ROUTE } from "../router/AppRouter";
+import { usersApi } from "../services/api";
 
 
 export default function UserPreviewCard({ userId }: { userId: string }) {
     
-    const [profile, setProfile] = useState<AppUser>();
+    const [profile, setProfile] = useState<User>();
 
     useEffect(() => {
         usersApi.getById(userId).then(u => setProfile(u!));
@@ -20,7 +20,7 @@ export default function UserPreviewCard({ userId }: { userId: string }) {
             className="container"
             sx={{ backgroundImage: `url(${profile?.header_bg})`, backgroundSize: "cover", backgroundPositionY: "20%" }}
         >
-        <Link href={`${BASE_ROUTE}/user/${profile?.username}/${userId}`} className="deck-link">
+        <Link href={`/user/${profile?.username}/${userId}`} className="deck-link">
             <Box className="background-gradient">
                 <Box sx={{ display: "flex", flexDirection: "column", justifyContent: "center" }}>
                     <Box sx={{ display: "flex", "flexDirection": "row", alignItems: "center" }}>

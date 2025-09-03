@@ -5,7 +5,6 @@ import "../style/DeckBuilder.css"
 import DeckCardDisplay from "../components/DeckCardDisplay";
 import { groupCardsByType } from "../../utils/deck";
 import { Deck, decksApi } from "../services/api";
-import { BASE_ROUTE } from "../router/AppRouter";
 
 
 export default function DeckDetails() {
@@ -58,7 +57,7 @@ export default function DeckDetails() {
 
                                         return sum > 0 && (
                                             <Tab key={index} className="deckbuilder-tab">
-                                                <img src={`${BASE_ROUTE}/icons/other/${type}_symbol.svg`} height={15} style={{ filter: "invert(100%)" }}/> 
+                                                <img src={`/icons/other/${type}_symbol.svg`} height={15} style={{ filter: "invert(100%)" }}/> 
                                                 <Typography>{sum}</Typography>
                                             </Tab>
                                         )})}
@@ -100,7 +99,7 @@ export default function DeckDetails() {
 
                                         return sum > 0 && (
                                             <Tab key={index} className="deckbuilder-tab">
-                                                <img src={`${BASE_ROUTE}/icons/other/${type}_symbol.svg`} height={15} style={{ filter: "invert(100%)" }}/> 
+                                                <img src={`/icons/other/${type}_symbol.svg`} height={15} style={{ filter: "invert(100%)" }}/> 
                                                 <Typography>{sum}</Typography>
                                             </Tab>
                                         )})}

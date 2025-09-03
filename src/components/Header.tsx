@@ -32,7 +32,7 @@ export default function Header() {
 
     return (
         <Box className="header">
-            <img src={`${BASE_ROUTE}/icons/icon.png`} className="logo" onClick={() => navigate(`${BASE_ROUTE}`)}/>
+            <img src="/icons/icon.png" className="logo" onClick={() => navigate(`${BASE_ROUTE}`)}/>
 
             <Typography>
                 {getPageName()}

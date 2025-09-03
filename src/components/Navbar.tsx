@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import "../style/Navbar.css"
 import { useUser } from "../context/UserContext";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Box, Button, Drawer, IconButton } from "@mui/joy";
-import { Close, Menu } from "@mui/icons-material";
+import { Avatar, Box, Button, Drawer, Dropdown, IconButton, Link, ListItemDecorator, MenuButton, MenuItem, Typography } from "@mui/joy";
+import { ArrowDropDown, Close, Login, Logout, Menu, Person } from "@mui/icons-material";
+import { supabase } from "../../db/supabase";
 import { useAuth } from "../context/AuthContext";
 import LogoutButton from "./LogoutButton";
 import { BASE_ROUTE } from "../router/AppRouter";
