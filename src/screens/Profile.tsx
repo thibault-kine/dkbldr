@@ -9,7 +9,6 @@ import ProfileAvatar from "../components/ProfileAvatar";
 import DeckPreviewCard from "../components/DeckPreviewCard";
 import FollowButton from "../components/FollowButton";
 import { Deck, decksApi, storageApi, usersApi } from "../services/api";
-import { BASE_ROUTE } from "../router/AppRouter";
 
 
 export default function Profile() {
@@ -247,7 +246,7 @@ export default function Profile() {
                     {isOwner && <Button
                         startDecorator={<Add />}
                         // Redirects to a new URL with `uuidv4()`, which generates an UUID
-                        onClick={() => navigate(`${BASE_ROUTE}/deck/${uuidv4()}/builder`)}
+                        onClick={() => navigate(`/deck/${uuidv4()}/builder`)}
                     >
                         Create a new deck
                     </Button>}

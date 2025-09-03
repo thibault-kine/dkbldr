@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../../db/supabase";
 import { Button } from "@mui/joy";
-import { BASE_ROUTE } from "../router/AppRouter";
 
 export default function LogoutButton() {
     
@@ -16,7 +15,7 @@ export default function LogoutButton() {
     async function handleLogout() {
         await supabase.auth.signOut();
         sessionStorage.removeItem("jwt");
-        navigate(`${BASE_ROUTE}`);
+        navigate("/");
         window.location.reload();
     }
 

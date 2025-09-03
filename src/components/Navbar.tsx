@@ -7,7 +7,6 @@ import { ArrowDropDown, Close, Login, Logout, Menu, Person } from "@mui/icons-ma
 import { supabase } from "../../db/supabase";
 import { useAuth } from "../context/AuthContext";
 import LogoutButton from "./LogoutButton";
-import { BASE_ROUTE } from "../router/AppRouter";
 
 
 export default function Navbar() {
@@ -36,7 +35,7 @@ export default function Navbar() {
                     <Box sx={{ width: "100%", height: "100%" }}>
                         <Button
                             onClick={() => {
-                                navigate(`${BASE_ROUTE}`)
+                                navigate("/")
                                 setOpen(false)
                             }}
                             className="nav-btn"
@@ -46,7 +45,7 @@ export default function Navbar() {
 
                     <Button
                         onClick={() => {
-                            navigate(`${BASE_ROUTE}/explore`)
+                            navigate("/explore")
                             setOpen(false)
                         }}
                         className="nav-btn"
@@ -56,7 +55,7 @@ export default function Navbar() {
 
                     <Button
                         onClick={() => {
-                            navigate(`${BASE_ROUTE}/about`)
+                            navigate("/about")
                             setOpen(false)
                         }}
                         className="nav-btn"
@@ -67,7 +66,7 @@ export default function Navbar() {
                     {user ? (<>
                         <Button
                             onClick={() => {
-                                navigate(`${BASE_ROUTE}/user/${profile?.username}/${user?.id}`)
+                                navigate(`/user/${profile?.username}/${user?.id}`)
                                 setOpen(false)
                             }}
                             className="nav-btn"
@@ -78,7 +77,7 @@ export default function Navbar() {
                     </>) : (
                         <Button
                             onClick={() => {
-                                navigate(`${BASE_ROUTE}/login`)
+                                navigate("/login")
                                 setOpen(false)
                             }}
                             className="nav-btn"

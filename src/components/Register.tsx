@@ -6,7 +6,6 @@ import { Box, Typography, Link, Input, Button } from "@mui/joy";
 import { FaLock, FaPerson, FaRegEnvelope } from "react-icons/fa6";
 import { FiLogIn } from "react-icons/fi";
 import { usersApi } from "../services/api";
-import { BASE_ROUTE } from "../router/AppRouter";
 
 export default function Register() {
 
@@ -39,7 +38,7 @@ export default function Register() {
             }
     
             // alert("Inscription réussie !");
-            navigate(`${BASE_ROUTE}/login`);
+            navigate(`/login`);
         }
     }
     

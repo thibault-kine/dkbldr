@@ -7,7 +7,6 @@ import { FaLock, FaRegEnvelope } from "react-icons/fa6";
 import "../style/Forms.css";
 import { useUser } from "../context/UserContext";
 import { usersApi } from "../services/api";
-import { BASE_ROUTE } from "../router/AppRouter";
 
 export default function Login() {
 
@@ -41,7 +40,7 @@ export default function Login() {
 
         const appUser = await usersApi.getById(user.id);
         setUser(appUser);
-        navigate(`${BASE_ROUTE}`);
+        navigate(`/`);
     }
 
 
