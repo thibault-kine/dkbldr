@@ -21,13 +21,8 @@ jobs:
       - name: Build API Docker image
         run: docker build -t dkbldr-api:latest ./api
 
-      - name: Build app Docker image
-        run: docker build -t dkbldr-app:latest ./
-
-      - name: Push images to Docker Hub
+      - name: Push image to Docker Hub
         run: |
           echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USER }}" --password-stdin
           docker tag dkbldr-api:latest ${{ secrets.DOCKER_USER }}/dkbldr-api:latest
           docker push ${{ secrets.DOCKER_USER }}/dkbldr-api:latest
-          docker tag dkbldr-app:latest ${{ secrets.DOCKER_USER }}/dkbldr-app:latest
-          docker push ${{ secrets.DOCKER_USER }}/dkbldr-app:latest
