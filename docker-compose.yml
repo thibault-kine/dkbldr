@@ -5,23 +5,18 @@ services:
     build: ./api
     container_name: dkbldr-api
     ports:
-      - "8080:${API_PORT:-4000}"
+      - "8080:4000"
     env_file:
       - ./api/.env
-    environment:
-      - PORT=${API_PORT:-4000}
     restart: unless-stopped
 
   app:
     build: ./
     container_name: dkbldr-app
     ports:
-      - "8081:${APP_PORT:-3000}"
+      - "8081:3000"
     env_file:
       - ./.env
-    environment:
-      - PORT=${APP_PORT:-3000}
-      - VITE_API_URL=http://localhost:8080/api
     depends_on:
       - api
     restart: unless-stopped
