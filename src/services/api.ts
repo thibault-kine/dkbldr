@@ -43,7 +43,6 @@ export type Archetype = {
 // Utility function for API calls
 async function apiCall(endpoint: string, options: RequestInit = {}) {
     const url = `${API_BASE_URL}${endpoint}`;
-    console.log(API_BASE_URL);
     const config: RequestInit = {
         headers: {
             'Content-Type': 'application/json',
