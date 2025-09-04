@@ -4,22 +4,25 @@ DOCKER_USER = "thibaultkine"
 API_NAME = "dkbldr-api"
 APP_NAME = "dkbldr-app"
 
-RAILWAY_API_URL = "https://backboard.railway.com/graphql/v2"
+RAILWAY_API_URL = "https://backboard.railway.app/graphql/v2"
 RAILWAY_TOKEN = os.environ.get("RAILWAY_TOKEN")
 RAILWAY_API_SERVICE_ID = os.environ.get("RAILWAY_API_SERVICE_ID")
 RAILWAY_APP_SERVICE_ID = os.environ.get("RAILWAY_APP_SERVICE_ID")
 
 TAG = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
 
+
 def run(cmd):
     print(f"$ {cmd}")
     subprocess.run(cmd, shell=True, check=True)
+
 
 def docker_build_and_push(name, path):
     image = f"{DOCKER_USER}/{name}:{TAG}"
     run(f"docker build -t {image} {path}")
     run(f"docker push {image}")
     return image
+
 
 def railway_get_deployment_id(service_id):
     query = """
@@ -61,8 +64,8 @@ def railway_get_deployment_id(service_id):
     else:
         print("Error:", res.status_code, res.text)
 
-def railway_update(service_id, image):
 
+def railway_update(service_id, image):
     deployment_id = railway_get_deployment_id(service_id)
 
     mutation = """
