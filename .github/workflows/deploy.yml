@@ -45,5 +45,8 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      - name: Set script as executable
+        run: chmod +x deploy.sh
+
       - name: Run deploy script
         run: ./deploy.sh
