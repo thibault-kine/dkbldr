@@ -71,8 +71,8 @@ def main():
     app_image = docker_build_and_push(APP_NAME, "./")
 
     print("[3/3] Updating Railway services...")
-    railway_update(RAILWAY_API_SERVICE_ID, api_image)
-    railway_update(RAILWAY_APP_SERVICE_ID, app_image)
+    railway_update(RAILWAY_API_SERVICE_ID, RAILWAY_API_ENV_ID, api_image)
+    railway_update(RAILWAY_APP_SERVICE_ID, RAILWAY_APP_ENV_ID, app_image)
 
     print("🚀 Deployment successful with tag:", TAG)
 
