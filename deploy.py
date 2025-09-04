@@ -4,7 +4,7 @@ DOCKER_USER = "thibaultkine"
 API_NAME = "dkbldr-api"
 APP_NAME = "dkbldr-app"
 
-RAILWAY_API_URL = "https://backboard.railway.com/graphql/v2"
+RAILWAY_API_URL = "https://backboard.railway.app/graphql/v2"
 RAILWAY_TOKEN = os.getenv("RAILWAY_TOKEN")
 RAILWAY_API_SERVICE_ID = os.getenv("RAILWAY_API_SERVICE_ID")
 RAILWAY_APP_SERVICE_ID = os.getenv("RAILWAY_APP_SERVICE_ID")
