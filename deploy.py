@@ -6,8 +6,8 @@ APP_NAME = "dkbldr-app"
 
 RAILWAY_API_URL = "https://backboard.railway.com/graphql/v2"
 RAILWAY_TOKEN = os.getenv("RAILWAY_TOKEN")
-RAILWAY_API_ID = os.getenv("RAILWAY_API_SERVICE_ID")
-RAILWAY_APP_ID = os.getenv("RAILWAY_APP_SERVICE_ID")
+RAILWAY_API_SERVICE_ID = os.getenv("RAILWAY_API_SERVICE_ID")
+RAILWAY_APP_SERVICE_ID = os.getenv("RAILWAY_APP_SERVICE_ID")
 
 TAG = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
 
@@ -44,7 +44,11 @@ def railway_update(service_id, image):
         }
     }
 
-    headers = { "Authorization": f"Bearer {RAILWAY_TOKEN}" }
+    headers = { 
+        "Authorization": f"Bearer {RAILWAY_TOKEN}",
+        "Content-Type": "application/json" 
+    }
+
     req = requests.post(
         RAILWAY_API_URL,
         json={ "query": query, "variables": variables },
@@ -55,17 +59,17 @@ def railway_update(service_id, image):
 
 
 def main():
-    print("Building and pushing API...")
+    print("[1/3] Building and pushing API...")
     api_image = docker_build_and_push(API_NAME, "./api")
 
-    print("Building and pushing app...")
+    print("[2/3] Building and pushing app...")
     app_image = docker_build_and_push(APP_NAME, "./")
 
-    print("Updating Railway services...")
-    railway_update(RAILWAY_API_ID, api_image)
-    railway_update(RAILWAY_APP_ID, app_image)
+    print("[3/3] Updating Railway services...")
+    railway_update(RAILWAY_API_SERVICE_ID, api_image)
+    railway_update(RAILWAY_APP_SERVICE_ID, app_image)
 
-    print("Deployment successful with tag:", TAG)
+    print("🚀 Deployment successful with tag:", TAG)
 
 
 if __name__ == "__main__":
