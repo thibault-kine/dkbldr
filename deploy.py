@@ -4,10 +4,14 @@ DOCKER_USER = "thibaultkine"
 API_NAME = "dkbldr-api"
 APP_NAME = "dkbldr-app"
 
-RAILWAY_API_URL = "https://backboard.railway.app/graphql/v2"
+RAILWAY_API_URL = "https://backboard.railway.com/graphql/v2"
 RAILWAY_TOKEN = os.environ.get("RAILWAY_TOKEN")
+
 RAILWAY_API_SERVICE_ID = os.environ.get("RAILWAY_API_SERVICE_ID")
+RAILWAY_API_ENV_ID = os.environ.get("RAILWAY_API_ENV_ID")
+
 RAILWAY_APP_SERVICE_ID = os.environ.get("RAILWAY_APP_SERVICE_ID")
+RAILWAY_APP_ENV_ID = os.environ.get("RAILWAY_APP_ENV_ID")
 
 TAG = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
 
@@ -24,64 +28,25 @@ def docker_build_and_push(name, path):
     return image
 
 
-def railway_get_deployment_id(service_id):
-    query = """
-    query GetLatestDeployment($serviceId: String!) {
-        service(id: $serviceId) {
-            deployments(first: 1) {
-                edges {
-                    nodes {
-                        id
-                        createdAt
-                        status
-                    }
-                }
-            }
-        }
-    }
-    """
-
-    variables = { "serviceId": service_id }
-
-    headers = { 
-        "Authorization": f"Bearer {RAILWAY_TOKEN}",
-        "Content-Type": "application/json" 
-    }
-
-    res = requests.post(
-        RAILWAY_API_URL,
-        json={ "query": query, "variables": variables },
-        headers=headers
-    )
-    if res.status_code == 200:
-        data = res.json()
-        deployments = data["data"]["service"]["deployments"]["edges"]
-        if deployments:
-            deployment = deployments[0]["node"]
-            return deployment["id"]
-        else:
-            print("No deployment found for this service")
-    else:
-        print("Error:", res.status_code, res.text)
-
-
-def railway_update(service_id, image):
-    deployment_id = railway_get_deployment_id(service_id)
-
+def railway_update(service_id, env_id, image):
     mutation = """
-    mutation RedeployService($serviceId: String!, $deploymentId: String!) {
-        serviceInstanceRedeploy(serviceId: $serviceId, input: {
-            image: \"""" + f"{image}:{TAG}" + """\"
-        }) {
-            id
-            status
+    mutation serviceInstanceUpdate($environmentId: String!, $input: ServiceInstanceUpdateInput!, $serviceId: $String!) {
+        serviceInstanceUpdate(environmentId: $id, input: $input, serviceId: $serviceId) {
+            environmentId
+            input
+            serviceId
         }
     }
     """
 
     variables = {
+        "environmentId": env_id,
         "serviceId": service_id,
-        "deploymentId": deployment_id
+        "input": {
+            "source": {
+                "image": image
+            }
+        }
     }
 
     headers = { 
