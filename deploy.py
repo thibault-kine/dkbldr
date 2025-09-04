@@ -4,7 +4,7 @@ DOCKER_USER = "thibaultkine"
 API_NAME = "dkbldr-api"
 APP_NAME = "dkbldr-app"
 
-RAILWAY_API_URL = "https://backboard.railway.com/graphql/v2/"
+RAILWAY_API_URL = "https://backboard.railway.com/graphql/v2"
 RAILWAY_TOKEN = os.environ.get("RAILWAY_TOKEN")
 RAILWAY_API_SERVICE_ID = os.environ.get("RAILWAY_API_SERVICE_ID")
 RAILWAY_APP_SERVICE_ID = os.environ.get("RAILWAY_APP_SERVICE_ID")
@@ -21,27 +21,64 @@ def docker_build_and_push(name, path):
     run(f"docker push {image}")
     return image
 
-def railway_update(service_id, image):
+def railway_get_deployment_id(service_id):
     query = """
-    mutation serviceUpdate($id: String!, $input: ServiceUpdateInput!) {
-        serviceUpdate(id: $id, input: $input) {
+    query GetLatestDeployment($serviceId: String!) {
+        service(id: $serviceId) {
+            deployments(first: 1) {
+                edges {
+                    nodes {
+                        id
+                        createdAt
+                        status
+                    }
+                }
+            }
+        }
+    }
+    """
+
+    variables = { "serviceId": service_id }
+
+    headers = { 
+        "Authorization": f"Bearer {RAILWAY_TOKEN}",
+        "Content-Type": "application/json" 
+    }
+
+    res = requests.post(
+        RAILWAY_API_URL,
+        json={ "query": query, "variables": variables },
+        headers=headers
+    )
+    if res.status_code == 200:
+        data = res.json()
+        deployments = data["data"]["service"]["deployments"]["edges"]
+        if deployments:
+            deployment = deployments[0]["node"]
+            return deployment["id"]
+        else:
+            print("No deployment found for this service")
+    else:
+        print("Error:", res.status_code, res.text)
+
+def railway_update(service_id, image):
+
+    deployment_id = railway_get_deployment_id(service_id)
+
+    mutation = """
+    mutation RedeployService($serviceId: String!, $deploymentId: String!) {
+        serviceInstanceRedeploy(serviceId: $serviceId, input: {
+            image: \"""" + f"{image}:{TAG}" + """\"
+        }) {
             id
-            name
-            updatedAt
+            status
         }
     }
     """
 
     variables = {
-        "id": service_id,
-        "input": {
-            "source": {
-                "image": {
-                    "repository": image,
-                    "tag": TAG
-                }
-            }
-        }
+        "serviceId": service_id,
+        "deploymentId": deployment_id
     }
 
     headers = { 
@@ -51,7 +88,7 @@ def railway_update(service_id, image):
 
     req = requests.post(
         RAILWAY_API_URL,
-        json={ "query": query, "variables": variables },
+        json={ "query": mutation, "variables": variables },
         headers=headers
     )
     req.raise_for_status()
