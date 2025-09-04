@@ -5,9 +5,9 @@ API_NAME = "dkbldr-api"
 APP_NAME = "dkbldr-app"
 
 RAILWAY_API_URL = "https://backboard.railway.com/graphql/v2/"
-RAILWAY_TOKEN = os.getenv("RAILWAY_TOKEN")
-RAILWAY_API_SERVICE_ID = os.getenv("RAILWAY_API_SERVICE_ID")
-RAILWAY_APP_SERVICE_ID = os.getenv("RAILWAY_APP_SERVICE_ID")
+RAILWAY_TOKEN = os.environ["RAILWAY_TOKEN"]
+RAILWAY_API_SERVICE_ID = os.environ["RAILWAY_API_SERVICE_ID"]
+RAILWAY_APP_SERVICE_ID = os.environ["RAILWAY_APP_SERVICE_ID"]
 
 TAG = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
 
