@@ -11,7 +11,7 @@ const app = express();
 const port = process.env.API_PORT || 4000;
 
 
-const corsOptions = {
+app.use(cors({
     origin: [
         "http://localhost:5173",
         "http://localhost:3000",
@@ -21,9 +21,8 @@ const corsOptions = {
     credentials: true,
     methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
-};
+}));
 
-app.use(cors(corsOptions));
 app.use(express.json({ limit: "5mb" }));
 app.use(express.urlencoded({ limit: '5mb', extended: true }));
 
