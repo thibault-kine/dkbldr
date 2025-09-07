@@ -4,6 +4,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
+RUN echo "window._env_ = { VITE_SUPABASE_URL: '$VITE_SUPABASE_URL', VITE_SUPABASE_ANON_KEY: '$VITE_SUPABASE_ANON_KEY' };" > /app/dist/env.js
 RUN npm run build --mode-production
 
 # Étape run (serve avec Vite ou un serveur statique)
