@@ -1,24 +1,25 @@
-# Étape build
-FROM node:20-alpine AS build
+# syntax=docker/dockerfile:1
+FROM node:20-alpine AS builder
 WORKDIR /app
 
-# On déclare les variables de build (elles viendront du CI/CD)
+# Copier package.json + package-lock.json
+COPY package*.json ./
+
+# Installer deps
+RUN npm install
+
+# Copier le reste
+COPY . .
+
+# Injecter les variables d'environnement pour le build
 ARG VITE_SUPABASE_URL
 ARG VITE_SUPABASE_ANON_KEY
 
-# On définit aussi les ENV (Vite lit import.meta.env.VITE_*)
-ENV VITE_SUPABASE_URL=$VITE_SUPABASE_URL
-ENV VITE_SUPABASE_ANON_KEY=$VITE_SUPABASE_ANON_KEY
+# Build avec les variables
+RUN VITE_SUPABASE_URL=$VITE_SUPABASE_URL \
+    VITE_SUPABASE_ANON_KEY=$VITE_SUPABASE_ANON_KEY \
+    npm run build
 
-# Installation des dépendances
-COPY package*.json ./
-RUN npm install
-
-# Copie du code source
-COPY . .
-
-# On build en injectant les ENV
-RUN npm run build
 
 # Étape run : serveur statique avec serve
 FROM node:20-alpine
