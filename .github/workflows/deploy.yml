@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - "main"
+  pull_request:
+    branches:
+      - "main"
 
 jobs:
 
@@ -51,10 +54,16 @@ jobs:
       - name: Push App image (latest)
         run: docker push thibaultkine/dkbldr-app:latest
 
-      - name: Setup Railway CLI
-        uses: railwayapp/railway-action@v1
-        with:
-          railwayToken: ${{ secrets.RAILWAY_TOKEN }}
+      - name: Install Railway CLI
+        run: curl -fsSL https://railway.app/install.sh | sh
+
+      - name: Add Railway to PATH
+        run: echo "$HOME/.railway/bin" >> $GITHUB_PATH
+
+      - name: Railway login
+        run: railway login --token $RAILWAY_TOKEN
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
       - name: Redeploy services
         run: |
