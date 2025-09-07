@@ -31,29 +31,32 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
 
-  # deploy:
-  #   runs-on: ubuntu-latest
-  #   environment: "production"
-  #   needs: test
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v4
+  deploy:
+    runs-on: ubuntu-latest
+    environment: "production"
+    needs: test
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-  #     - name: Log in to Docker Hub
-  #       uses: docker/login-action@v3
-  #       with:
-  #         username: ${{ secrets.DOCKER_USERNAME }}
-  #         password: ${{ secrets.DOCKER_PASSWORD }}
-      
-  #     - name: Set up Python
-  #       uses: actions/setup-python@v4
-  #       with:
-  #         python-version: '3.12'
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+        
+      - name: Push API image (latest)
+        run: docker push thibaultkine/dkbldr-api:latest
 
-  #     - name: Install Python deps
-  #       run: pip install requests
+      - name: Push App image (latest)
+        run: docker push thibaultkine/dkbldr-app:latest
 
-  #     - name: Run deploy script
-  #       env:
-  #         RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-  #       run: python deploy.py
+      - name: Setup Railway CLI
+        uses: railwayapp/railway-action@v1
+        with:
+          railwayToken: ${{ secrets.RAILWAY_TOKEN }}
+
+      - name: Redeploy services
+        run: |
+          railway redeploy --service dkbldr-api
+          railway redeploy --service dkbldr-app
