@@ -63,6 +63,36 @@ def railway_update(service_id, env_id, image):
     print("Railway update response:", req.json())
 
 
+def railway_redeploy(env_id, service_id):
+    mutation = """
+    mutation serviceInstanceRedeploy($environmentId: String!, $serviceId: $String!) {
+        serviceInstanceRedeploy(environmentId: $id, serviceId: $serviceId) {
+            environmentId
+            input
+            serviceId
+        }
+    }
+    """
+
+    variables = {
+        "environmentId": env_id,
+        "serviceId": service_id
+    }
+
+    headers = { 
+        "Authorization": f"Bearer {RAILWAY_TOKEN}",
+        "Content-Type": "application/json" 
+    }
+
+    req = requests.post(
+        RAILWAY_API_URL,
+        json={ "query": mutation, "variables": variables },
+        headers=headers
+    )
+    req.raise_for_status()
+    print("Railway update response:", req.json())
+
+
 def main():
     print("[1/3] Building and pushing API...")
     api_image = docker_build_and_push(API_NAME, "./api")

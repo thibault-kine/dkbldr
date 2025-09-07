@@ -2,7 +2,9 @@ version: "3.9"
 
 services:
   api:
-    build: ./api
+    build: 
+      context: ./api
+      dockerfile: "api.dockerfile"
     container_name: dkbldr-api
     ports:
       - "8080:4000"
@@ -11,7 +13,9 @@ services:
     restart: unless-stopped
 
   app:
-    build: ./
+    build: 
+      context: ./
+      dockerfile: "app.dockerfile"
     container_name: dkbldr-app
     ports:
       - "8081:3000"

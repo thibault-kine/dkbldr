@@ -1,11 +1,9 @@
 build:
-  builder: NIXPACKS
-  nixpacksConfigPath: nixpacks.toml
   context: .
   dockerfile: dockerfile
 
 deploy:
-  startCommand: node index.js
+  startCommand: echo "Starting on port $PORT" && node index.js
   
   numReplicas: 1
   
@@ -14,8 +12,8 @@ deploy:
   
 variables:
   NODE_ENV: production
-  VITE_SUPABASE_URL: ${{SUPABASE_URL}}
-  VITE_SUPABASE_ANON_KEY: ${{SUPABASE_ANON_KEY}}
+  SUPABASE_URL: ${{SUPABASE_URL}}
+  SUPABASE_ANON_KEY: ${{SUPABASE_ANON_KEY}}
 
 healthcheckTimeout: 300
 
