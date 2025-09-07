@@ -35,4 +35,5 @@ exec \"$@\"' > /entrypoint.sh && chmod +x /entrypoint.sh
 
 
 EXPOSE 3000
+ENTRYPOINT ["/entrypoint.sh"]
 CMD ["serve", "-s", "dist", "-l", "3000", "-n", "--listen", "tcp://0.0.0.0:3000"]
