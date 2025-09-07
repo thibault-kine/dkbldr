@@ -54,6 +54,9 @@ jobs:
           docker push thibaultkine/dkbldr-api:latest
 
       - name: Build & Push App image
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_KEY }}
         run: |
           docker build -t thibaultkine/dkbldr-app:latest ./
           docker push thibaultkine/dkbldr-app:latest
