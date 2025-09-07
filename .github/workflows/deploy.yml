@@ -46,7 +46,7 @@ jobs:
         run: docker build \
           --build-arg VITE_SUPABASE_URL=${{ secrets.SUPABASE_URL }} \
           --build-arg VITE_SUPABASE_ANON_KEY=${{ secrets.SUPABASE_KEY }} \
-          -t thibaultkine/dkbldr-app:${{ env.TAG }} ./
+          -t thibaultkine/dkbldr-app:${{ env.TAG }} .
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
