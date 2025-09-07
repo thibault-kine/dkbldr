@@ -4,7 +4,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
-RUN npm run build
+RUN npm run build --mode-production
 
 # Étape run (serve avec Vite ou un serveur statique)
 FROM node:20-alpine
