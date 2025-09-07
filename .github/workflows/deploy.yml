@@ -64,12 +64,13 @@ jobs:
       - name: Add Railway to PATH
         run: echo "$HOME/.railway/bin" >> $GITHUB_PATH
 
-      - name: Railway login
-        run: railway login --token $RAILWAY_TOKEN
+      - name: Redeploy API
+        run: railway redeploy --service dkbldr-api
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
-      - name: Redeploy services
-        run: |
-          railway redeploy --service dkbldr-api
-          railway redeploy --service dkbldr-app
+      - name: Redeploy App
+        run: railway redeploy --service dkbldr-app
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
