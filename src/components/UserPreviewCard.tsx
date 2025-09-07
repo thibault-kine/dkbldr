@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { Card } from "scryfall-api";
-import { User, useUser } from "../context/UserContext";
+import { useUser } from "../context/UserContext";
 import { Avatar, Box, Link, Typography } from "@mui/joy";
 import "../style/DeckPreviewCard.css";
-import { usersApi } from "../services/api";
+import { AppUser, usersApi } from "../services/api";
 
 
 export default function UserPreviewCard({ userId }: { userId: string }) {
     
-    const [profile, setProfile] = useState<User>();
+    const [profile, setProfile] = useState<AppUser>();
 
     useEffect(() => {
         usersApi.getById(userId).then(u => setProfile(u!));
