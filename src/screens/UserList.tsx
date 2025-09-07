@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { AppUser, useUser } from "../context/UserContext";
+import { useUser } from "../context/UserContext";
 import { Box, Button, Table } from "@mui/joy";
 import FollowButton from "../components/FollowButton";
 import Loading from "../components/Loading";
 import { Link } from "react-router-dom";
-import { usersApi } from "../services/api";
+import { AppUser, usersApi } from "../services/api";
 
 export default function UserList() {
 

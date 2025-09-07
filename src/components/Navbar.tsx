@@ -4,7 +4,6 @@ import { useUser } from "../context/UserContext";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Avatar, Box, Button, Drawer, Dropdown, IconButton, Link, ListItemDecorator, MenuButton, MenuItem, Typography } from "@mui/joy";
 import { ArrowDropDown, Close, Login, Logout, Menu, Person } from "@mui/icons-material";
-import { supabase } from "../../db/supabase";
 import { useAuth } from "../context/AuthContext";
 import LogoutButton from "./LogoutButton";
 

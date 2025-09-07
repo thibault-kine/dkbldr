@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-import { AppUser } from "../context/UserContext";
 import { Button } from "@mui/joy";
 import { Add, Remove } from "@mui/icons-material";
-import { usersApi } from "../services/api";
+import { AppUser, usersApi } from "../services/api";
 
 export default function FollowButton({ currentUserId, targetUser }: { currentUserId: string, targetUser: AppUser }) {
     

@@ -1,4 +1,5 @@
 import { Card } from "scryfall-api";
+import { getFollowDecks, getRecommendedDecks } from "../../api/controllers/usersController";
 
 // Service API centralisé pour remplacer les appels directs à la DB
 const API_BASE_URL = `${import.meta.env.VITE_API_URL}/api`;
@@ -95,6 +96,19 @@ export const usersApi = {
         return apiCall(`/users/${userId}`, {
             method: 'DELETE',
         });
+    },
+
+    async getFollowDecks(userFollowings: string[]): Promise<Deck[] | null> {
+        return apiCall(`/users/followDecks`, {
+            method: "GET",
+            body: JSON.stringify(userFollowings)
+        });
+    },
+
+    async getRecommendedDecks(userId: string): Promise<Deck[] | null> {
+        return apiCall(`/users/recommendedDecks/${userId}`, {
+            method: "GET",
+        })
     },
 
     async follow(userId: string, targetId: string): Promise<{ success: boolean }> {

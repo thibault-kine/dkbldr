@@ -1,7 +1,6 @@
 import { Avatar, Box, Button, Dropdown, IconButton, List, ListItem, ListItemDecorator, Menu, MenuButton, MenuItem, Switch, Typography } from "@mui/joy";
 import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import { supabase } from "../../db/supabase";
 import "../style/Header.css"
 import { Icon, Toolbar } from "@mui/material";
 import { useUser } from "../context/UserContext";

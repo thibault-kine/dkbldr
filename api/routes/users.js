@@ -1,5 +1,5 @@
 const express = require("express");
-const { getUsers, createUser, updateUser, deleteUser, followUser, unfollowUser } = require("../controllers/usersController");
+const { getUsers, createUser, updateUser, deleteUser, followUser, unfollowUser, getFollowDecks, getRecommendedDecks } = require("../controllers/usersController");
 const { getUserById } = require("../services/userService");
 
 const router = express.Router();
@@ -18,6 +18,10 @@ router.get("/:userId", getUserById);
 router.patch("/:userId", updateUser);
 
 router.delete("/:userId", deleteUser);
+
+router.get("/followDecks", getFollowDecks);
+
+router.get("/recommendedDecks/:userId", getRecommendedDecks);
 
 
 module.exports = router;

@@ -1,13 +1,13 @@
 import { Edit } from "@mui/icons-material";
 import { Avatar, Box, Button, IconButton } from "@mui/joy";
 import React, { useRef, useState } from "react";
-import { User } from "../context/UserContext";
 import { SxProps } from "@mui/joy/styles/types";
+import { AppUser } from "../services/api";
 
 export default function ProfileAvatar({ 
     user, isOwner, onAvatarChange, sx
 }: { 
-    user: User; isOwner: boolean; onAvatarChange?: (event) => any ; sx?: SxProps
+    user: AppUser; isOwner: boolean; onAvatarChange?: (event) => any ; sx?: SxProps
 }) {
 
     const [hover, setHover] = useState(false);

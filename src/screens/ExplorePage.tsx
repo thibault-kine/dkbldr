@@ -1,23 +1,24 @@
 import { SearchOutlined } from "@mui/icons-material";
 import { Box, Button, IconButton, Input, Link, ToggleButtonGroup, Typography } from "@mui/joy";
 import { useState } from "react";
-import { User } from "../context/UserContext";
-import { supabase } from "../../db/supabase";
+import { getSupabase } from "../../db/supabase";
 import DeckPreviewCard from "../components/DeckPreviewCard";
 import UserPreviewCard from "../components/UserPreviewCard";
-import { Deck } from "../services/api";
+import { AppUser, Deck } from "../services/api";
 
 export default function ExplorePage() {
     
     const [searchFor, setSearchFor] = useState("deck");
     const [searchValue, setSearchValue] = useState<string>();
-    const [data, setData] = useState<Deck[] | User[] | null>();
+    const [data, setData] = useState<Deck[] | AppUser[] | null>();
 
 
     async function getSearchData() {
+        const supabase = await getSupabase();
+
         switch (searchFor) {
             case "deck": {
-                const { data, error } = await supabase
+                const { data: Deck, error } = await supabase
                     .from("decks")
                     .select("*")
                     .ilike("name", `%${searchValue}%`);
@@ -28,7 +29,7 @@ export default function ExplorePage() {
             }
             
             case "user": {
-                const { data, error } = await supabase
+                const { data: AppUser, error } = await supabase
                     .from("users")
                     .select("*")
                     .ilike("username", `%${searchValue}%`);
@@ -39,7 +40,7 @@ export default function ExplorePage() {
             }
             
             case "commander": {
-                const { data, error } = await supabase
+                const { data: Card, error } = await supabase
                 .from("decks")
                 .select("*")
                 .or(`commanders->0->>name.ilike.%${searchValue}%,commanders->1->>name.ilike.%${searchValue}%`);

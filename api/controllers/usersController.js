@@ -92,6 +92,44 @@ async function deleteUser(req, res) {
 }
 
 
+async function getFollowDecks(req, res) {
+    try {
+        const userFollowing = req.body.userFollowing;
+
+        const { data, error } = await supabase
+            .from("decks")
+            .select("*")
+            .in("user_id", userFollowing)
+            .order("created_at", { ascending: false })
+            .limit(3);
+
+        if (!data || data.length === 0)
+            return res.status(404).json({ error: "No following decks found" });
+
+        return res.status(200).json({ decks: data });
+    } catch(err) {
+        return res.status(500).json({ error: err.message });
+    }
+}
+
+
+async function getRecommendedDecks(req, res) {
+    try {
+        const userId = req.params.userId;
+
+        const { data, error } = await supabase
+                .rpc("get_recommended_decks", { user_uuid: userId });
+    
+        if (!data || data.length === 0)
+            return res.status(404).json({ error: "No recommended decks found" });
+    
+        return res.status(200).json({ decks: data });
+    } catch(err) {
+        return res.status(500).json({ error: err.message });
+    }
+}
+
+
 /* FOLLOW / UNFOLLOW STUFF */
 
 async function followUser(req, res) {
@@ -151,6 +189,9 @@ module.exports = {
     getUsers,
     updateUser,
     deleteUser,
+
+    getFollowDecks,
+    getRecommendedDecks,
 
     followUser,
     unfollowUser

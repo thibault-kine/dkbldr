@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { supabase } from "../../db/supabase";
+import { getSupabase } from "../../db/supabase";
 import { usersApi, AppUser } from "../services/api";
 
 
@@ -18,6 +18,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<AppUser | null>(null);
 
     async function fetchUser() {
+        const supabase = await getSupabase();
+
         const { data: authUser, error } = await supabase.auth.getUser();
 
         if (error || !authUser.user) {
@@ -34,26 +36,27 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     }
 
     useEffect(() => {
+        getSupabase().then(supabase => {
+            const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+                if (session?.user) {
+                    usersApi.getById(session.user.id)
+                        .then(userData => setUser(userData))
+                        .catch(err => {
+                            console.error("Erreur lors de la récupération du profil : ", err);
+                            setUser(null);
+                        });
+                }
+                else {
+                    setUser(null);
+                }
+            })
 
-        const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-            if (session?.user) {
-                usersApi.getById(session.user.id)
-                    .then(userData => setUser(userData))
-                    .catch(err => {
-                        console.error("Erreur lors de la récupération du profil : ", err);
-                        setUser(null);
-                    });
-            }
-            else {
-                setUser(null);
+            fetchUser();
+    
+            return () => {
+                authListener.subscription.unsubscribe();
             }
         })
-
-        fetchUser();
-
-        return () => {
-            authListener.subscription.unsubscribe();
-        }
     }, []);
 
 

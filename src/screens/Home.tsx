@@ -4,8 +4,8 @@ import { useUser } from "../context/UserContext";
 import { Card } from "scryfall-api";
 import Loading from "../components/Loading";
 import "../style/Home.css"
-import { supabase } from "../../db/supabase";
-import { cardsApi, Deck } from "../services/api";
+import { getSupabase } from "../../db/supabase";
+import { cardsApi, Deck, usersApi } from "../services/api";
 
 export default function Home() {
 
@@ -47,32 +47,18 @@ export default function Home() {
             setLoading(false);
             return;
         }
-
-        const { data, error } = await supabase
-            .from("decks")
-            .select("*")
-            .in("user_id", user?.following!)
-            .order("created_at", { ascending: false })
-            .limit(3);
-
-        if (error) {
-            setFollowDecks([]);
-            throw new Error("Erreur lors de la récupération des decks suivis :", error);
-        } else {
-            setFollowDecks(data)
-        }
+        
+        const data = await usersApi.getFollowDecks(user?.following!);
+        setFollowDecks(data!);
 
         setLoading(false);
     }
 
 
     const [recommendedDecks, setRecommendedDecks] = useState<Deck[] | []>();
-    async function getRecommendedDecks() {
-        const { data, error } = await supabase
-            .rpc("get_recommended_decks", { user_uuid: user?.id });
-
-        if (error) console.error(error);
-        else setRecommendedDecks(data);
+    async function getRecommendedDecks() {       
+        const data = await usersApi.getRecommendedDecks(user?.id!);
+        setRecommendedDecks(data!);
     }
 
     
