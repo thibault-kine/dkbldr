@@ -65,12 +65,12 @@ jobs:
         run: echo "$HOME/.railway/bin" >> $GITHUB_PATH
 
       - name: Redeploy API
-        run: railway redeploy --service dkbldr-api
+        run: railway redeploy --service dkbldr --yes
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
       - name: Redeploy App
-        run: railway redeploy --service dkbldr-app
+        run: railway redeploy --service dkbldr-ap --yes
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
