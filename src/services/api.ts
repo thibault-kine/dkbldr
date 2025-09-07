@@ -1,5 +1,4 @@
 import { Card } from "scryfall-api";
-import { getFollowDecks, getRecommendedDecks } from "../../api/controllers/usersController";
 
 // Service API centralisé pour remplacer les appels directs à la DB
 const API_BASE_URL = `${import.meta.env.VITE_API_URL}/api`;
@@ -44,6 +43,8 @@ export type Archetype = {
 // Utility function for API calls
 async function apiCall(endpoint: string, options: RequestInit = {}) {
     const url = `${API_BASE_URL}${endpoint}`;
+    console.log(url);
+    
     const config: RequestInit = {
         headers: {
             'Content-Type': 'application/json',
