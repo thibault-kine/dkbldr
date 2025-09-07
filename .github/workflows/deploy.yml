@@ -53,10 +53,14 @@ jobs:
           docker build -t thibaultkine/dkbldr-api:latest ./api
           docker push thibaultkine/dkbldr-api:latest
 
-      - name: Build & Push App image
+      - name: Build & Push App
         run: |
-          docker build -t thibaultkine/dkbldr-app:latest ./
+          docker build \
+            --build-arg VITE_SUPABASE_URL=${{ secrets.SUPABASE_URL }} \
+            --build-arg VITE_SUPABASE_ANON_KEY=${{ secrets.SUPABASE_KEY }} \
+            -t thibaultkine/dkbldr-app:latest ./
           docker push thibaultkine/dkbldr-app:latest
+
 
       - name: Install Railway CLI
         run: curl -fsSL https://railway.app/install.sh | sh
