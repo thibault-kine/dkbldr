@@ -53,5 +53,3 @@ dist
 stats.html
 
 .eslintcache
-/deploy.bat
-/deploy.py
