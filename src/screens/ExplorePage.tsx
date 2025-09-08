@@ -1,7 +1,7 @@
 import { SearchOutlined } from "@mui/icons-material";
 import { Box, Button, IconButton, Input, Link, ToggleButtonGroup, Typography } from "@mui/joy";
 import { useState } from "react";
-import { getSupabase } from "../../db/supabase";
+import { supabase } from "../../db/supabase";
 import DeckPreviewCard from "../components/DeckPreviewCard";
 import UserPreviewCard from "../components/UserPreviewCard";
 import { AppUser, Deck } from "../services/api";
@@ -14,11 +14,9 @@ export default function ExplorePage() {
 
 
     async function getSearchData() {
-        const supabase = await getSupabase();
-
         switch (searchFor) {
             case "deck": {
-                const { data: Deck, error } = await supabase
+                const { data, error } = await supabase
                     .from("decks")
                     .select("*")
                     .ilike("name", `%${searchValue}%`);
@@ -29,7 +27,7 @@ export default function ExplorePage() {
             }
             
             case "user": {
-                const { data: AppUser, error } = await supabase
+                const { data, error } = await supabase
                     .from("users")
                     .select("*")
                     .ilike("username", `%${searchValue}%`);
@@ -40,7 +38,7 @@ export default function ExplorePage() {
             }
             
             case "commander": {
-                const { data: Card, error } = await supabase
+                const { data, error } = await supabase
                 .from("decks")
                 .select("*")
                 .or(`commanders->0->>name.ilike.%${searchValue}%,commanders->1->>name.ilike.%${searchValue}%`);

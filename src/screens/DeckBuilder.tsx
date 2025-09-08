@@ -11,7 +11,7 @@ import Toast from "../components/Snackbar";
 import { useDeckBuilder } from "../hooks/useDeckBuilder";
 import { groupCardsByType } from "../../utils/deck";
 import CardSearchbar from "../components/CardSearchbar";
-import { getSupabase } from "../../db/supabase";
+import { supabase } from "../../db/supabase";
 import { Archetype, archetypesApi, decksApi } from "../services/api";
 
 
@@ -125,8 +125,6 @@ export default function DeckBuilder({ user }) {
 
     async function handleSaveTags() {
         if (!deckId) return;
-
-        const supabase = await getSupabase();
 
         // Étape 1 : Supprimer les anciens liens
         const { error: deleteError } = await supabase

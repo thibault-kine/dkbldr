@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { getSupabase } from "../../db/supabase";
+import { supabase } from "../../db/supabase";
 import { usersApi, AppUser } from "../services/api";
 
 
@@ -18,8 +18,6 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<AppUser | null>(null);
 
     async function fetchUser() {
-        const supabase = await getSupabase();
-
         const { data: authUser, error } = await supabase.auth.getUser();
 
         if (error || !authUser.user) {
@@ -36,7 +34,6 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     }
 
     useEffect(() => {
-        getSupabase().then(supabase => {
             const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
                 if (session?.user) {
                     usersApi.getById(session.user.id)
@@ -56,7 +53,6 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
             return () => {
                 authListener.subscription.unsubscribe();
             }
-        })
     }, []);
 
 

@@ -1,6 +1,6 @@
 import { Session, User } from "@supabase/supabase-js";
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
-import { getSupabase } from "../../db/supabase";
+import { supabase } from "../../db/supabase";
 
 
 interface AuthContextType {
@@ -21,9 +21,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const setSessionFromSupabase = async () => {
-            const supabase = await getSupabase();
-            
+        const setSessionFromSupabase = async () => {            
             const {
                 data: { session },
                 error
@@ -39,7 +37,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         
         setSessionFromSupabase();
         
-        getSupabase().then(supabase => {
             const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
                 setSession(session);
                 setUser(session?.user ?? null);
@@ -47,7 +44,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             return () => {
                 listener.subscription.unsubscribe();
             }
-        });
     }, []);
 
 

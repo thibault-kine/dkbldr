@@ -4,7 +4,7 @@ import { useUser } from "../context/UserContext";
 import { Card } from "scryfall-api";
 import Loading from "../components/Loading";
 import "../style/Home.css"
-import { getSupabase } from "../../db/supabase";
+import { supabase } from "../../db/supabase";
 import { cardsApi, Deck, usersApi } from "../services/api";
 
 export default function Home() {

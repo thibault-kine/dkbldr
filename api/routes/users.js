@@ -19,7 +19,7 @@ router.patch("/:userId", updateUser);
 
 router.delete("/:userId", deleteUser);
 
-router.get("/followDecks", getFollowDecks);
+router.post("/followDecks", getFollowDecks);
 
 router.get("/recommendedDecks/:userId", getRecommendedDecks);
 

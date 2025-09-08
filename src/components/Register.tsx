@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getSupabase } from "../../db/supabase";
+import { supabase } from "../../db/supabase";
 import "../style/Forms.css"
 import { Box, Typography, Link, Input, Button } from "@mui/joy";
 import { FaLock, FaPerson, FaRegEnvelope } from "react-icons/fa6";
@@ -18,8 +18,6 @@ export default function Register() {
 
     async function handleRegister(e: React.FormEvent) {
         e.preventDefault();
-
-        const supabase = await getSupabase();
     
         const { data, error } = await supabase.auth.signUp({
             email,

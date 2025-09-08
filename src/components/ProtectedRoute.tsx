@@ -1,6 +1,6 @@
 import { Navigate, Outlet } from "react-router-dom";
 import React, { useEffect, useState } from "react";
-import { getSupabase } from "../../db/supabase";
+import { supabase } from "../../db/supabase";
 import { User } from "@supabase/supabase-js";
 import { CircularProgress } from "@mui/joy";
 
@@ -10,12 +10,10 @@ export default function ProtectedRoute() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        getSupabase().then(supabase => {
             supabase.auth.getUser().then(({ data }) => {
                 setUser(data.user);
                 setLoading(false);
             });
-        })
     }, []);
 
     if (loading) return;

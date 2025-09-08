@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getSupabase } from "../../db/supabase";
+import { supabase } from "../../db/supabase";
 import { Button, Link, Input, Box, Typography } from "@mui/joy";
 import { FiLogIn } from "react-icons/fi";
 import { FaLock, FaRegEnvelope } from "react-icons/fa6";
@@ -21,8 +21,6 @@ export default function Login() {
     async function handleLogin(e: React.FormEvent) {
         e.preventDefault();
 
-        const supabase = await getSupabase();
-        
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         
         if (error) {
