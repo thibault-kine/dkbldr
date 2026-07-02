@@ -14,9 +14,7 @@ const port = process.env.API_PORT || 4000;
 app.use(cors({
     origin: [
         "http://localhost:5173",
-        "http://localhost:3000",
-        "https://dkbldr.up.railway.app",
-        "https://dkbldr-api.up.railway.app"
+        "http://localhost:8080",
     ],
     credentials: true,
     methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
