@@ -4,7 +4,7 @@ const Cards = require("scryfall-api").Cards;
 async function getRandomCard(req, res) {
     try {
         const result = await Cards.random();
-        
+        console.log(result);
         if (!result.ok) return res.status(result.status).json({ error: err.message });
         const card = await result.json();
 
