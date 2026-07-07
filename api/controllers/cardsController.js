@@ -20,7 +20,7 @@ async function getRandomCommander(req, res) {
         const now = new Date();
         now.setMinutes(now.getMinutes() + tzOffset);
 
-        const result = await fetch("https://api.scryfall.com/cards/random?q=legal:edh is:commander -t:background -otag:synergy-sticker", {
+        const result = await fetch("https://api.scryfall.com/cards/random?q=legal:edh+is:commander+-t:background", {
             method: "GET", 
             headers: {
                 "Content-Type": "application/json"
