@@ -3,9 +3,6 @@ const Scryfall = require("scryfall-api");
 
 async function getRandomCard(req, res) {
     try {
-        // const result = await Scryfall.Cards.random();
-        // console.log("result is: ", result);
-        // if (!result.ok) return res.status(result.status).json({ error: err.message });
         const card = await Scryfall.Cards.random();
 
         return res.status(200).json(card);
@@ -33,7 +30,6 @@ async function getRandomCommander(req, res) {
         if (!result.ok) return res.status(result.status).json({ error: result.text });
         const card = await result.json();
 
-        console.log("🔵 getRandomCommander - 200");
         return res.status(200).json(card);
     }
     catch (err) {
@@ -45,12 +41,8 @@ async function getRandomCommander(req, res) {
 async function searchCard(req, res) {
     try {
         const query = req.params.q;
-        const result = await Cards.byName(query, true);
-        
-        if (!result) return res.status(404).json({ error: "Data not found" });
-        const card = await result.json();
-        
-        console.log("🔵 searchCard - 200");
+        const card = await Scryfall.Cards.byName(query, true);
+
         return res.status(200).json(card);
     }
     catch (err) {
@@ -62,12 +54,8 @@ async function searchCard(req, res) {
 async function getCardById(req, res) {
     try {
         const cardId = req.params.cardId;
-        const result = await Cards.byId(cardId.toString());
+        const card = await Cards.byId(cardId.toString());
         
-        if (!result) return res.status(404).json({ error: "Data not found" });
-        const card = await result.json();
-        
-        console.log("🔵 getCardById - 200");
         return res.status(200).json(card);
     }
     catch (err) {
@@ -86,7 +74,6 @@ async function getAllPrints(req, res) {
         if (!result.ok) return res.status(result.status).json({ error: result.text });
         
         const card = await result.json();
-        console.log("🔵 getAllPrints - 200");
         return res.status(200).json(card);
     }
     catch(err) {
