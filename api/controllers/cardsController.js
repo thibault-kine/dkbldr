@@ -26,8 +26,6 @@ async function getRandomCommander(req, res) {
                 "Content-Type": "application/json"
             }
         });
-        
-        if (!result.ok) return res.status(result.status).json({ error: result.text });
         const card = await result.json();
 
         return res.status(200).json(card);
