@@ -64,7 +64,8 @@ jobs:
           docker push thibaultkine/dkbldr-app:latest
 
       - name: Install Railway CLI
-        run: curl -fsSL https://railway.app/install.sh | sh
+        shell: bash
+        run: curl -fsSL https://railway.app/install.sh | bash
 
       - name: Add Railway to PATH
         run: echo "$HOME/.railway/bin" >> $GITHUB_PATH
