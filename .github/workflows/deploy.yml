@@ -32,7 +32,7 @@ jobs:
         run: npm run test
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
 
   deploy:
     runs-on: ubuntu-latest
@@ -55,7 +55,12 @@ jobs:
 
       - name: Build & Push App image
         run: |
-          docker build -t thibaultkine/dkbldr-app:latest ./
+          docker build \
+          --build-arg VITE_SUPABASE_URL=${{ secrets.VITE_SUPABASE_URL }} \
+          --build-arg VITE_SUPABASE_PUBLIC_KEY=${{ secrets.VITE_SUPABASE_PUBLIC_KEY }} \
+          --build-arg VITE_API_URL=${{ secrets.VITE_API_URL }} \
+          -t thibaultkine/dkbldr-app:latest ./
+
           docker push thibaultkine/dkbldr-app:latest
 
       - name: Install Railway CLI
