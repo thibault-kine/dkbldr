@@ -15,6 +15,7 @@ app.use(cors({
     origin: [
         "http://localhost:5173",
         "http://localhost:8080",
+        "https://dkbldr-production.up.railway.app"
     ],
     credentials: true,
     methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
