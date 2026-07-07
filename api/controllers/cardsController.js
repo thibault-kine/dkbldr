@@ -1,4 +1,4 @@
-const Cards = require("scryfall-api")
+const Cards = require("scryfall-api").Cards;
 
 
 async function getRandomCard(req, res) {
