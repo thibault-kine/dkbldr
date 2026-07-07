@@ -63,20 +63,20 @@ jobs:
 
           docker push thibaultkine/dkbldr-app:latest
 
-      - name: Install Railway CLI
-        shell: bash
-        run: curl -fsSL https://railway.app/install.sh | bash
+    #   - name: Install Railway CLI
+    #     shell: bash
+    #     run: curl -fsSL https://railway.app/install.sh | bash
 
-      - name: Add Railway to PATH
-        run: echo "$HOME/.railway/bin" >> $GITHUB_PATH
+    #   - name: Add Railway to PATH
+    #     run: echo "$HOME/.railway/bin" >> $GITHUB_PATH
 
-      - name: Redeploy API
-        run: railway redeploy --service dkbldr-api --yes
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+    #   - name: Redeploy API
+    #     run: railway redeploy --service dkbldr-api --yes
+    #     env:
+    #       RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
-      - name: Redeploy App
-        run: railway redeploy --service dkbldr-app --yes
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+    #   - name: Redeploy App
+    #     run: railway redeploy --service dkbldr-app --yes
+    #     env:
+    #       RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
