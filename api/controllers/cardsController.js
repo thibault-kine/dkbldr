@@ -15,23 +15,30 @@ async function getRandomCard(req, res) {
 
 async function getRandomCommander(req, res) {
     try {
-        const tzOffset = 60;
+        const query = encodeURIComponent(
+            "legal:edh is:commander -t:background"
+        );
 
-        const now = new Date();
-        now.setMinutes(now.getMinutes() + tzOffset);
+        const response = await fetch(
+            `https://api.scryfall.com/cards/random?q=${query}`
+        );
 
-        const result = await fetch("https://api.scryfall.com/cards/random?q=legal:edh+is:commander+-t:background", {
-            method: "GET", 
-            headers: {
-                "Content-Type": "application/json"
-            }
-        });
-        const card = await result.json();
+        if (!response.ok) {
+            return res.status(response.status).json({
+                error: "Scryfall API error"
+            });
+        }
+
+        const card = await response.json();
 
         return res.status(200).json(card);
     }
     catch (err) {
-        return res.status(500).json({ error: err.message });
+        console.error(err);
+
+        return res.status(500).json({
+            error: err.message
+        });
     }
 }
 
