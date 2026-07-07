@@ -1,12 +1,12 @@
-import { Cards } from "scryfall-api";
+const Scryfall = require("scryfall-api");
 
 
 async function getRandomCard(req, res) {
     try {
-        const result = await Cards.random();
-        console.log("result is: ", result);
-        if (!result.ok) return res.status(result.status).json({ error: err.message });
-        const card = await result.json();
+        // const result = await Scryfall.Cards.random();
+        // console.log("result is: ", result);
+        // if (!result.ok) return res.status(result.status).json({ error: err.message });
+        const card = await Scryfall.Cards.random();
 
         return res.status(200).json(card);
     }
