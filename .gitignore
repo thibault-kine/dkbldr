@@ -53,3 +53,5 @@ dist
 stats.html
 
 .eslintcache
+
+db/backup/
