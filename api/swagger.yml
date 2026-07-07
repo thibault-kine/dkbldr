@@ -4,7 +4,7 @@ info:
     description: API documentation for the Dkbldg deckbuilder backend
     version: 1.0.0
 servers:
-    - url: https://dkbldr-api.up.railway.app/
+    - url: https://dkbldr-api-production.up.railway.app/
 paths:
     /api/decks/{deckId}:
         get:
