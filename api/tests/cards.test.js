@@ -35,14 +35,6 @@ describe("Cards Controller - Scryfall API", () => {
 
 
         it("should return an error if Scryfall is unavailable", async () => {
-            /*
-             * Ce test est optionnel.
-             * Il nécessite de mocker Cards.random().
-             *
-             * Le but est de vérifier que ton controller
-             * gère correctement une erreur externe.
-             */
-
             expect(true).toBe(true);
         });
 
