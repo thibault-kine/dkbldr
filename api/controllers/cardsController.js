@@ -7,10 +7,6 @@ async function getRandomCard(req, res) {
     try {
         const response = await fetch("https://api.scryfall.com/cards/random", { headers });
 
-        console.log("Status: ", response.status);
-        const body = await response.text();
-        console.log("Body: ", body);
-
         if (!response.ok) {
             return res.status(response.status).json({
                 error: "Failed to fetch card from Scryfall"
