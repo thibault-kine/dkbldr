@@ -3,7 +3,8 @@ const Scryfall = require("scryfall-api");
 
 async function getRandomCard(req, res) {
     try {
-        const card = await Scryfall.Cards.random();
+        // const card = await Scryfall.Cards.random();
+        const card = await Scryfall.Cards.byName("Black Lotus", false);
         console.log("card: ", card);
         return res.status(200).json(card);
     }
