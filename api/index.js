@@ -52,5 +52,5 @@ app.get("/", (req, res) => {
 
 app.listen(port, () => {
     console.log(`🟢 dkbldr-api listening on port ${port}`);
-    console.log(`API documentation available at ${process.env.API_URL}/api-docs`);
+    console.log(`API documentation available at ${process.env.API_URL | process.env.RAILWAY_PUBLIC_DOMAIN}/api-docs`);
 });
