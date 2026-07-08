@@ -1,11 +1,16 @@
 const Scryfall = require("scryfall-api");
 
-
 async function getRandomCard(req, res) {
     try {
-        // const card = await Scryfall.Cards.random();
-        const card = await Scryfall.Cards.byName("Black Lotus", false);
-        console.log("card: ", card);
+        const response = await fetch("https://api.scryfall.com/cards/random");
+        if (!response.ok) {
+            return res.status(response.status).json({
+                error: "Scryfall API error"
+            });
+        }
+
+        const card = await response.json();
+        console.log("card scryfall: ", card.name);
         return res.status(200).json(card);
     }
     catch (err) {
